@@ -20,4 +20,8 @@ export class TabsApi {
         await browser.tabs.update(id, { active: true });
         await browser.windows.update(windowId, { focused: true });
     }
+
+    static async getAllTabs(): Promise<Tabs.Tab[]> {
+        return browser.tabs.query({});
+    }
 }

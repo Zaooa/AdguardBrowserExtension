@@ -161,9 +161,6 @@
     "filtering_modal_unblock": {
         "message": "Ապաարգելափակել"
     },
-    "filtering_modal_remove_user": {
-        "message": "Հեռացնել օգտվողի զտիչից"
-    },
     "filtering_modal_preview_request_button": {
         "message": "Նախատեսք"
     },
@@ -226,9 +223,6 @@
     },
     "options_select_theme": {
         "message": "Ֆոն"
-    },
-    "options_theme_selector_system": {
-        "message": "Համակարգ"
     },
     "options_export_settings": {
         "message": "Արտահանել կարգավորումները"
@@ -321,6 +315,6 @@
         "message": "AdGuard AdBlocker"
     },
     "short_name": {
-        "message": "AdGuard AdBlocker"
+        "message": "AdGuard"
     }
 }

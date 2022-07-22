@@ -122,9 +122,6 @@
     "filtering_modal_unblock": {
         "message": "Nyahhalang"
     },
-    "filtering_modal_remove_user": {
-        "message": "Padam dari penyaring pengguna"
-    },
     "filtering_modal_add_title": {
         "message": "Tambah peraturan"
     },
@@ -158,12 +155,6 @@
     "options_enable_autodetect_filter": {
         "message": "Aktifkan penyaring yang paling sesuai secara automatik"
     },
-    "options_theme_selector_system": {
-        "message": "Sistem"
-    },
-    "options_theme_selector_light": {
-        "message": "Cerah"
-    },
     "options_update_antibanner_filters": {
         "message": "Semak kemaskini penyaring"
     },
@@ -191,9 +182,6 @@
     "options_use_optimized_filters_desc": {
         "message": "Senarai penapis dioptimumkan untuk peranti mudah alih"
     },
-    "short_name": {
-        "message": "Penghalang Iklan AdGuard"
-    },
     "options_github": {
         "message": "GitHub"
     },
@@ -202,6 +190,9 @@
     },
     "options_reset_settings_confirm_modal_clear_button": {
         "message": "Tetapkan semula"
+    },
+    "short_name": {
+        "message": "AdGuard"
     },
     "description": {
         "message": "Unmatched adblock extension against advertising and pop-ups. Blocks ads on Facebook, YouTube and all other websites."

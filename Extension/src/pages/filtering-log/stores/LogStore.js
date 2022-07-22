@@ -379,13 +379,14 @@ class LogStore {
                 && !filteringEvent.replaceRules
                 && !filteringEvent.removeParam
                 && !filteringEvent.removeHeader;
-            const isModified = filteringEvent.requestRule?.isModifyingCookieRule
-                || filteringEvent.requestRule?.cssRule
-                || filteringEvent.requestRule?.scriptRule
-                || filteringEvent.requestRule?.cspRule
-                || filteringEvent.replaceRules
-                || filteringEvent.removeParam
-                || filteringEvent.removeHeader;
+            const isModified = !isAllowlisted
+                && (filteringEvent.requestRule?.isModifyingCookieRule
+                    || filteringEvent.requestRule?.cssRule
+                    || filteringEvent.requestRule?.scriptRule
+                    || filteringEvent.requestRule?.cspRule
+                    || filteringEvent.replaceRules
+                    || filteringEvent.removeParam
+                    || filteringEvent.removeHeader);
             const isUserFilter = filteringEvent.requestRule?.filterId === 0;
             const isFirstParty = !filteringEvent.requestThirdParty;
             const isThirdParty = filteringEvent.requestThirdParty;
@@ -454,22 +455,24 @@ class LogStore {
         });
     };
 
-    toNumberOrString = (dirtyString) => {
-        const num = Number.parseInt(dirtyString, 10);
-        if (Number.isNaN(num)) {
-            return dirtyString;
+    @action
+    handleSelectEvent = (eventId) => {
+        if (this.selectedEvent
+            && this.rootStore.wizardStore.isModalOpen
+            && eventId === this.selectedEvent.eventId) {
+            this.selectedEvent = null;
+            this.rootStore.wizardStore.closeModal();
+            return;
         }
-        return String(num) === dirtyString ? num : dirtyString;
+
+        this.rootStore.wizardStore.setAddedRuleState(false);
+        this.setSelectedEventById(eventId);
+        this.rootStore.wizardStore.openModal();
     };
 
     @action
-    setSelectedEventById = (eventIdString) => {
-        const eventId = this.toNumberOrString(eventIdString);
-        if (this.selectedEvent && eventId !== this.selectedEvent.eventId) {
-            this.rootStore.wizardStore.setAddedRuleState(false);
-        }
+    setSelectedEventById = (eventId) => {
         this.selectedEvent = find(this.filteringEvents, { eventId });
-        this.rootStore.wizardStore.openModal();
     };
 
     @computed

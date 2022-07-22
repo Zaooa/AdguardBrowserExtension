@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Θα εγγραφείτε σε αυτό το φίλτρο."
     },
+    "options_popup_url_title": {
+        "message": "Νέα συνδρομή φίλτρου"
+    },
     "options_popup_url_placeholder": {
         "message": "Εισάγετε διεύθυνση URL ή διαδρομή αρχείου"
     },
@@ -87,7 +90,7 @@
         "message": "Εγγραφή"
     },
     "name": {
-        "message": "Adguard AdBlocker"
+        "message": "AdGuard AdBlocker"
     },
     "description": {
         "message": "Απαράμιλλη επέκταση adblock έναντι διαφημίσεων και αναδυόμενων παραθύρων. Αποκλείει διαφημίσεις σε Facebook, YouTube και σε όλους τους άλλους ιστότοπους."
@@ -320,9 +323,6 @@
     "popup_security_report": {
         "message": "Αναφορά ασφάλειας ιστότοπου"
     },
-    "popup_reset_custom_rules": {
-        "message": "Επαναφορά όλων των κανόνων χρήστη για αυτήν τη σελίδα"
-    },
     "popup_open_settings": {
         "message": "Ρυθμίσεις AdGuard"
     },
@@ -479,9 +479,6 @@
     "filtering_modal_unblock": {
         "message": "Ξεμπλοκάρισμα"
     },
-    "filtering_modal_remove_user": {
-        "message": "Κατάργηση από τους κανόνες χρήστη"
-    },
     "filtering_modal_preview_request_button": {
         "message": "Προεπισκόπηση"
     },
@@ -585,7 +582,7 @@
         "message": "Θέμα"
     },
     "options_theme_selector_system": {
-        "message": "Σύστημα"
+        "message": "Προεπιλογή συστήματος"
     },
     "options_theme_selector_light": {
         "message": "Φωτεινό"
@@ -610,9 +607,6 @@
     },
     "options_check_update_progress": {
         "message": "Έλεγχος..."
-    },
-    "options_set_update_interval": {
-        "message": "Χρονικό διάστημα ενημέρωσης φίλτρων"
     },
     "options_userfilter_export": {
         "message": "Εξαγωγή"
@@ -756,7 +750,7 @@
         "message": "Διακόπτης προστασίας"
     },
     "short_name": {
-        "message": "Adguard AdBlocker"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Σχετικά με"
@@ -781,15 +775,6 @@
     },
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Κατάργηση"
-    },
-    "options_nav_better_than_extension": {
-        "message": "Γιατί το πλήρες πρόγραμμα AdGuard είναι καλύτερο από την επέκταση;"
-    },
-    "options_nav_compare": {
-        "message": "Πώς συγκρίνονται"
-    },
-    "options_nav_hide": {
-        "message": "Απόκρυψη"
     },
     "options_filters_search": {
         "message": "Αναζήτηση"

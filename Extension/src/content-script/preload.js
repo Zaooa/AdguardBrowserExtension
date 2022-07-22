@@ -221,6 +221,7 @@ export const preload = (function () {
         }
 
         const elementUrl = getElementUrl(element);
+
         if (!elementUrl) {
             return;
         }
@@ -242,6 +243,7 @@ export const preload = (function () {
         };
 
         const response = await contentPage.sendMessage(message);
+
         onProcessShouldCollapseResponse(response);
     };
 
@@ -347,15 +349,15 @@ export const preload = (function () {
             return;
         }
 
-        for (let i = 0; i < css.length; i += 1) {
-            const styleEl = document.createElement('style');
-            styleEl.setAttribute('type', 'text/css');
-            setStyleContent(styleEl, css[i]);
+        const stylesheet = css.join('\n');
 
-            (document.head || document.documentElement).appendChild(styleEl);
+        const styleEl = document.createElement('style');
+        styleEl.setAttribute('type', 'text/css');
+        setStyleContent(styleEl, stylesheet);
 
-            protectStyleElementContent(styleEl);
-        }
+        (document.head || document.documentElement).appendChild(styleEl);
+
+        protectStyleElementContent(styleEl);
     };
 
     /**

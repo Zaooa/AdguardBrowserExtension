@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Veți fi abonat la acel filtru."
     },
+    "options_popup_url_title": {
+        "message": "Abonarea la un filtru nou"
+    },
     "options_popup_url_placeholder": {
         "message": "Introduceți URL-ul sau cale"
     },
@@ -120,7 +123,7 @@
         "message": "Reguli modificate:"
     },
     "filtering_log_privacy_applied_rules": {
-        "message": "Mod Incognito aplicat"
+        "message": "Modul Incognito aplicat"
     },
     "filtering_log_in_allowlist": {
         "message": "Site-ul este autorizat"
@@ -333,7 +336,7 @@
         "message": "Verificați securitatea site-ului"
     },
     "popup_reset_custom_rules": {
-        "message": "Resetați toate reguli personalizate pe această pagină"
+        "message": "Ștergeți toate regulile de utilizator pentru acest site"
     },
     "popup_open_settings": {
         "message": "Setări AdGuard"
@@ -480,7 +483,7 @@
         "message": "Reguli:"
     },
     "filtering_modal_privacy": {
-        "message": "Mod Incognito:"
+        "message": "Modul Incognito:"
     },
     "filtering_modal_filter": {
         "message": "Filtrul:"
@@ -495,7 +498,7 @@
         "message": "Deblocați"
     },
     "filtering_modal_remove_user": {
-        "message": "Ștergeți din filtrele utilizatorului"
+        "message": "Ștergeți regula"
     },
     "filtering_modal_preview_request_button": {
         "message": "Previzualizare"
@@ -550,6 +553,18 @@
     },
     "filtering_modal_hide_full_url": {
         "message": "Ascunde tot URL-ul"
+    },
+    "filtering_modal_show_full_rule": {
+        "message": "Afișați regula completă"
+    },
+    "filtering_modal_hide_full_rule": {
+        "message": "Ascundeți regula completă"
+    },
+    "filtering_modal_show_full_element": {
+        "message": "Afișați elementul complet"
+    },
+    "filtering_modal_hide_full_element": {
+        "message": "Ascundeți elementul complet"
     },
     "filtering_modal_copy_to_clipboard": {
         "message": "Copiază în clipboard"
@@ -612,7 +627,7 @@
         "message": "Temă"
     },
     "options_theme_selector_system": {
-        "message": "Sistem"
+        "message": "Implicită de sistem"
     },
     "options_theme_selector_light": {
         "message": "Luminoasă"
@@ -627,7 +642,7 @@
         "message": "Import de setări"
     },
     "options_privacy": {
-        "message": "Mod Incognito"
+        "message": "Modul Incognito"
     },
     "options_update_antibanner_filters": {
         "message": "Verifică actualizări de filtre"
@@ -639,7 +654,7 @@
         "message": "Se verifică..."
     },
     "options_set_update_interval": {
-        "message": "Interval actualizări filtre"
+        "message": "Auto-actualizare filtre"
     },
     "options_set_update_interval_desc": {
         "message": "Pentru o blocare mai eficientă, filtrele trebuie actualizate în mod regulat"
@@ -726,7 +741,7 @@
         "message": "Liste de filtre optimizate pentru aparate mobile"
     },
     "options_privacy_title": {
-        "message": "Mod Incognito"
+        "message": "Modul Incognito"
     },
     "options_privacy_desc": {
         "message": "Protejați-vă identitatea și informații sensibile personale de mii de agenți de urmărire online, blocând cele mai populare metode de urmărire."
@@ -822,7 +837,7 @@
         "message": "Comutator protecție"
     },
     "short_name": {
-        "message": "AdGuard AdBlocker"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Despre"
@@ -848,14 +863,8 @@
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Elimină"
     },
-    "options_nav_better_than_extension": {
-        "message": "De ce este programul complet AdGuard mai bun decât extensia?"
-    },
     "options_nav_compare": {
-        "message": "Care este diferența"
-    },
-    "options_nav_hide": {
-        "message": "Ascunde"
+        "message": "Comparați"
     },
     "options_filters_search": {
         "message": "Caută"
@@ -876,7 +885,7 @@
         "message": "Elimină ferestrele pop-up și alte notificări enervante, cum ar fi notificările privind cookie-urile"
     },
     "group_description_security": {
-        "message": "Protejați-vă de malware, phishing și alte amenințări online"
+        "message": "Protejați-vă de malware, phishing și alte amenințări online."
     },
     "group_description_miscellaneous": {
         "message": "Mai multe setări pentru a vă configura și mai mult navigarea pe web cu AdGuard"
@@ -1015,5 +1024,11 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Continuați oricum"
+    },
+    "text_collapser_show_default": {
+        "message": "Afișați textul complet"
+    },
+    "text_collapser_hide_default": {
+        "message": "Ascundeți textul complet"
     }
 }

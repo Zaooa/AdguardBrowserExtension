@@ -8,6 +8,7 @@ import React, {
     useEffect,
     useState,
     useRef,
+    forwardRef,
 } from 'react';
 import { observer } from 'mobx-react';
 import cn from 'classnames';
@@ -26,6 +27,8 @@ import { passiveEventSupported } from '../../../helpers';
 import './filtering-events.pcss';
 import { Status } from '../Status';
 import { StatusMode, getStatusMode } from '../../filteringLogStatus';
+
+const ITEM_HEIGHT_PX = 30;
 
 const filterNameAccessor = (props) => {
     const {
@@ -133,10 +136,13 @@ const Row = observer(({
 }) => {
     return (
         <div
-            style={style}
+            style={{
+                ...style,
+                top: `${parseFloat(style.top) + ITEM_HEIGHT_PX}px`,
+            }}
             id={event.eventId}
             onClick={onClick}
-            className={cn('tr', getRowClassName(event))}
+            className={cn('tr tr--tbody', getRowClassName(event))}
         >
             {
                 columns.map((column) => {
@@ -181,37 +187,96 @@ const VirtualizedRow = ({
     );
 };
 
-const ITEM_HEIGHT_PX = 30;
+const ColumnsContext = React.createContext({});
+
+const ColumnsProvider = ColumnsContext.Provider;
+
+const TableHeader = ({ style }) => {
+    const { columns } = useContext(ColumnsContext);
+
+    return (
+        <div
+            className="thead"
+            style={style}
+        >
+            <div className="tr">
+                {
+                    columns.map((column) => (
+                        <div
+                            className="th"
+                            key={column.id}
+                            style={{ width: column.getWidth() }}
+                        >
+                            {column.Header}
+                            <div
+                                role="separator"
+                                className="resizer"
+                                key={column.id}
+                                style={{ cursor: 'col-resize' }}
+                                {...column.getResizerProps()}
+                            />
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    );
+};
+
+const TableInnerWrapper = forwardRef(({ children, ...rest }, ref) => {
+    return (
+        <div ref={ref} {...rest}>
+            <TableHeader
+                index={0}
+                key={0}
+                style={{
+                    top: 0, left: 0, width: '100%', height: 30,
+                }}
+            />
+
+            {children}
+        </div>
+    );
+});
+
 const FilteringEventsRows = observer(({
     logStore,
     columns,
     handleRowClick,
 }) => {
     const { events } = logStore;
+
     return (
-        <AutoSizer>
-            {({
-                height,
-                width,
-            }) => {
-                return (
-                    <FixedSizeList
-                        className="list"
-                        height={height}
-                        itemCount={events.length}
-                        itemData={{
-                            events,
-                            columns,
-                            handleRowClick,
-                        }}
-                        itemSize={ITEM_HEIGHT_PX}
-                        width={width}
-                    >
-                        {VirtualizedRow}
-                    </FixedSizeList>
-                );
-            }}
-        </AutoSizer>
+        /**
+         * FixedSizeList does not support passing props to innerElementType component
+         * We use React Context API to bypass this limatation
+         *
+         * https://github.com/bvaughn/react-window/issues/404
+         */
+        <ColumnsProvider value={{ columns }}>
+            <AutoSizer>
+                {({
+                    height,
+                }) => {
+                    return (
+                        <FixedSizeList
+                            className="list"
+                            height={height}
+                            itemCount={events.length}
+                            itemData={{
+                                events,
+                                columns,
+                                handleRowClick,
+                            }}
+                            innerElementType={TableInnerWrapper}
+                            itemSize={ITEM_HEIGHT_PX}
+                        >
+                            {VirtualizedRow}
+                        </FixedSizeList>
+                    );
+                }}
+            </AutoSizer>
+        </ColumnsProvider>
     );
 });
 
@@ -225,7 +290,7 @@ const FilteringEvents = observer(() => {
 
     const handleRowClick = useCallback((e) => {
         const { id } = e.currentTarget;
-        logStore.setSelectedEventById(id);
+        logStore.handleSelectEvent(id);
     }, [logStore]);
 
     const columnsData = [
@@ -420,28 +485,6 @@ const FilteringEvents = observer(() => {
                 className="table filtering-log__inner"
                 ref={tableRef}
             >
-                <div className="thead">
-                    <div className="tr">
-                        {
-                            columns.map((column) => (
-                                <div
-                                    className="th"
-                                    key={column.id}
-                                    style={{ width: column.getWidth() }}
-                                >
-                                    {column.Header}
-                                    <div
-                                        role="separator"
-                                        className="resizer"
-                                        key={column.id}
-                                        style={{ cursor: 'col-resize' }}
-                                        {...column.getResizerProps()}
-                                    />
-                                </div>
-                            ))
-                        }
-                    </div>
-                </div>
                 <div className="tbody" style={{ height: '100%' }}>
                     <FilteringEventsRows
                         logStore={logStore}

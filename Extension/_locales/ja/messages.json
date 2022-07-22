@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "このフィルタへのサブスクリプションが有効になります。"
     },
+    "options_popup_url_title": {
+        "message": "新しいフィルタ・サブスクリプション"
+    },
     "options_popup_url_placeholder": {
         "message": "URLまたはファイルパスを入力してください"
     },
@@ -333,7 +336,7 @@
         "message": "サイトの安全性を確認する"
     },
     "popup_reset_custom_rules": {
-        "message": "このページに対するユーザールールを全部リセット"
+        "message": "このページに対するユーザールールを全部削除する"
     },
     "popup_open_settings": {
         "message": "AdGuard 設定"
@@ -495,7 +498,7 @@
         "message": "ブロックを解除する"
     },
     "filtering_modal_remove_user": {
-        "message": "ユーザールールから除去する"
+        "message": "ルールを削除する"
     },
     "filtering_modal_preview_request_button": {
         "message": "プレビュー"
@@ -612,7 +615,7 @@
         "message": "カラーテーマ"
     },
     "options_theme_selector_system": {
-        "message": "システムのテーマに合わせる"
+        "message": "システムに合わせる"
     },
     "options_theme_selector_light": {
         "message": "ライト"
@@ -639,7 +642,7 @@
         "message": "確認中…"
     },
     "options_set_update_interval": {
-        "message": "フィルタ更新期間"
+        "message": "フィルタの自動更新"
     },
     "options_set_update_interval_desc": {
         "message": "より効果的にブロックするためには、フィルタを頻繁に更新する必要があります。"
@@ -822,7 +825,7 @@
         "message": "保護スイッチ"
     },
     "short_name": {
-        "message": "AdGuard 広告ブロッカー"
+        "message": "アドガード"
     },
     "options_about": {
         "message": "AdGuardについて"
@@ -848,15 +851,6 @@
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "削除"
     },
-    "options_nav_better_than_extension": {
-        "message": "アプリ版AdGuardが拡張機能版よりも優れている理由は？"
-    },
-    "options_nav_compare": {
-        "message": "比較を見る"
-    },
-    "options_nav_hide": {
-        "message": "非表示"
-    },
     "options_filters_search": {
         "message": "検索"
     },
@@ -876,7 +870,7 @@
         "message": "ポップアップウィンドウやクッキー通知などのような煩わしい通知を削除します。"
     },
     "group_description_security": {
-        "message": "マルウェア、フィッシング詐欺やその他のオンライン危険から保護します。"
+        "message": "マルウェア、フィッシング詐欺やその他のオンライン脅威から保護します。"
     },
     "group_description_miscellaneous": {
         "message": "AdGuardを使用したウェブサーフィンをさらに微調整するための追加設定です。"

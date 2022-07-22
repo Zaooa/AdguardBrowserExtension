@@ -1,4 +1,4 @@
-import { UserSettingOption, UserSettings } from './settings';
+import { SettingOption, Settings } from './settings';
 
 /**
  * Message types used for message passing between background page and
@@ -37,6 +37,7 @@ export enum MessageType {
   OPEN_ASSISTANT = 'openAssistant',
   OPEN_ABUSE_TAB = 'openAbuseTab',
   OPEN_SITE_REPORT_TAB = 'openSiteReportTab',
+  OPEN_COMPARE_PAGE = 'openComparePage',
   RESET_CUSTOM_RULES_FOR_PAGE = 'resetCustomRulesForPage',
   REMOVE_ALLOWLIST_DOMAIN = 'removeAllowlistDomainPopup',
   ADD_ALLOWLIST_DOMAIN_POPUP = 'addAllowlistDomainPopup',
@@ -78,6 +79,7 @@ export enum MessageType {
   GET_EDITOR_STORAGE_CONTENT = 'getEditorStorageContent',
   SET_EDITOR_STORAGE_CONTENT = 'setEditorStorageContent',
   CONVERT_RULES_TEXT = 'convertRulesText',
+  SET_FILTERING_LOG_WINDOW_STATE = 'setFilteringLogWindowState',
 }
 
 export type GetTabInfoForPopupMessage = {
@@ -124,16 +126,52 @@ export type GetOptionsDataMessage = {
   type: MessageType.GET_OPTIONS_DATA;
 };
 
-export type ChangeUserSettingMessage<T extends UserSettingOption = UserSettingOption> = {
+export type ChangeUserSettingMessage<T extends SettingOption = SettingOption> = {
   type: MessageType.CHANGE_USER_SETTING;
   data: {
     key: T,
-    value: UserSettings[T]
+    value: Settings[T]
   }
 };
 
 export type ResetSettingsMessage = {
   type: MessageType.RESET_SETTINGS
+};
+
+export type AddAndEnableFilterMessage = {
+  type: MessageType.ADD_AND_ENABLE_FILTER
+  data: {
+    filterId: number
+  }
+};
+
+export type DisableAntiBannerFilterMessage = {
+  type: MessageType.DISABLE_ANTIBANNER_FILTER
+  data: {
+    filterId: number,
+    remove: boolean
+  }
+};
+
+export type RemoveAntiBannerFilterMessage = {
+  type: MessageType.REMOVE_ANTIBANNER_FILTER
+  data: {
+    filterId: number
+  }
+};
+
+export type SaveAllowlistDomainsMessage = {
+  type: MessageType.SAVE_ALLOWLIST_DOMAINS
+  data: {
+    value: string,
+  }
+};
+
+export type SaveUserRulesMessage = {
+  type: MessageType.SAVE_USER_RULES
+  data: {
+    value: string,
+  }
 };
 
 export type Message = (
@@ -147,6 +185,11 @@ export type Message = (
   | GetOptionsDataMessage
   | ChangeUserSettingMessage
   | ResetSettingsMessage
+  | AddAndEnableFilterMessage
+  | DisableAntiBannerFilterMessage
+  | RemoveAntiBannerFilterMessage
+  | SaveAllowlistDomainsMessage
+  | SaveUserRulesMessage
 ) &
   MessageCommonProps;
 

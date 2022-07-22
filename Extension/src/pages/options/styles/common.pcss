@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+:root {
+    color-scheme: light dark;
+}
+
 html,
 .root {
     height: 100%;
@@ -162,10 +166,12 @@ label.checkbox-label {
             }
 
             &:hover {
-                background-color: var(--gray100);
+                @media (min-width: 1024px) {
+                    background-color: var(--gray100);
 
-                @media (prefers-color-scheme: dark) {
-                    background-color: var(--gray900);
+                    @media (prefers-color-scheme: dark) {
+                        background-color: var(--gray900);
+                    }
                 }
             }
         }
@@ -350,6 +356,8 @@ select:focus {
 
 
 .light-mode {
+    color-scheme: light;
+
     body {
         background-color: var(--transparent);
         color: var(--gray-base);
@@ -405,6 +413,8 @@ select:focus {
 }
 
 .dark-mode {
+    color-scheme: dark;
+
     body {
         background-color: var(--black);
         color: var(--gray300)

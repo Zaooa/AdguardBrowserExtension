@@ -1,14 +1,17 @@
 /* eslint-disable jsx-a11y/no-autofocus */
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useEffect } from 'react';
 import { observer } from 'mobx-react';
 
 import { reactTranslator } from '../../../../../common/translators/reactTranslator';
 import { Select } from '../../../../common/components/ui/Select';
 import { Icon } from '../../../../common/components/ui/Icon';
+import { isMacOs } from '../../../../../common/user-agent-utils';
 import { rootStore } from '../../../stores/RootStore';
-import { SEARCH_FILTERS } from './constants';
+import { SEARCH_FILTERS, TABLET_SCREEN_WIDTH } from './constants';
 
 import './search.pcss';
+
+const isDesktopScreen = window.innerWidth > TABLET_SCREEN_WIDTH;
 
 const options = [
     {
@@ -36,6 +39,31 @@ const Search = observer(() => {
         setSearchSelect,
         searchSelect,
     } = settingsStore;
+
+    useEffect(() => {
+        const modifierKeyProperty = isMacOs ? 'metaKey' : 'ctrlKey';
+        const handleSearchHotkey = (e) => {
+            const { code } = e;
+            if (e[modifierKeyProperty] && code === 'KeyF') {
+                e.preventDefault();
+                searchInputRef.current.focus();
+            }
+        };
+        const handleResetHotkey = (e) => {
+            const { code } = e;
+            if (code === 'Escape') {
+                e.preventDefault();
+                setSearchInput('');
+            }
+        };
+
+        window.addEventListener('keydown', handleSearchHotkey);
+        window.addEventListener('keydown', handleResetHotkey);
+        return function onUnmount() {
+            window.removeEventListener('keydown', handleSearchHotkey);
+            window.removeEventListener('keydown', handleResetHotkey);
+        };
+    }, [setSearchInput]);
 
     const searchInputHandler = (e) => {
         const { value } = e.target;
@@ -65,7 +93,9 @@ const Search = observer(() => {
             <label className="search__label" htmlFor="search__input">
                 <input
                     id="search__input"
-                    autoFocus
+                    // autofocus triggers the keypad on mobile devices, which worsens tab navigation
+                    // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/2117
+                    autoFocus={isDesktopScreen}
                     className="search__input"
                     type="text"
                     placeholder={reactTranslator.getMessage('options_filters_search')}

@@ -42,13 +42,16 @@
         "message": "Vypnúť oznámenia"
     },
     "popup_adguard_footer_title": {
-        "message": "Získajte AdGuard pre Vaše mobilné zariadenie"
+        "message": "Získajte AdGuard pre Váš mobil"
     },
     "options_popup_call_to_action": {
         "message": "Zadajte platnú URL adresu alebo umiestnenie súboru s filtrom do poľa vyššie."
     },
     "options_popup_description": {
         "message": "Budete odoberať tento filter."
+    },
+    "options_popup_url_title": {
+        "message": "Odber nového filtra"
     },
     "options_popup_url_placeholder": {
         "message": "Zadajte URL adresu alebo cestu"
@@ -333,7 +336,7 @@
         "message": "Kontrola bezpečnosti stránky"
     },
     "popup_reset_custom_rules": {
-        "message": "Obnoviť všetky používateľské pravidlá pre túto stránku"
+        "message": "Vymazať všetky používateľské pravidlá pre túto stránku"
     },
     "popup_open_settings": {
         "message": "Nastavenia AdGuard"
@@ -494,9 +497,6 @@
     "filtering_modal_unblock": {
         "message": "Odblokovať"
     },
-    "filtering_modal_remove_user": {
-        "message": "Odstrániť z používateľského filtra"
-    },
     "filtering_modal_preview_request_button": {
         "message": "Náhľad"
     },
@@ -550,6 +550,18 @@
     },
     "filtering_modal_hide_full_url": {
         "message": "Skryť úplnú URL adresu"
+    },
+    "filtering_modal_show_full_rule": {
+        "message": "Zobraziť celé pravidlo"
+    },
+    "filtering_modal_hide_full_rule": {
+        "message": "Skryť celé pravidlo"
+    },
+    "filtering_modal_show_full_element": {
+        "message": "Ukázať celý prvok"
+    },
+    "filtering_modal_hide_full_element": {
+        "message": "Skryť celý prvok"
     },
     "filtering_modal_copy_to_clipboard": {
         "message": "Skopírovať do pamäťovej schránky"
@@ -612,7 +624,7 @@
         "message": "Téma"
     },
     "options_theme_selector_system": {
-        "message": "Systémová"
+        "message": "Systémom predvolené"
     },
     "options_theme_selector_light": {
         "message": "Svetlá"
@@ -639,7 +651,7 @@
         "message": "Kontrolujem..."
     },
     "options_set_update_interval": {
-        "message": "Interval aktualizácie filtrov"
+        "message": "Automatická aktualizácia filtrov"
     },
     "options_set_update_interval_desc": {
         "message": "Pre efektívnejšie blokovanie je potrebné filtre pravidelne aktualizovať."
@@ -667,6 +679,9 @@
     },
     "options_safebrowsing_enabled": {
         "message": "Ochrana proti podvodným a škodlivým stránkam"
+    },
+    "options_safebrowsing_enabled_desc": {
+        "message": "Povoľte modul AdGuard Browsing Security, ktorý zisťuje potenciálne škodlivé a phishingové stránky ich porovnávaním s online databázou. <a>Prečítajte si viac<\/a>"
     },
     "options_site": {
         "message": "Oficiálna domovská stránka"
@@ -819,7 +834,7 @@
         "message": "Vypnutie ochrany"
     },
     "short_name": {
-        "message": "AdGuard blokovač reklamy"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "O"
@@ -845,15 +860,6 @@
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Odstrániť"
     },
-    "options_nav_better_than_extension": {
-        "message": "Prečo je plnohodnotný program AdGuard lepší ako rozšírenie?"
-    },
-    "options_nav_compare": {
-        "message": "Vzájomné porovnanie"
-    },
-    "options_nav_hide": {
-        "message": "Skryť"
-    },
     "options_filters_search": {
         "message": "Hľadať"
     },
@@ -871,9 +877,6 @@
     },
     "group_description_annoyances": {
         "message": "Odstráňte kontextové okná a ďalšie nepríjemné upozornenia, ako sú oznámenia o súboroch cookie."
-    },
-    "group_description_security": {
-        "message": "Chráňte sa pred malvérom, phishingom a ďalšími online hrozbami."
     },
     "group_description_miscellaneous": {
         "message": "Ďalšie nastavenia na konfiguráciu Vášho surfovania na webe s AdGuardom ešte ďalej."
@@ -1012,5 +1015,11 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Aj tak pokračovať"
+    },
+    "text_collapser_show_default": {
+        "message": "Zobraziť celý text"
+    },
+    "text_collapser_hide_default": {
+        "message": "Skryť celý text"
     }
 }

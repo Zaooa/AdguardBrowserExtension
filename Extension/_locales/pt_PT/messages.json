@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Estará subscrito a esse filtro."
     },
+    "options_popup_url_title": {
+        "message": "Nova Assinatura de Filtro"
+    },
     "options_popup_url_placeholder": {
         "message": "Insira a URL ou caminho:"
     },
@@ -333,7 +336,7 @@
         "message": "Verificar a segurança do sítio"
     },
     "popup_reset_custom_rules": {
-        "message": "Repor todas as regras do utilizador para esta página"
+        "message": "Apagar todas as regras do usuário para esta página"
     },
     "popup_open_settings": {
         "message": "Definições do AdGuard"
@@ -495,7 +498,7 @@
         "message": "Desbloquear"
     },
     "filtering_modal_remove_user": {
-        "message": "Remover das regras do utilizador"
+        "message": "Apagar regra"
     },
     "filtering_modal_preview_request_button": {
         "message": "Pré-visualização"
@@ -550,6 +553,18 @@
     },
     "filtering_modal_hide_full_url": {
         "message": "Esconder URL completa"
+    },
+    "filtering_modal_show_full_rule": {
+        "message": "Mostrar regra completa"
+    },
+    "filtering_modal_hide_full_rule": {
+        "message": "Esconder regra completa"
+    },
+    "filtering_modal_show_full_element": {
+        "message": "Mostrar elemento completo"
+    },
+    "filtering_modal_hide_full_element": {
+        "message": "Esconder elemento completo"
     },
     "filtering_modal_copy_to_clipboard": {
         "message": "Copiar para a área de transferência"
@@ -612,7 +627,7 @@
         "message": "Tema"
     },
     "options_theme_selector_system": {
-        "message": "Sistema"
+        "message": "Sistema predefinido"
     },
     "options_theme_selector_light": {
         "message": "Claro"
@@ -639,7 +654,7 @@
         "message": "A verificar..."
     },
     "options_set_update_interval": {
-        "message": "Intervalo de atualização de filtros"
+        "message": "Atualização automática dos filtros"
     },
     "options_set_update_interval_desc": {
         "message": "Para um bloqueio mais eficaz, os filtros precisam ser atualizados regularmente."
@@ -822,7 +837,7 @@
         "message": "Alternador de proteção"
     },
     "short_name": {
-        "message": "Bloqueador de publicidade do AdGuard"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Acerca de"
@@ -847,15 +862,6 @@
     },
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Remover"
-    },
-    "options_nav_better_than_extension": {
-        "message": "Por que o programa completo do AdGuard é melhor do que a extensão?"
-    },
-    "options_nav_compare": {
-        "message": "Como eles comparam"
-    },
-    "options_nav_hide": {
-        "message": "Esconder"
     },
     "options_filters_search": {
         "message": "Pesquisar"
@@ -1015,5 +1021,11 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Prosseguir mesmo assim"
+    },
+    "text_collapser_show_default": {
+        "message": "Mostrar texto completo"
+    },
+    "text_collapser_hide_default": {
+        "message": "Esconder texto completo"
     }
 }

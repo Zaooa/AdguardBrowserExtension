@@ -29,6 +29,8 @@ import { uiService } from './ui-service';
 import { browserUtils } from './utils/browser-utils';
 import { frames } from './tabs/frames';
 import { safebrowsing } from './filter/services/safebrowsing';
+// TODO: implement in new background
+// import { filteringLogWindowState } from './utils/filtering-log-window-state';
 import { utils } from './utils/common';
 import { RequestTypes } from './utils/request-types';
 import { application } from './application';
@@ -220,6 +222,41 @@ const createMessageHandler = () => {
     };
 
     /**
+     * For dangerous (which can change user rules) messages we also check their origin
+     * @param message
+     * @param sender
+     * @return {boolean}
+     */
+    const isMessageAllowed = (message, sender) => {
+        const OPTIONS_PAGE_DANGEROUS_MESSAGES = [
+            MessageType.SUBSCRIBE_TO_CUSTOM_FILTER,
+            MessageType.SAVE_USER_RULES,
+            // TODO: implement in new background
+            // MESSAGE_TYPES.APPLY_SETTINGS_JSON,
+            MessageType.ADD_USER_RULE,
+        ];
+
+        // Dangerous messages are allowed only from own pages (popup, options, filtering log, devtools)
+        if (OPTIONS_PAGE_DANGEROUS_MESSAGES.includes(message?.type)) {
+            // Allow empty sender. Empty sender can be in the messages from devtools and popup
+            // There is always sender for messages sent by content script
+            const isSenderEmpty = !sender || (sender && Object.keys(sender).length === 0);
+            if (isSenderEmpty) {
+                return true;
+            }
+
+            const url = sender.tab?.url;
+
+            const isOwnUrl = url && backgroundPage.app.isOwnRequest(url);
+            const isDevtoolsUrl = url && url.startsWith('devtools://');
+
+            return isOwnUrl || isDevtoolsUrl;
+        }
+
+        return true;
+    };
+
+    /**
      * Main function for processing messages from content-scripts
      *
      * @param message
@@ -227,6 +264,11 @@ const createMessageHandler = () => {
      * @returns {*}
      */
     const handleMessage = async (message, sender) => {
+        if (!isMessageAllowed(message, sender)) {
+            log.error('Message: {0} is not allowed for the sender: {1} ', message, sender);
+            return;
+        }
+
         const { data, type } = message;
 
         switch (type) {
@@ -396,7 +438,15 @@ const createMessageHandler = () => {
                 } else {
                     urlForSelectors = message.documentUrl;
                 }
-                return webRequestService.processGetSelectorsAndScripts(sender.tab, urlForSelectors) || {};
+
+                // force getting selectors and scripts during browser restart with already open tabs
+                const response = webRequestService.processGetSelectorsAndScripts(
+                    sender.tab,
+                    urlForSelectors,
+                    filteringApi.shouldCollapseAllElements(),
+                );
+
+                return response || {};
             }
             case MessageType.GET_COOKIE_RULES: {
                 if (!utils.url.isHttpOrWsRequest(message.documentUrl) && sender.frameId !== 0) {
@@ -550,7 +600,7 @@ const createMessageHandler = () => {
                             showInfoAboutFullVersion: settings.isShowInfoAboutAdguardFullVersion(),
                             isMacOs: browserUtils.isMacOs(),
                             isEdgeBrowser: browserUtils.isEdgeBrowser()
-                                    || browserUtils.isEdgeChromiumBrowser(),
+                                || browserUtils.isEdgeChromiumBrowser(),
                             notification: notifications.getCurrentNotification(),
                             isDisableShowAdguardPromoInfo: settings.isDisableShowAdguardPromoInfo(),
                             hasCustomRulesToReset: await userrules.hasRulesForUrl(frameInfo.url),

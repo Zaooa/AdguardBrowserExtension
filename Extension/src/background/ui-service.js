@@ -17,6 +17,8 @@
 
 /* eslint-disable max-len */
 
+import { nanoid } from 'nanoid';
+
 import { application } from './application';
 import { backgroundPage } from './extension-api/background-page';
 import { utils, unload, BACKGROUND_TAB_ID } from './utils/common';
@@ -27,6 +29,7 @@ import { prefs } from './prefs';
 import { pageStats } from './filter/page-stats';
 import { frames } from './tabs/frames';
 import { notifications } from './utils/notifications';
+import { filteringLogWindowState } from './utils/filtering-log-window-state';
 import { allowlist } from './filter/allowlist';
 import { userrules } from './filter/userrules';
 import { browserUtils } from './utils/browser-utils';
@@ -34,6 +37,7 @@ import { log } from '../common/log';
 import { runtimeImpl } from '../common/common-script';
 import { MessageType, AntiBannerFiltersId } from '../common/constants';
 import { translator } from '../common/translators/translator';
+import { COMPARE_URL } from '../pages/constants';
 
 /**
  * UI service
@@ -262,6 +266,7 @@ export const uiService = (function () {
         function addSeparator() {
             backgroundPage.contextMenus.create({
                 type: 'separator',
+                contexts: ['all'],
             });
         }
 
@@ -393,7 +398,13 @@ export const uiService = (function () {
 
     const isAdguardTab = (tab) => {
         const { url } = tab;
-        const parsedUrl = new URL(url);
+        let parsedUrl;
+        try {
+            parsedUrl = new URL(url);
+        } catch (e) {
+            log.error(e);
+            return false;
+        }
         const schemeUrl = backgroundPage.app.getUrlScheme();
         return parsedUrl.protocol.indexOf(schemeUrl) > -1;
     };
@@ -443,11 +454,13 @@ export const uiService = (function () {
         }
 
         let offer = translator.getMessage('options_popup_version_update_offer');
+        let offerDesc = '';
         let offerButtonHref = 'https://adguard.com/forward.html?action=learn_about_adguard&from=version_popup&app=browser_extension';
         let offerButtonText = translator.getMessage('options_popup_version_update_offer_button_text');
 
         if (promoNotification) {
             offer = promoNotification.text.title;
+            offerDesc = promoNotification.text.desc;
             offerButtonText = promoNotification.text.btn;
             offerButtonHref = `${promoNotification.url}&from=version_popup`;
         }
@@ -460,6 +473,7 @@ export const uiService = (function () {
             changelogText: translator.getMessage('options_popup_version_update_changelog_text'),
             showPromoNotification: !!promoNotification,
             offer,
+            offerDesc,
             offerButtonText,
             offerButtonHref,
             disableNotificationText: translator.getMessage('options_popup_version_update_disable_notification'),
@@ -719,6 +733,11 @@ export const uiService = (function () {
             inNewWindow,
             type,
             hashParameters,
+            width,
+            height,
+            top,
+            left,
+            isFullscreen,
         } = options;
 
         url = appendHashParameters(url, hashParameters);
@@ -750,6 +769,11 @@ export const uiService = (function () {
             type: type || 'normal',
             active: !inBackground,
             inNewWindow,
+            width,
+            height,
+            top,
+            left,
+            isFullscreen,
         });
 
         return tab;
@@ -775,8 +799,7 @@ export const uiService = (function () {
         const filterIds = application.getEnabledFiltersFromEnabledGroups()
             .map(filter => filter.filterId);
 
-        openTab(`https://reports.adguard.com/new_issue.html?product_type=Ext&product_version=${
-            encodeURIComponent(backgroundPage.app.getVersion())
+        openTab(`https://reports.adguard.com/new_issue.html?product_type=Ext&product_version=${encodeURIComponent(backgroundPage.app.getVersion())
         }&browser=${encodeURIComponent(browser)
         }${browserDetails ? `&browser_detail=${encodeURIComponent(browserDetails)}` : ''
         }&url=${encodeURIComponent(url)
@@ -787,7 +810,12 @@ export const uiService = (function () {
 
     const openFilteringLog = async function (tabId) {
         const FILTERING_LOG_PAGE = 'filtering-log.html';
-        const options = { activateSameTab: true, type: 'popup' };
+        const windowState = filteringLogWindowState.getState();
+        const options = {
+            activateSameTab: true,
+            type: 'popup',
+            ...windowState,
+        };
 
         if (!tabId) {
             const tab = await tabsApi.getActive();
@@ -826,10 +854,7 @@ export const uiService = (function () {
         for (let i = 0; i < tabs.length; i += 1) {
             const tab = tabs[i];
             if (tab.url === filtersDownloadUrl) {
-                // In YaBrowser don't activate found page
-                if (!browserUtils.isYaBrowser()) {
-                    tabsApi.activate(tab.tabId);
-                }
+                tabsApi.activate(tab.tabId);
                 tabsApi.reload(tab.tabId, thankyouUrl);
                 return;
             }
@@ -838,12 +863,16 @@ export const uiService = (function () {
         await openTab(thankyouUrl);
     };
 
+    const openComparePage = async () => {
+        await openTab(COMPARE_URL);
+    };
+
     const openExtensionStore = async function () {
         await openTab(extensionStoreLink);
     };
 
     const openFiltersDownloadPage = function () {
-        openTab(getPageUrl('filter-download.html'), { inBackground: browserUtils.isYaBrowser() });
+        openTab(getPageUrl('filter-download.html'));
     };
 
     const openCustomFiltersModal = async (url, title) => {
@@ -909,10 +938,19 @@ export const uiService = (function () {
         }
     };
 
+    const getAssistantToken = (() => {
+        const assistantToken = nanoid();
+
+        return () => {
+            return assistantToken;
+        };
+    })();
+
     const initAssistant = async (selectElement) => {
         const options = {
             addRuleCallbackName: MessageType.ADD_USER_RULE,
             selectElement,
+            token: getAssistantToken(),
         };
 
         // init assistant
@@ -934,9 +972,9 @@ export const uiService = (function () {
      * @param {boolean} selectElement - if true select the element on which the Mousedown event was
      */
     const openAssistant = async (selectElement) => {
-        // Load Assistant code to the activate tab immediately
+        // Load Assistant code to the active tab immediately
         await tabsApi.executeScriptFile(null, { file: '/pages/assistant.js' });
-        initAssistant(selectElement);
+        await initAssistant(selectElement);
     };
 
     const init = async () => {
@@ -1074,6 +1112,7 @@ export const uiService = (function () {
         openFilteringLog,
         openFullscreenUserRules,
         openThankYouPage,
+        openComparePage,
         openExtensionStore,
         openFiltersDownloadPage,
         openCustomFiltersModal,
@@ -1090,5 +1129,7 @@ export const uiService = (function () {
         openTab,
 
         showAlertMessagePopup,
+
+        getAssistantToken,
     };
 })();

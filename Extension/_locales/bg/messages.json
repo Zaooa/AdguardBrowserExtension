@@ -14,6 +14,9 @@
     "options_popup_check_false_title": {
         "message": "Грешка"
     },
+    "options_popup_try_again_button": {
+        "message": "Опитай пак"
+    },
     "options_popup_filter_description": {
         "message": "Описание:"
     },
@@ -31,6 +34,12 @@
     },
     "options_select_update_period_default": {
         "message": "По подразбиране"
+    },
+    "options_select_update_period_24h": {
+        "message": "24 часа"
+    },
+    "options_select_update_period_6h": {
+        "message": "6 часа"
     },
     "options_select_update_period_disabled": {
         "message": "Деактивиран"
@@ -173,9 +182,6 @@
     "filtering_modal_unblock": {
         "message": "Деблокирай"
     },
-    "filtering_modal_remove_user": {
-        "message": "Премахни от потребителските филтри"
-    },
     "filtering_modal_preview_request_button": {
         "message": "Преглед"
     },
@@ -239,12 +245,6 @@
     "options_select_theme": {
         "message": "Тема"
     },
-    "options_theme_selector_system": {
-        "message": "Система"
-    },
-    "options_theme_selector_light": {
-        "message": "Светъл цвят"
-    },
     "options_export_settings": {
         "message": "Експортиране на настройките"
     },
@@ -278,6 +278,9 @@
     "options_site": {
         "message": "Официален сайт"
     },
+    "options_reset_stats": {
+        "message": "Нулирай статистиката"
+    },
     "options_reset_stats_done": {
         "message": "Статистиката е нулирана"
     },
@@ -306,7 +309,7 @@
         "message": "Действия"
     },
     "short_name": {
-        "message": "AdGuard рекламен блокер"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Относно"
@@ -323,9 +326,6 @@
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Премахни"
     },
-    "options_nav_hide": {
-        "message": "Скрий"
-    },
     "options_filters_search": {
         "message": "Търси"
     },
@@ -337,6 +337,9 @@
     },
     "options_confirm_modal_cancel_button": {
         "message": "Отказ"
+    },
+    "filtering_log_details_modal_try_again": {
+        "message": "Опитай пак"
     },
     "options_stealth_general_title": {
         "message": "General"

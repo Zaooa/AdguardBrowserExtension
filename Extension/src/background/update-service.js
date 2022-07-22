@@ -26,6 +26,8 @@ import { application } from './application';
 import { settings } from './settings/user-settings';
 import { safebrowsing } from './filter/services/safebrowsing';
 import { utils } from './utils/common';
+import { settingsProvider } from './settings/settings-provider';
+import { notifications } from './utils/notifications';
 
 /**
  * Service that manages extension version information and handles
@@ -39,10 +41,16 @@ export const applicationUpdateService = (function () {
      * @private
      */
     async function executeMethods(methods) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const method of methods) {
-            // eslint-disable-next-line no-await-in-loop
-            await method();
+        try {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const method of methods) {
+                // eslint-disable-next-line no-await-in-loop
+                await method();
+            }
+        } catch (e) {
+            // if catch error while updating, reset settings and reload extension
+            await settingsProvider.applyDefaultSettings();
+            backgroundPage.runtime.reload();
         }
     }
 
@@ -106,6 +114,15 @@ export const applicationUpdateService = (function () {
         });
 
         await Promise.all(reloadRulesPromises);
+    }
+
+    /**
+     * In the v4.0.171 we have littered window.localStorage with proms used in the promo notifications module, now we
+     * are clearing them
+     */
+    function onUpdateClearPromoDetails() {
+        window.localStorage.removeItem(notifications.VIEWED_NOTIFICATIONS);
+        window.localStorage.removeItem(notifications.LAST_NOTIFICATION_TIME);
     }
 
     /**
@@ -175,6 +192,9 @@ export const applicationUpdateService = (function () {
         }
         if (browserUtils.isGreaterVersion('4.0.67', runInfo.prevVersion)) {
             methods.push(onUpdateRuleConverter);
+        }
+        if (browserUtils.isGreaterVersion('4.0.180', runInfo.prevVersion)) {
+            methods.push(onUpdateClearPromoDetails);
         }
 
         // On every update remove if necessary obsolete filters

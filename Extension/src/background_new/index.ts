@@ -1,10 +1,3 @@
-import { messageHandler } from './message-handler';
-import { UiService } from './services/ui-service';
-import { PopupService } from './services/popup-service';
-import { SettingsService } from './services/settings/settings-service';
+import { app } from './app';
 
-SettingsService.init();
-UiService.init();
-PopupService.init();
-
-messageHandler.init();
+app.init();

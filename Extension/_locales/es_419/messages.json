@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Estarás suscrito a ese filtro."
     },
+    "options_popup_url_title": {
+        "message": "Nueva suscripción a filtro"
+    },
     "options_popup_url_placeholder": {
         "message": "Ingresa una URL o ruta"
     },
@@ -333,7 +336,7 @@
         "message": "Verificar seguridad del sitio web"
     },
     "popup_reset_custom_rules": {
-        "message": "Restablecer todas las reglas del usuario para esta página"
+        "message": "Eliminar todas las reglas del usuario para esta página"
     },
     "popup_open_settings": {
         "message": "Configuración de AdGuard"
@@ -495,7 +498,7 @@
         "message": "Desbloquear"
     },
     "filtering_modal_remove_user": {
-        "message": "Eliminar de las reglas del usuario"
+        "message": "Eliminar regla"
     },
     "filtering_modal_preview_request_button": {
         "message": "Vista previa"
@@ -550,6 +553,18 @@
     },
     "filtering_modal_hide_full_url": {
         "message": "Ocultar URL completa"
+    },
+    "filtering_modal_show_full_rule": {
+        "message": "Mostrar regla completa"
+    },
+    "filtering_modal_hide_full_rule": {
+        "message": "Ocultar regla completa"
+    },
+    "filtering_modal_show_full_element": {
+        "message": "Mostrar elemento completo"
+    },
+    "filtering_modal_hide_full_element": {
+        "message": "Ocultar elemento completo"
     },
     "filtering_modal_copy_to_clipboard": {
         "message": "Copiar al portapapeles"
@@ -639,7 +654,7 @@
         "message": "Comprobando..."
     },
     "options_set_update_interval": {
-        "message": "Intervalo de actualización"
+        "message": "Actualizar filtros automáticamente"
     },
     "options_set_update_interval_desc": {
         "message": "Para un bloqueo más eficaz, los filtros deben actualizarse periódicamente."
@@ -822,7 +837,7 @@
         "message": "Interruptor de protección"
     },
     "short_name": {
-        "message": "AdGuard AdBlocker"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Acerca de"
@@ -849,13 +864,10 @@
         "message": "Eliminar"
     },
     "options_nav_better_than_extension": {
-        "message": "¿Por qué el programa completo de AdGuard es mejor que la extensión?"
+        "message": "¿Por qué la aplicación AdGuard es mejor que la extensión?"
     },
     "options_nav_compare": {
-        "message": "Cómo se comparan"
-    },
-    "options_nav_hide": {
-        "message": "Ocultar"
+        "message": "Comparar"
     },
     "options_filters_search": {
         "message": "Buscar"
@@ -1015,5 +1027,11 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Continuar de todos modos"
+    },
+    "text_collapser_show_default": {
+        "message": "Mostrar texto completo"
+    },
+    "text_collapser_hide_default": {
+        "message": "Ocultar texto completo"
     }
 }

@@ -21,6 +21,7 @@ import { tabsApi } from '../tabs/tabs-api';
 import { uiService } from '../ui-service';
 import { lazyGet } from './lazy';
 import { browserUtils } from './browser-utils';
+import { localStorage } from '../storage';
 
 /**
  * Object that manages user settings.
@@ -30,52 +31,119 @@ export const notifications = (function () {
     const VIEWED_NOTIFICATIONS = 'viewed-notifications';
     const LAST_NOTIFICATION_TIME = 'viewed-notification-time';
 
-    const newYearNotification = {
-        id: 'newYear2020',
+    const BIRTHDAY_13_ID = 'birthday13';
+
+    const birthday13Notification = {
+        id: BIRTHDAY_13_ID,
         locales: {
             en: {
-                title: 'AdGuard wishes you happy holidays',
-                btn: 'Get your present',
-            },
-            de: {
-                title: 'AdGuard wünscht Ihnen frohe Festtage!',
-                btn: 'HOLEN SIE SICH IHR GESCHENK',
-            },
-            ko: {
-                title: 'AdGuard는 행복한 크리스마스가 되길 바랍니다',
-                btn: '선물 받기',
+                title: 'AdGuard',
+                desc: 'Anniversary Quiz',
+                btn: 'Play',
             },
             ru: {
-                title: 'AdGuard поздравляет вас с праздниками',
-                btn: 'Получить подарок!',
+                title: 'Нам 13 лет!',
+                desc: 'Отпразднуем?',
+                btn: 'Вперёд!',
             },
-            ja: {
-                title: 'AdGuardからのクリスマスプレゼント',
-                btn: 'プレゼントをGET',
+            es: {
+                title: 'Test de cumpleaños',
+                desc: 'de AdGuard',
+                btn: 'Ponte a prueba',
+            },
+            de: {
+                title: 'AdGuard-Quiz',
+                desc: 'zum 13. Geburtstag',
+                btn: "Los geht's!",
             },
             fr: {
-                title: 'AdGuard vous souhaite de joyeuses fêtes !',
-                btn: 'VOIR CADEAU',
+                title: 'AdGuard fête ses 13',
+                desc: 'ans !',
+                btn: 'Test festif ici',
             },
             it: {
-                title: 'AdGuard vi augura buone feste!',
-                btn: 'VEDERE IL REGALO',
+                title: 'AdGuard celebra i',
+                desc: 'suoi 13 anni!',
+                btn: 'Test festivo qui',
+            },
+            ko: {
+                title: 'AdGuard 생일 퀴즈',
+                btn: '퀴즈 시작',
+            },
+            zh_cn: {
+                title: 'AdGuard 生日会',
+                desc: '知识竞赛',
+                btn: '我要参加！',
+            },
+            zh_tw: {
+                title: 'AdGuard 生日派對',
+                desc: '知識競賽',
+                btn: '我要參加！',
+            },
+            ja: {
+                title: 'AdGuard',
+                desc: '創業13周年クイズ',
+                btn: '答えてみる',
+            },
+            uk: {
+                title: 'Вікторина до дня',
+                desc: 'народження AdGuard',
+                btn: 'Взяти участь',
+            },
+            pt_pt: {
+                title: 'Quiz de aniversário',
+                desc: 'AdGuard',
+                btn: 'Teste-se',
+            },
+            pt_br: {
+                title: 'Quiz de aniversário',
+                desc: 'AdGuard',
+                btn: 'Teste-se',
+            },
+            ar: {
+                title: 'اختبار عيد ميلاد',
+                desc: 'AdGuard',
+                btn: 'اختبر نفسك',
+            },
+            be: {
+                title: 'Тэст дня нараджэння',
+                btn: 'Праверце сябе',
+            },
+            id: {
+                title: 'Kuis ulang tahun',
+                desc: 'AdGuard',
+                btn: 'Uji dirimu',
+            },
+            pl: {
+                title: 'Quiz urodzinowy',
+                desc: 'AdGuard',
+                btn: 'Sprawdź się',
+            },
+            tr: {
+                title: 'AdGuard doğum günü',
+                desc: 'testi',
+                btn: 'Kendini test et',
+            },
+            vi: {
+                title: 'Câu đố sinh nhật',
+                desc: 'AdGuard',
+                btn: 'Tự kiểm tra',
             },
         },
         text: '',
-        url: 'https://adguard.com/forward.html?action=ny2020_notify&from=popup&app=browser_extension',
-        from: '24 December 2019 00:00:00',
-        to: '1 January 2020 00:00:00',
+        url: 'https://adguard.com/forward.html?action=birthday13&app=browser_extension',
+        from: '31 May 2022 12:00:00',
+        to: '5 June 2022 23:59:00',
         type: 'animated',
         get icons() {
-            return lazyGet(newYearNotification, 'icons', () => ({
+            return lazyGet(birthday13Notification, 'icons', () => ({
                 ICON_GREEN: {
-                    '19': backgroundPage.getURL('icons/green-19-ny.png'),
-                    '38': backgroundPage.getURL('icons/green-38-ny.png'),
+                    '19': backgroundPage.getURL('assets/icons/b13-on-19.png'),
+                    '38': backgroundPage.getURL('assets/icons/b13-on-38.png'),
                 },
                 ICON_GRAY: {
-                    '19': backgroundPage.getURL('icons/gray-19-ny.png'),
-                    '38': backgroundPage.getURL('icons/gray-38-ny.png'),
+                    '19': backgroundPage.getURL('assets/icons/b13-off-19.png'),
+                    '38': backgroundPage.getURL('assets/icons/b13-off-38.png'),
                 },
             }));
         },
@@ -97,7 +165,7 @@ export const notifications = (function () {
      * @property {string} type;
      */
     const notifications = {
-        newYear2020: newYearNotification,
+        birthday13: birthday13Notification,
     };
 
     /**
@@ -189,6 +257,7 @@ export const notifications = (function () {
         if (currentNotification) {
             const viewedNotifications = localStorage.getItem(VIEWED_NOTIFICATIONS) || [];
             const { id } = currentNotification;
+
             if (!viewedNotifications.includes(id)) {
                 viewedNotifications.push(id);
                 localStorage.setItem(VIEWED_NOTIFICATIONS, viewedNotifications);
@@ -207,6 +276,13 @@ export const notifications = (function () {
      * @returns {null|Notification} - notification
      */
     const getCurrentNotification = function () {
+        // TODO remove to show next notification
+        const DISABLE_NOTIFICATIONS = true;
+
+        if (DISABLE_NOTIFICATIONS) {
+            return null;
+        }
+
         // Do not display notification on Firefox
         if (browserUtils.isFirefoxBrowser()) {
             return null;
@@ -250,5 +326,7 @@ export const notifications = (function () {
     return {
         getCurrentNotification,
         setNotificationViewed,
+        VIEWED_NOTIFICATIONS,
+        LAST_NOTIFICATION_TIME,
     };
 })();

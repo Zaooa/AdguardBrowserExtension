@@ -1,3 +1,7 @@
+:root {
+    color-scheme: light dark;
+}
+
 html,
 body,
 #root {
@@ -29,6 +33,14 @@ body,
     @media (prefers-color-scheme: dark) {
         background-color: var(--gray700);
         border: 3px solid var(--grayDark);
+    }
+}
+
+*::-webkit-scrollbar-corner {
+    background: var(--gray100);
+
+    @media (prefers-color-scheme: dark) {
+        background: var(--grayDark);
     }
 }
 
@@ -163,6 +175,8 @@ button.green-button {
 }
 
 .light-mode {
+    color-scheme: light;
+
     & .icon {
         &--green {
             color: var(--green400);
@@ -178,9 +192,15 @@ button.green-button {
         border-radius: 20px;
         border: 3px solid var(--gray100);
     }
+
+    *::-webkit-scrollbar-corner {
+        background: var(--gray100);
+    }
 }
 
 .dark-mode {
+    color-scheme: dark;
+
     & .icon {
         &--green {
             color: var(--white);
@@ -195,5 +215,9 @@ button.green-button {
         background-color: var(--gray700);
         border-radius: 20px;
         border: 3px solid var(--grayDark);
+    }
+
+    *::-webkit-scrollbar-corner {
+        background: var(--grayDark);
     }
 }

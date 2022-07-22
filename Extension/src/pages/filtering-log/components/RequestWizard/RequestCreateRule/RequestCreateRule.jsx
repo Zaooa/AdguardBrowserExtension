@@ -85,8 +85,10 @@ const RequestCreateRule = observer(() => {
             }
 
             // $removeparam option is available only for requests with query
+            // and is not shown for cookie rules
             if (id === RULE_OPTIONS.RULE_REMOVE_PARAM
-                && logStore.selectedEvent.requestUrl?.indexOf('?') < 0) {
+                && (logStore.selectedEvent.requestUrl?.indexOf('?') < 0
+                || logStore.selectedEvent.requestRule?.cookieRule)) {
                 return null;
             }
 
@@ -122,7 +124,7 @@ const RequestCreateRule = observer(() => {
     };
 
     const handleAddRuleClick = async () => {
-        await messenger.addUserRule(wizardStore.rule);
+        await messenger.filteringLogAddUserRule(wizardStore.rule);
         const addedRuleState = wizardStore.requestModalState === WIZARD_STATES.BLOCK_REQUEST
             ? ADDED_RULE_STATES.BLOCK
             : ADDED_RULE_STATES.UNBLOCK;
@@ -163,9 +165,9 @@ const RequestCreateRule = observer(() => {
                     onClick={handleBackClick}
                     className="request-modal__navigation request-modal__navigation--button"
                 >
-                    <Icon classname="icon--contain" id="#arrow-left" />
+                    <Icon classname="icon--24" id="#arrow-left" />
+                    <span className="request-modal__header">{title}</span>
                 </button>
-                <span className="request-modal__header">{title}</span>
             </div>
             <div ref={ref} className="request-modal__content">
                 <div className="request-info">

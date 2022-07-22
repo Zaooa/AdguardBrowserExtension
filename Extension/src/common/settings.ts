@@ -1,10 +1,36 @@
 import { z } from 'zod';
 
-export const ADGUARD_USER_SETTINGS_KEY = 'adguard-user-settings';
+export const ADGUARD_SETTINGS_KEY = 'adguard-settings';
 
-export enum UserSettingOption {
+export enum SettingOption {
+    CLIENT_ID = 'clentId',
+
+    // filters states
+
+    FILTERS_STATE_PROP = 'filters-state',
+    FILTERS_VERSION_PROP = 'filters-version',
+    GROUPS_STATE_PROP = 'groups-state',
+
+    // filters metadata
+
+    METADATA = 'filters-metadata',
+    I18N_METADATA = 'filters-i18n-metadata',
+
+    CUSTOM_FILTERS = 'custom_filters',
+
+    // page stats
+
+    PAGE_STATISTIC = 'page-statistic',
+
+    // user settings
+
     DISABLE_DETECT_FILTERS = 'detect-filters-disabled',
     DISABLE_SHOW_PAGE_STATS = 'disable-show-page-statistic',
+
+    // allowlist domains
+
+    ALLOWLIST_DOMAINS = 'white-list-domains',
+    INVERTED_ALLOWLIST_DOMAINS = 'block-list-domains',
 
     /* flag used to show link to comparison of desktop and browser adblocker versions */
     DISABLE_SHOW_ADGUARD_PROMO_INFO = 'show-info-about-adguard-disabled',
@@ -52,33 +78,50 @@ export const DEFAULT_FIRST_PARTY_COOKIES_SELF_DESTRUCT_MIN = 4320;
 
 export const DEFAULT_THIRD_PARTY_COOKIES_SELF_DESTRUCT_MIN = 2880;
 
-export type UserSettings = {
-    [UserSettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: boolean,
-    [UserSettingOption.DISABLE_SAFEBROWSING]: boolean,
-    [UserSettingOption.DISABLE_COLLECT_HITS]: boolean,
-    [UserSettingOption.DEFAULT_ALLOWLIST_MODE]: boolean,
-    [UserSettingOption.ALLOWLIST_ENABLED]: boolean,
-    [UserSettingOption.USE_OPTIMIZED_FILTERS]: boolean,
-    [UserSettingOption.DISABLE_DETECT_FILTERS]: boolean,
-    [UserSettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION]: boolean,
-    [UserSettingOption.FILTERS_UPDATE_PERIOD]: number,
-    [UserSettingOption.DISABLE_STEALTH_MODE]: boolean,
-    [UserSettingOption.HIDE_REFERRER]: boolean,
-    [UserSettingOption.HIDE_SEARCH_QUERIES]: boolean,
-    [UserSettingOption.SEND_DO_NOT_TRACK]: boolean,
-    [UserSettingOption.BLOCK_CHROME_CLIENT_DATA]: boolean,
-    [UserSettingOption.BLOCK_WEBRTC]: boolean,
-    [UserSettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES]: boolean,
-    [UserSettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME]:number,
-    [UserSettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES]: boolean,
-    [UserSettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME]:number,
-    [UserSettingOption.APPEARANCE_THEME]: AppearanceTheme,
-    [UserSettingOption.USER_FILTER_ENABLED]: boolean,
-    [UserSettingOption.HIDE_RATE_BLOCK]: boolean,
-    [UserSettingOption.USER_RULES_EDITOR_WRAP]: boolean,
-    [UserSettingOption.DISABLE_FILTERING]: boolean,
-    [UserSettingOption.DISABLE_SHOW_PAGE_STATS]: boolean,
-    [UserSettingOption.DISABLE_SHOW_CONTEXT_MENU]: boolean,
+export type Settings = {
+    [SettingOption.CLIENT_ID]: string,
+
+    [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: boolean,
+    [SettingOption.DISABLE_SAFEBROWSING]: boolean,
+    [SettingOption.DISABLE_COLLECT_HITS]: boolean,
+    [SettingOption.DEFAULT_ALLOWLIST_MODE]: boolean,
+    [SettingOption.ALLOWLIST_ENABLED]: boolean,
+    [SettingOption.USE_OPTIMIZED_FILTERS]: boolean,
+    [SettingOption.DISABLE_DETECT_FILTERS]: boolean,
+    [SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION]: boolean,
+    [SettingOption.FILTERS_UPDATE_PERIOD]: number,
+    [SettingOption.DISABLE_STEALTH_MODE]: boolean,
+    [SettingOption.HIDE_REFERRER]: boolean,
+    [SettingOption.HIDE_SEARCH_QUERIES]: boolean,
+    [SettingOption.SEND_DO_NOT_TRACK]: boolean,
+    [SettingOption.BLOCK_CHROME_CLIENT_DATA]: boolean,
+    [SettingOption.BLOCK_WEBRTC]: boolean,
+    [SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES]: boolean,
+    [SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME]:number,
+    [SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES]: boolean,
+    [SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME]:number,
+    [SettingOption.APPEARANCE_THEME]: AppearanceTheme,
+    [SettingOption.USER_FILTER_ENABLED]: boolean,
+    [SettingOption.HIDE_RATE_BLOCK]: boolean,
+    [SettingOption.USER_RULES_EDITOR_WRAP]: boolean,
+    [SettingOption.DISABLE_FILTERING]: boolean,
+    [SettingOption.DISABLE_SHOW_PAGE_STATS]: boolean,
+    [SettingOption.DISABLE_SHOW_CONTEXT_MENU]: boolean,
+
+    [SettingOption.FILTERS_STATE_PROP]?: string,
+    [SettingOption.FILTERS_VERSION_PROP]?: string,
+    [SettingOption.GROUPS_STATE_PROP]?: string,
+
+    [SettingOption.METADATA]?: string,
+    [SettingOption.I18N_METADATA]?: string,
+
+    [SettingOption.CUSTOM_FILTERS]?: string,
+
+    [SettingOption.PAGE_STATISTIC]?: string,
+
+    [SettingOption.ALLOWLIST_DOMAINS]?: string,
+
+    [SettingOption.INVERTED_ALLOWLIST_DOMAINS]?: string,
 };
 
 // TODO: use setting import validation in settings service
@@ -137,4 +180,4 @@ export const settingsValidator = z.object({
         .optional(),
 });
 
-export type Settings = z.infer<typeof settingsValidator>;
+// export type Settings = z.infer<typeof settingsValidator>;

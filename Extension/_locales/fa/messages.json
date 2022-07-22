@@ -44,6 +44,9 @@
     "options_popup_description": {
         "message": "شما مشترک این فیلتر شده اید."
     },
+    "options_popup_url_title": {
+        "message": "اشتراک فیلتر جدید"
+    },
     "options_popup_url_placeholder": {
         "message": "مسیر یا آدرس را وارد کنید"
     },
@@ -308,9 +311,6 @@
     "popup_security_report": {
         "message": "گزارش امنیتی وبسایت"
     },
-    "popup_reset_custom_rules": {
-        "message": "بازنشانی همه فیلترهای دستی برای این صفحه"
-    },
     "popup_open_settings": {
         "message": "تنظیمات AdGuard"
     },
@@ -440,9 +440,6 @@
     "filtering_modal_unblock": {
         "message": "باز کن"
     },
-    "filtering_modal_remove_user": {
-        "message": "حذف از فیلترهای کاربر"
-    },
     "filtering_modal_preview_request_button": {
         "message": "پیشنمایش"
     },
@@ -524,12 +521,6 @@
     "options_theme_selector_system": {
         "message": "سیستم"
     },
-    "options_theme_selector_light": {
-        "message": "روشن"
-    },
-    "options_theme_selector_dark": {
-        "message": "پوسته تیره"
-    },
     "options_export_settings": {
         "message": "خروجی گیری تنظیمات"
     },
@@ -544,9 +535,6 @@
     },
     "options_check_update": {
         "message": "بررسي براي بروز رساني"
-    },
-    "options_set_update_interval": {
-        "message": "فاصله بروز رسانی فیلترها"
     },
     "options_userfilter_export": {
         "message": "خروجيگيري"
@@ -660,7 +648,7 @@
         "message": "تعویض حفاظت"
     },
     "short_name": {
-        "message": "مسدودساز تبلیغ AdGuard"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "درباره"
@@ -682,12 +670,6 @@
     },
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "حذف"
-    },
-    "options_nav_compare": {
-        "message": "چطور مقایسه می شوند"
-    },
-    "options_nav_hide": {
-        "message": "پنهان کن"
     },
     "options_filters_search": {
         "message": "جستجو"

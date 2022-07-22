@@ -13,9 +13,11 @@ import './mode-adguard';
 import './editor.pcss';
 
 const DEFAULT_EDITOR_SIZE = {
-    width: '100%',
+    width: '610px',
     height: '300px',
 };
+
+const EDITOR_PADDING = 26;
 
 const Editor = ({
     name,
@@ -58,7 +60,9 @@ const Editor = ({
     const onResize = fullscreen
         ? () => { }
         : (width, height) => {
-            localStorage.setItem(SIZE_STORAGE_KEY, JSON.stringify({ width, height }));
+            localStorage.setItem(SIZE_STORAGE_KEY, JSON.stringify({
+                width: width + EDITOR_PADDING, height,
+            }));
             editorRef.current.editor.resize();
         };
 

@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Zasubskrybujesz ten filtr."
     },
+    "options_popup_url_title": {
+        "message": "Nowa subskrypcja filtra"
+    },
     "options_popup_url_placeholder": {
         "message": "Wpisz adres URL lub ścieżkę"
     },
@@ -333,7 +336,7 @@
         "message": "Sprawdź bezpieczeństwo witryny"
     },
     "popup_reset_custom_rules": {
-        "message": "Zresetuj wszystkie reguły użytkownika dla tej strony"
+        "message": "Usuń wszystkie reguły użytkownika dla tej strony"
     },
     "popup_open_settings": {
         "message": "Ustawienia AdGuard"
@@ -495,7 +498,7 @@
         "message": "Odblokuj"
     },
     "filtering_modal_remove_user": {
-        "message": "Usuń z reguł użytkownika"
+        "message": "Usuń regułę"
     },
     "filtering_modal_preview_request_button": {
         "message": "Podgląd"
@@ -612,7 +615,7 @@
         "message": "Motyw"
     },
     "options_theme_selector_system": {
-        "message": "Systemowy"
+        "message": "Domyślny systemowy"
     },
     "options_theme_selector_light": {
         "message": "Jasny"
@@ -639,7 +642,7 @@
         "message": "Sprawdzanie..."
     },
     "options_set_update_interval": {
-        "message": "Interwał aktualizacji filtrów"
+        "message": "Automatycznie aktualizuj filtry"
     },
     "options_set_update_interval_desc": {
         "message": "Aby zapewnić skuteczniejsze blokowanie, filtry należy regularnie aktualizować."
@@ -822,7 +825,7 @@
         "message": "Przełącznik ochrony"
     },
     "short_name": {
-        "message": "Bloker reklam AdGuard"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "O rozszerzeniu"
@@ -847,15 +850,6 @@
     },
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Usuń"
-    },
-    "options_nav_better_than_extension": {
-        "message": "Dlaczego pełnoprawny program AdGuard jest lepszy niż rozszerzenie?"
-    },
-    "options_nav_compare": {
-        "message": "Jak się mają do siebie"
-    },
-    "options_nav_hide": {
-        "message": "Ukryj"
     },
     "options_filters_search": {
         "message": "Wyszukaj"

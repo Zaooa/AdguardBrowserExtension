@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Du vil abonnere på dette filter."
     },
+    "options_popup_url_title": {
+        "message": "Nyt filterabonnement"
+    },
     "options_popup_url_placeholder": {
         "message": "Angiv URL eller sti"
     },
@@ -333,7 +336,7 @@
         "message": "Tjek webstedets sikkerhed"
     },
     "popup_reset_custom_rules": {
-        "message": "Nulstil alle brugerregler for denne side"
+        "message": "Slet alle tilpassede regler for denne side"
     },
     "popup_open_settings": {
         "message": "AdGuard-indstillinger"
@@ -495,7 +498,7 @@
         "message": "Afblokér"
     },
     "filtering_modal_remove_user": {
-        "message": "Fjern fra Brugerregler"
+        "message": "Slet regel"
     },
     "filtering_modal_preview_request_button": {
         "message": "Forhåndsvisning"
@@ -550,6 +553,18 @@
     },
     "filtering_modal_hide_full_url": {
         "message": "Skjul komplet URL"
+    },
+    "filtering_modal_show_full_rule": {
+        "message": "Vis komplet regel"
+    },
+    "filtering_modal_hide_full_rule": {
+        "message": "Skjul komplet regel"
+    },
+    "filtering_modal_show_full_element": {
+        "message": "Vis komplette element"
+    },
+    "filtering_modal_hide_full_element": {
+        "message": "Skjul komplette element"
     },
     "filtering_modal_copy_to_clipboard": {
         "message": "Kopiér til udklipsholder"
@@ -612,7 +627,7 @@
         "message": "Tema"
     },
     "options_theme_selector_system": {
-        "message": "System"
+        "message": "Systemstandard"
     },
     "options_theme_selector_light": {
         "message": "Lyst"
@@ -639,7 +654,7 @@
         "message": "Tjekker..."
     },
     "options_set_update_interval": {
-        "message": "Filtrenes opdateringsinterval"
+        "message": "Auto-opdatér filtre"
     },
     "options_set_update_interval_desc": {
         "message": "For en mere effektiv blokering bør filtre opdateres regelmæssigt."
@@ -822,7 +837,7 @@
         "message": "Beskyttelsesskifter"
     },
     "short_name": {
-        "message": "AdGuard AdBlocker"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Om"
@@ -847,15 +862,6 @@
     },
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Fjern"
-    },
-    "options_nav_better_than_extension": {
-        "message": "Hvorfor er det komplette AdGuard-program bedre end udvidelse?"
-    },
-    "options_nav_compare": {
-        "message": "Deres indbyrdes forskelle"
-    },
-    "options_nav_hide": {
-        "message": "Skjul"
     },
     "options_filters_search": {
         "message": "Søg"
@@ -1015,5 +1021,11 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Fortsæt alligevel"
+    },
+    "text_collapser_show_default": {
+        "message": "Vis fuld tekst"
+    },
+    "text_collapser_hide_default": {
+        "message": "Skjul fuld tekst"
     }
 }

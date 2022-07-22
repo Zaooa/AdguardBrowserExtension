@@ -44,6 +44,9 @@
     "options_popup_description": {
         "message": "Du kommer att abonnera på det här filtret."
     },
+    "options_popup_url_title": {
+        "message": "Ny filterprenumeration"
+    },
     "options_popup_url_placeholder": {
         "message": "Skriv in URL eller sökväg"
     },
@@ -398,9 +401,6 @@
     "filtering_modal_unblock": {
         "message": "Avblockera"
     },
-    "filtering_modal_remove_user": {
-        "message": "Ta bort från det egna filtret"
-    },
     "filtering_modal_preview_request_button": {
         "message": "Förhandsgranska"
     },
@@ -433,9 +433,6 @@
     },
     "filtering_modal_copied": {
         "message": "Kopierad"
-    },
-    "filtering_log_filter_regular": {
-        "message": "Regular"
     },
     "filtering_log_filter_allowed": {
         "message": "Vitlistade"
@@ -496,9 +493,6 @@
     },
     "options_check_update": {
         "message": "Kolla efter uppdateringar"
-    },
-    "options_set_update_interval": {
-        "message": "Filterppdateringsintervall"
     },
     "options_userfilter_export": {
         "message": "Exportera"
@@ -609,7 +603,7 @@
         "message": "Skyddsomkopplare"
     },
     "short_name": {
-        "message": "AdGuard AdBlocker"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Om"
@@ -632,11 +626,8 @@
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Ta bort"
     },
-    "options_nav_compare": {
-        "message": "Jämför dem"
-    },
-    "options_nav_hide": {
-        "message": "Dölj"
+    "options_nav_better_than_extension": {
+        "message": "Varför är AdGuard-appen bättre än tillägget?"
     },
     "options_filters_search": {
         "message": "Sök"

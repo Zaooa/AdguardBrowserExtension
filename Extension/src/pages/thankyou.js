@@ -15,8 +15,9 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { contentPage } from '../content-script/content-script';
 import { MessageType } from '../common/constants';
+import { UserAgent } from '../common/user-agent';
+import { messenger } from './services/messenger';
 
 const PageController = (response) => {
     const {
@@ -33,8 +34,7 @@ const PageController = (response) => {
 
     const safebrowsingEnabledChange = (e) => {
         const checkbox = e.currentTarget;
-        contentPage.sendMessage({
-            type: MessageType.CHANGE_USER_SETTING,
+        messenger.sendMessage(MessageType.CHANGE_USER_SETTING, {
             key: userSettings.names.DISABLE_SAFEBROWSING,
             value: !checkbox.checked,
         });
@@ -43,19 +43,13 @@ const PageController = (response) => {
     const trackingFilterEnabledChange = (e) => {
         const checkbox = e.currentTarget;
         if (checkbox.checked) {
-            contentPage.sendMessage({
-                type: MessageType.ADD_AND_ENABLE_FILTER,
-                data: {
-                    filterId: AntiBannerFiltersId.TRACKING_FILTER_ID,
-                },
+            messenger.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, {
+                filterId: AntiBannerFiltersId.TRACKING_FILTER_ID,
             });
         } else {
-            contentPage.sendMessage({
-                type: MessageType.DISABLE_ANTIBANNER_FILTER,
-                data: {
-                    filterId: AntiBannerFiltersId.TRACKING_FILTER_ID,
-                    remove: true,
-                },
+            messenger.sendMessage(MessageType.DISABLE_ANTIBANNER_FILTER, {
+                filterId: AntiBannerFiltersId.TRACKING_FILTER_ID,
+                remove: true,
             });
         }
     };
@@ -63,27 +57,20 @@ const PageController = (response) => {
     const socialFilterEnabledChange = (e) => {
         const checkbox = e.currentTarget;
         if (checkbox.checked) {
-            contentPage.sendMessage({
-                type: MessageType.ADD_AND_ENABLE_FILTER,
-                data: {
-                    filterId: AntiBannerFiltersId.SOCIAL_FILTER_ID,
-                },
+            messenger.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, {
+                filterId: AntiBannerFiltersId.SOCIAL_FILTER_ID,
             });
         } else {
-            contentPage.sendMessage({
-                type: MessageType.DISABLE_ANTIBANNER_FILTER,
-                data: {
-                    filterId: AntiBannerFiltersId.SOCIAL_FILTER_ID,
-                    remove: true,
-                },
+            messenger.sendMessage(MessageType.DISABLE_ANTIBANNER_FILTER, {
+                filterId: AntiBannerFiltersId.SOCIAL_FILTER_ID,
+                remove: true,
             });
         }
     };
 
     const sendStatsCheckboxChange = (e) => {
         const checkbox = e.currentTarget;
-        contentPage.sendMessage({
-            type: MessageType.CHANGE_USER_SETTING,
+        messenger.sendMessage(MessageType.CHANGE_USER_SETTING, {
             key: userSettings.names.DISABLE_COLLECT_HITS,
             value: !checkbox.checked,
         });
@@ -92,19 +79,13 @@ const PageController = (response) => {
     const allowAcceptableAdsChange = (e) => {
         const checkbox = e.currentTarget;
         if (checkbox.checked) {
-            contentPage.sendMessage({
-                type: MessageType.ADD_AND_ENABLE_FILTER,
-                data: {
-                    filterId: AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
-                },
+            messenger.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, {
+                filterId: AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
             });
         } else {
-            contentPage.sendMessage({
-                type: MessageType.DISABLE_ANTIBANNER_FILTER,
-                data: {
-                    filterId: AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
-                    remove: true,
-                },
+            messenger.sendMessage(MessageType.DISABLE_ANTIBANNER_FILTER, {
+                filterId: AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
+                remove: true,
             });
         }
     };
@@ -121,7 +102,7 @@ const PageController = (response) => {
         trackingFilterEnabledCheckbox.addEventListener('change', trackingFilterEnabledChange);
         socialFilterEnabledCheckbox.addEventListener('change', socialFilterEnabledChange);
         // ignore Firefox, see task AG-2322
-        if (!navigator.userAgent.includes('Firefox')) {
+        if (!UserAgent.isFirefox) {
             sendStatsCheckbox.addEventListener('change', sendStatsCheckboxChange);
         }
         allowAcceptableAdsCheckbox.addEventListener('change', allowAcceptableAdsChange);
@@ -130,7 +111,7 @@ const PageController = (response) => {
         openExtensionStoreBtns.forEach((openExtensionStoreBtn) => {
             openExtensionStoreBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                contentPage.sendMessage({ type: MessageType.OPEN_EXTENSION_STORE });
+                messenger.sendMessage(MessageType.OPEN_EXTENSION_STORE);
             });
         });
 
@@ -138,7 +119,7 @@ const PageController = (response) => {
         openSettingsBtns.forEach((openSettingsBtn) => {
             openSettingsBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                contentPage.sendMessage({ type: MessageType.OPEN_SETTINGS_TAB });
+                messenger.sendMessage(MessageType.OPEN_SETTINGS_TAB);
             });
         });
     };
@@ -188,7 +169,7 @@ let counter = 0;
 const MAX_WAIT_RETRY = 10;
 const RETRY_TIMEOUT_MS = 100;
 const init = async () => {
-    if (typeof contentPage === 'undefined') {
+    if (typeof messenger === 'undefined') {
         if (counter > MAX_WAIT_RETRY) {
             clearTimeout(timeoutId);
             return;
@@ -200,8 +181,9 @@ const init = async () => {
 
     clearTimeout(timeoutId);
 
-    const response = await contentPage.sendMessage({ type: MessageType.INITIALIZE_FRAME_SCRIPT });
+    const response = await messenger.sendMessage(MessageType.INITIALIZE_FRAME_SCRIPT);
     const controller = PageController(response);
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             controller.init();

@@ -122,6 +122,11 @@ class Messenger {
         return this.sendMessage(MessageType.OPEN_EXTENSION_STORE);
     };
 
+    // TODO: implement in new background
+    openComparePage = async () => {
+        return this.sendMessage(MessageType.OPEN_COMPARE_PAGE);
+    };
+
     async enableFilter(filterId) {
         return this.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, { filterId });
     }
@@ -140,6 +145,11 @@ class Messenger {
 
     async resetStatistics() {
         return this.sendMessage(MessageType.RESET_BLOCKED_ADS_COUNT);
+    }
+
+    // TODO: implement in new background
+    async setFilteringLogWindowState(windowState) {
+        return this.sendMessage(MessageType.SET_FILTERING_LOG_WINDOW_STATE, { windowState });
     }
 
     async resetSettings() {

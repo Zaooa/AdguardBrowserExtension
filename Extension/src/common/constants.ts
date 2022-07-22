@@ -112,3 +112,5 @@ export const WASTE_CHARACTERS = /[.*+?^${}()|[\]\\]/g;
 
 // Custom scrollbar width
 export const SCROLLBAR_WIDTH = 12 as const;
+
+export const BACKGROUND_TAB_ID = -1 as const;

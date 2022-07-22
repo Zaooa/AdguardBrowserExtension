@@ -50,6 +50,9 @@
     "options_popup_description": {
         "message": "Na ta filter boste naročeni."
     },
+    "options_popup_url_title": {
+        "message": "Nova naročnina filtra"
+    },
     "options_popup_url_placeholder": {
         "message": "Vnesite URL ali pot"
     },
@@ -333,7 +336,7 @@
         "message": "Preveri varnost spletne strani"
     },
     "popup_reset_custom_rules": {
-        "message": "Ponastavi vsa uporabniška pravila za to stran"
+        "message": "Izbriši vsa uporabniška pravila za to stran"
     },
     "popup_open_settings": {
         "message": "Nastavitve AdGuarda"
@@ -495,7 +498,7 @@
         "message": "Omogoči"
     },
     "filtering_modal_remove_user": {
-        "message": "Odstrani iz uporabniških filtrov"
+        "message": "Izbriši pravilo"
     },
     "filtering_modal_preview_request_button": {
         "message": "Predogled"
@@ -612,7 +615,7 @@
         "message": "Tema"
     },
     "options_theme_selector_system": {
-        "message": "Sistemska"
+        "message": "Sistemska privzeta"
     },
     "options_theme_selector_light": {
         "message": "Svetla"
@@ -639,7 +642,7 @@
         "message": "Preverjanje..."
     },
     "options_set_update_interval": {
-        "message": "Interval posodabljanja filtrov"
+        "message": "Samodejno posodobi filtre"
     },
     "options_set_update_interval_desc": {
         "message": "Za učinkovitejše zaviranje je treba filtre redno posodabljati."
@@ -822,7 +825,7 @@
         "message": "Zaščitno stikalo"
     },
     "short_name": {
-        "message": "AdGuard Zaviralec oglasov"
+        "message": "AdGuard"
     },
     "options_about": {
         "message": "Vizitka"
@@ -848,15 +851,6 @@
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "Odstrani"
     },
-    "options_nav_better_than_extension": {
-        "message": "Zakaj je AdGuard polnopravni program boljši od razširitve?"
-    },
-    "options_nav_compare": {
-        "message": "Kako se primerjajo"
-    },
-    "options_nav_hide": {
-        "message": "Skrij"
-    },
     "options_filters_search": {
         "message": "Poišči"
     },
@@ -876,7 +870,7 @@
         "message": "Odstrani pojavna okna in druga nadležna obvestila, kot so obvestila o piškotkih."
     },
     "group_description_security": {
-        "message": "Zaščitite se pred zlonamernimi programi, lažnim predstavljanjem in drugimi spletnimi grožnjami."
+        "message": "Obvarujte se pred zlonamernimi programi, lažnim predstavljanjem in drugimi spletnimi grožnjami."
     },
     "group_description_miscellaneous": {
         "message": "Več nastavitev za še večjo nastavitev vašega brskanja po spletu z AdGuardom."
