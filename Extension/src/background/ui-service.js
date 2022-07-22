@@ -35,7 +35,8 @@ import { userrules } from './filter/userrules';
 import { browserUtils } from './utils/browser-utils';
 import { log } from '../common/log';
 import { runtimeImpl } from '../common/common-script';
-import { MessageType, AntiBannerFiltersId } from '../common/constants';
+import { AntiBannerFiltersId } from '../common/constants';
+import { MessageType } from '../common/messages';
 import { translator } from '../common/translators/translator';
 import { COMPARE_URL } from '../pages/constants';
 
