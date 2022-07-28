@@ -1,7 +1,7 @@
 import React, { useRef, forwardRef, useEffect } from 'react';
 import cn from 'classnames';
 import { Icon } from '../../../common/components/ui/Icon';
-import { isMacOs } from '../../../../common/user-agent-utils';
+import { UserAgent } from '../../../../common/user-agent';
 
 import './search.pcss';
 
@@ -11,7 +11,7 @@ const Search = forwardRef(({
     const localSearchInputRef = useRef(null);
 
     useEffect(() => {
-        const modifierKeyProperty = isMacOs ? 'metaKey' : 'ctrlKey';
+        const modifierKeyProperty = UserAgent.isMacOs ? 'metaKey' : 'ctrlKey';
         const handleSearchHotkey = (e) => {
             const { code } = e;
             if (e[modifierKeyProperty] && code === 'KeyF') {

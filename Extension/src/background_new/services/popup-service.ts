@@ -42,7 +42,7 @@ export class PopupService {
                 isFirefoxBrowser: UserAgent.isFirefox,
                 showInfoAboutFullVersion: !settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 isMacOs: UserAgent.isMacOs,
-                isEdgeBrowser: UserAgent.isEdge, // TODO: Edge chromium
+                isEdgeBrowser: UserAgent.isEdge || UserAgent.isEdgeChromium,
                 notification: null, // TODO
                 isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 hasCustomRulesToReset: false, // TODO,

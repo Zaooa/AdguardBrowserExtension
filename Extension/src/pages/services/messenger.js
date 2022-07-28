@@ -122,7 +122,6 @@ class Messenger {
         return this.sendMessage(MessageType.OPEN_EXTENSION_STORE);
     };
 
-    // TODO: implement in new background
     openComparePage = async () => {
         return this.sendMessage(MessageType.OPEN_COMPARE_PAGE);
     };

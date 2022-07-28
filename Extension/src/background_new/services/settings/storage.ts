@@ -24,7 +24,7 @@ export class SettingsStorage {
         [SettingOption.DISABLE_COLLECT_HITS]: true,
         [SettingOption.DEFAULT_ALLOWLIST_MODE]: true,
         [SettingOption.ALLOWLIST_ENABLED]: true,
-        [SettingOption.USE_OPTIMIZED_FILTERS]: UserAgent.isMobile,
+        [SettingOption.USE_OPTIMIZED_FILTERS]: UserAgent.isAndroid,
         [SettingOption.DISABLE_DETECT_FILTERS]: false,
         [SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION]: false,
         [SettingOption.FILTERS_UPDATE_PERIOD]: DEFAULT_FILTERS_UPDATE_PERIOD,

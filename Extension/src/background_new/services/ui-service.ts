@@ -26,6 +26,8 @@ export class UiService {
 
     static thankYouPageUrl = 'https://welcome.adguard.com/v2/thankyou.html';
 
+    static comparePageUrl = 'https://adguard.com/forward.html?action=compare&from=options_screen&app=browser_extension';
+
     static extensionStoreUrl = UiService.getExtensionStoreUrl();
 
     static init() {
@@ -37,6 +39,7 @@ export class UiService {
         messageHandler.addListener(MessageType.ADD_FILTERING_SUBSCRIPTION, UiService.openCustomFilterModal);
         messageHandler.addListener(MessageType.OPEN_THANKYOU_PAGE, UiService.openThankYouPage);
         messageHandler.addListener(MessageType.OPEN_EXTENSION_STORE, UiService.openExtensionStore);
+        messageHandler.addListener(MessageType.OPEN_COMPARE_PAGE, UiService.openComparePage);
         messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
 
         tabsApi.onUpdate.subscribe((tab) => {
@@ -145,6 +148,10 @@ export class UiService {
         await browser.tabs.create({ url: UiService.filtersDownloadPageUrl });
     }
 
+    static async openComparePage() {
+        await browser.tabs.create({ url: UiService.comparePageUrl });
+    }
+
     static async openThankYouPage() {
         const params = BrowserUtils.getExtensionParams();
         params.push(`_locale=${encodeURIComponent(browser.i18n.getUILanguage())}`);
@@ -187,7 +194,7 @@ export class UiService {
                 isChrome: UserAgent.isChrome,
                 Prefs: {
                     locale: browser.i18n.getUILanguage(),
-                    mobile: UserAgent.isMobile,
+                    mobile: UserAgent.isAndroid,
                 },
                 appVersion: browser.runtime.getManifest().version,
             },

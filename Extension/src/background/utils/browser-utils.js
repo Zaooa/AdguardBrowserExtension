@@ -21,7 +21,7 @@ import { collections } from './collections';
 import { tabsApi } from '../tabs/tabs-api';
 import { backgroundPage } from '../extension-api/background-page';
 import { browser } from '../extension-api/browser';
-import { isMacOs, isWindowsOs } from '../../common/user-agent-utils';
+import { UserAgent } from '../../common/user-agent';
 
 export const browserUtils = (function () {
     /**
@@ -166,11 +166,11 @@ export const browserUtils = (function () {
         },
 
         isWindowsOs() {
-            return isWindowsOs;
+            return UserAgent.isWindows;
         },
 
         isMacOs() {
-            return isMacOs;
+            return UserAgent.isMacOs;
         },
 
         /**

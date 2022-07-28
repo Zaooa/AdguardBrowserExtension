@@ -1,5 +1,3 @@
-import Bowser from 'bowser';
-
 /**
  * helper class for user agent data
  *
@@ -7,33 +5,157 @@ import Bowser from 'bowser';
  * https://developer.mozilla.org/en-US/docs/Web/API/User-Agent_Client_Hints_API#browser_compatibility
  */
 export class UserAgent {
-    static parser = Bowser.getParser(window.navigator.userAgent);
+    static isChrome = UserAgent.isTargetBrowser('Chrome');
 
-    static data = UserAgent.parser.getResult();
+    static isFirefox = UserAgent.isTargetBrowser('Firefox');
 
-    static readonly isSupportedBrowser = UserAgent.parser.satisfies({
-        chrome: '>=79',
-        firefox: '>=78',
-        opera: '>=66',
-    });
+    static isOpera = UserAgent.isTargetBrowser('Opera');
 
-    static browserName = UserAgent.data.browser.name;
+    static isYandex = UserAgent.isTargetBrowser('YaBrowser');
 
-    static isChrome = UserAgent.browserName === 'Chrome';
+    static isEdge = UserAgent.isTargetBrowser('Edge');
 
-    static isFirefox = UserAgent.browserName === 'Firefox';
+    static isEdgeChromium = UserAgent.isTargetBrowser('EdgeChromium');
 
-    static isEdge = UserAgent.browserName === 'Microsoft Edge';
+    static chromeVersion = UserAgent.getBrowserVersion('Chrome');
 
-    static isYandex = UserAgent.browserName === 'Yandex Browser';
+    static firefoxVersion = UserAgent.getBrowserVersion('Firefox');
 
-    static isOpera = UserAgent.browserName = 'Opera';
+    static operaVersion = UserAgent.getBrowserVersion('Opera');
 
-    static osName = UserAgent.data.os.name;
+    static isMacOs = UserAgent.isTargetPlatform('MAC');
 
-    static isMacOs = UserAgent.osName === 'macOS';
+    static isWindows = UserAgent.isTargetPlatform('WIN');
 
-    static isWindows = UserAgent.osName === 'Windows';
+    static isAndroid = UserAgent.isTargetPlatform('ANDROID');
 
-    static isMobile = UserAgent.data.platform.type === 'mobile';
+    static isSupportedBrowser = (UserAgent.isChrome && UserAgent.chromeVersion >= 79)
+        || (UserAgent.isFirefox && UserAgent.firefoxVersion >= 78)
+        || (UserAgent.isOpera && UserAgent.operaVersion >= 66);
+
+    static browserName = UserAgent.getBrowserName();
+
+    static browserDataMap = {
+        'Chrome': {
+            brand: 'Google Chrome',
+            uaStringName: 'Chrome',
+        },
+        'Firefox': {
+            brand: undefined,
+            uaStringName: 'Firefox',
+        },
+        'Safari': {
+            brand: undefined,
+            uaStringName: 'Safari',
+        },
+        'Opera': {
+            brand: 'Opera',
+            uaStringName: 'OPR',
+        },
+        'YaBrowser': {
+            brand: 'Yandex',
+            uaStringName: 'YaBrowser',
+        },
+        'Edge': {
+            brand: undefined,
+            uaStringName: 'edge',
+        },
+        'EdgeChromium': {
+            brand: 'Microsoft Edge',
+            uaStringName: 'edg',
+        },
+    };
+
+    static getBrowserName(): string | null {
+        const brandsData = navigator?.userAgentData?.brands;
+
+        const browserDataEntries = Object.entries(UserAgent.browserDataMap);
+
+        for (let i = 0; i < browserDataEntries.length; i += 1) {
+            const [name, data] = browserDataEntries[i];
+
+            for (let j = 0; j < brandsData.length; j += 1) {
+                const brandData = brandsData[i];
+
+                if (brandData.brand === data.brand) {
+                    return name;
+                }
+            }
+
+            if (navigator.userAgent.indexOf(data.uaStringName) >= 0) {
+                return name;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if current browser is as given
+     */
+    static isTargetBrowser(browserName: string): boolean {
+        const brand = UserAgent.browserDataMap[browserName]?.brand;
+        const uaStringName = UserAgent.browserDataMap[browserName]?.uaStringName;
+
+        const brandsData = navigator?.userAgentData?.brands;
+
+        if (!brandsData || !brand) {
+            return navigator.userAgent.indexOf(uaStringName) >= 0;
+        }
+
+        for (let i = 0; i < brandsData.length; i += 1) {
+            const data = brandsData[i];
+
+            if (data.brand === brand) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if current platform is as given
+     */
+    static isTargetPlatform(platformName: string): boolean {
+        const platformString = navigator.userAgentData?.platform;
+
+        return platformString
+            ? platformString.toUpperCase().indexOf(platformName) >= 0
+            : navigator.userAgent.toUpperCase().indexOf(platformName) >= 0;
+    }
+
+    /**
+     * Get browser version by name
+     * @param {string} browserName
+     * @returns {number|null}
+     */
+    static getBrowserVersion(browserName: string): number | null {
+        let brand: string;
+        let uaStringMask: RegExp;
+
+        if (browserName === 'Chrome') {
+            brand = 'Google Chrome';
+            uaStringMask = /\sChrome\/(\d+)\./;
+        } else if (browserName === 'Firefox') {
+            uaStringMask = /\sFirefox\/(\d+)\./;
+        }
+
+        const brandsData = navigator.userAgentData?.brands;
+        if (!brandsData || !brand) {
+            const match = uaStringMask.exec(navigator.userAgent);
+            return match === null ? null : Number.parseInt(match[1], 10);
+        }
+
+        for (let i = 0; i < brandsData.length; i += 1) {
+            const data = brandsData[i];
+
+            if (data.brand === brand) {
+                const { version } = data;
+                return Number.parseInt(version, 10);
+            }
+        }
+
+        return null;
+    }
 }

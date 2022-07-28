@@ -17,16 +17,7 @@
 
 import { browser } from './extension-api/browser';
 import { lazyGet } from './utils/lazy';
-import {
-    isAndroid,
-    isFirefox,
-    isOpera,
-    isYaBrowser,
-    isEdge,
-    isEdgeChromium,
-    chromeVersion,
-    firefoxVersion,
-} from '../common/user-agent-utils';
+import { UserAgent } from '../common/user-agent';
 /**
  * Extension global preferences.
  */
@@ -34,7 +25,7 @@ export const prefs = (() => {
     const Prefs = {
 
         get mobile() {
-            return lazyGet(Prefs, 'mobile', () => isAndroid);
+            return lazyGet(Prefs, 'mobile', () => UserAgent.isAndroid);
         },
 
         get platform() {
@@ -44,15 +35,15 @@ export const prefs = (() => {
         get browser() {
             return lazyGet(Prefs, 'browser', () => {
                 let browser;
-                if (isYaBrowser) {
+                if (UserAgent.isYandex) {
                     browser = 'YaBrowser';
-                } else if (isEdge) {
+                } else if (UserAgent.isEdge) {
                     browser = 'Edge';
-                } else if (isEdgeChromium) {
+                } else if (UserAgent.isEdgeChromium) {
                     browser = 'EdgeChromium';
-                } else if (isOpera) {
+                } else if (UserAgent.isOpera) {
                     browser = 'Opera';
-                } else if (isFirefox) {
+                } else if (UserAgent.isFirefox) {
                     browser = 'Firefox';
                 } else {
                     browser = 'Chrome';
@@ -62,11 +53,11 @@ export const prefs = (() => {
         },
 
         get chromeVersion() {
-            return lazyGet(Prefs, 'chromeVersion', () => chromeVersion);
+            return lazyGet(Prefs, 'chromeVersion', () => UserAgent.chromeVersion);
         },
 
         get firefoxVersion() {
-            return lazyGet(Prefs, 'firefoxVersion', () => firefoxVersion);
+            return lazyGet(Prefs, 'firefoxVersion', () => UserAgent.firefoxVersion);
         },
 
         /**
