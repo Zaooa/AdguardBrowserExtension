@@ -5,36 +5,6 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/User-Agent_Client_Hints_API#browser_compatibility
  */
 export class UserAgent {
-    static isChrome = UserAgent.isTargetBrowser('Chrome');
-
-    static isFirefox = UserAgent.isTargetBrowser('Firefox');
-
-    static isOpera = UserAgent.isTargetBrowser('Opera');
-
-    static isYandex = UserAgent.isTargetBrowser('YaBrowser');
-
-    static isEdge = UserAgent.isTargetBrowser('Edge');
-
-    static isEdgeChromium = UserAgent.isTargetBrowser('EdgeChromium');
-
-    static chromeVersion = UserAgent.getBrowserVersion('Chrome');
-
-    static firefoxVersion = UserAgent.getBrowserVersion('Firefox');
-
-    static operaVersion = UserAgent.getBrowserVersion('Opera');
-
-    static isMacOs = UserAgent.isTargetPlatform('MAC');
-
-    static isWindows = UserAgent.isTargetPlatform('WIN');
-
-    static isAndroid = UserAgent.isTargetPlatform('ANDROID');
-
-    static isSupportedBrowser = (UserAgent.isChrome && UserAgent.chromeVersion >= 79)
-        || (UserAgent.isFirefox && UserAgent.firefoxVersion >= 78)
-        || (UserAgent.isOpera && UserAgent.operaVersion >= 66);
-
-    static browserName = UserAgent.getBrowserName();
-
     static browserDataMap = {
         'Chrome': {
             brand: 'Google Chrome',
@@ -142,7 +112,7 @@ export class UserAgent {
         }
 
         const brandsData = navigator.userAgentData?.brands;
-        if (!brandsData || !brand) {
+        if ((!brandsData || !brand) && uaStringMask) {
             const match = uaStringMask.exec(navigator.userAgent);
             return match === null ? null : Number.parseInt(match[1], 10);
         }
@@ -158,4 +128,34 @@ export class UserAgent {
 
         return null;
     }
+
+    static isChrome = UserAgent.isTargetBrowser('Chrome');
+
+    static isFirefox = UserAgent.isTargetBrowser('Firefox');
+
+    static isOpera = UserAgent.isTargetBrowser('Opera');
+
+    static isYandex = UserAgent.isTargetBrowser('YaBrowser');
+
+    static isEdge = UserAgent.isTargetBrowser('Edge');
+
+    static isEdgeChromium = UserAgent.isTargetBrowser('EdgeChromium');
+
+    static chromeVersion = UserAgent.getBrowserVersion('Chrome');
+
+    static firefoxVersion = UserAgent.getBrowserVersion('Firefox');
+
+    static operaVersion = UserAgent.getBrowserVersion('Opera');
+
+    static isMacOs = UserAgent.isTargetPlatform('MAC');
+
+    static isWindows = UserAgent.isTargetPlatform('WIN');
+
+    static isAndroid = UserAgent.isTargetPlatform('ANDROID');
+
+    static isSupportedBrowser = (UserAgent.isChrome && UserAgent.chromeVersion >= 79)
+        || (UserAgent.isFirefox && UserAgent.firefoxVersion >= 78)
+        || (UserAgent.isOpera && UserAgent.operaVersion >= 66);
+
+    static browserName = UserAgent.getBrowserName();
 }
