@@ -1,4 +1,5 @@
 import React, {
+    useState,
     useContext,
     useEffect,
     useRef,
@@ -6,6 +7,7 @@ import React, {
 } from 'react';
 import { observer } from 'mobx-react';
 import { Range } from 'ace-builds';
+import debounce from 'lodash/debounce';
 import { SimpleRegex } from '@adguard/tsurlfilter/dist/es/simple-regex';
 
 import { userRulesEditorStore } from './UserRulesEditorStore';
@@ -13,9 +15,11 @@ import { Editor } from '../Editor';
 import { UserRulesSavingButton } from './UserRulesSavingButton';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { Popover } from '../ui/Popover';
+import { Checkbox } from '../ui/Checkbox';
 import { Icon } from '../ui/Icon';
 import { messenger } from '../../../services/messenger';
 import { MESSAGE_TYPES, NOTIFIER_TYPES } from '../../../../common/constants';
+import { HANDLER_DELAY_MS } from '../../constants';
 import { handleFileUpload } from '../../../helpers';
 import { log } from '../../../../common/log';
 import { ToggleWrapButton } from './ToggleWrapButton';
@@ -27,6 +31,7 @@ import { exportData, ExportTypes } from '../../utils/export';
  */
 export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
     const store = useContext(userRulesEditorStore);
+    const [userFilterEnabled, setUserFilterEnabledSettingId] = useState(false);
 
     const editorRef = useRef(null);
     const inputRef = useRef(null);
@@ -40,6 +45,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
     useEffect(() => {
         (async () => {
             await store.requestSettingsData();
+            setUserFilterEnabledSettingId(store.userFilterEnabled);
         })();
     }, [store]);
 
@@ -291,6 +297,10 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
         window.close();
     };
 
+    const handleUserRulesToggle = debounce((e) => {
+        store.updateSetting(e.id, e.data);
+    }, HANDLER_DELAY_MS);
+
     const fullscreenTooltipText = fullscreen
         ? reactTranslator.getMessage('options_editor_close_fullscreen_button_tooltip')
         : reactTranslator.getMessage('options_editor_open_fullscreen_button_tooltip');
@@ -307,6 +317,20 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
             />
             <div className="actions actions--divided">
                 <div className="actions__group">
+                    {
+                        fullscreen && (
+                            <>
+                                <div className="title__inner">
+                                    <h2 className="title">{reactTranslator.getMessage('fullscreen_user_rules_title')}</h2>
+                                </div>
+                                <Checkbox
+                                    id="user-filter-enabled"
+                                    handler={handleUserRulesToggle}
+                                    value={userFilterEnabled}
+                                />
+                            </>
+                        )
+                    }
                     <UserRulesSavingButton onClick={saveClickHandler} />
                     <input
                         type="file"

@@ -102,6 +102,16 @@ class UserRulesEditorStore {
         return this.userRulesEditorWrap;
     }
 
+    @computed
+    get userFilterEnabledSettingId() {
+        return this.settings.names.USER_FILTER_ENABLED;
+    }
+
+    @computed
+    get userFilterEnabled() {
+        return this.settings.values[this.userFilterEnabledSettingId];
+    }
+
     // eslint-disable-next-line class-methods-use-this
     async saveUserRules(value) {
         savingService.send(SAVING_FSM_EVENTS.SAVE, { value });
