@@ -319,16 +319,22 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                 <div className="actions__group">
                     {
                         fullscreen && (
-                            <>
+                            <label
+                                className="title__container"
+                                htmlFor="user-filter-enabled"
+                                style={{ paddingBottom: '8px' }}
+                            >
                                 <div className="title__inner">
                                     <h2 className="title">{reactTranslator.getMessage('fullscreen_user_rules_title')}</h2>
                                 </div>
-                                <Checkbox
-                                    id="user-filter-enabled"
-                                    handler={handleUserRulesToggle}
-                                    value={userFilterEnabled}
-                                />
-                            </>
+                                <div className="setting__container setting__container--inline setting__inline-control">
+                                    <Checkbox
+                                        id="user-filter-enabled"
+                                        handler={handleUserRulesToggle}
+                                        value={userFilterEnabled}
+                                    />
+                                </div>
+                            </label>
                         )
                     }
                     <UserRulesSavingButton onClick={saveClickHandler} />
