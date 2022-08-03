@@ -109,7 +109,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
 
     // Append listeners
     useEffect(() => {
-        let removeListenerCallback = () => {};
+        let removeListenerCallback = () => { };
 
         (async () => {
             // Subscribe to events of request filter update
@@ -320,20 +320,18 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                     {
                         fullscreen && (
                             <label
-                                className="title__container"
+                                className="actions__label"
                                 htmlFor="user-filter-enabled"
-                                style={{ paddingBottom: '8px' }}
                             >
-                                <div className="title__inner">
-                                    <h2 className="title">{reactTranslator.getMessage('fullscreen_user_rules_title')}</h2>
+                                <div className="actions__title">
+                                    {reactTranslator.getMessage('fullscreen_user_rules_title')}
                                 </div>
-                                <div className="setting__container setting__container--inline setting__inline-control">
-                                    <Checkbox
-                                        id="user-filter-enabled"
-                                        handler={handleUserRulesToggle}
-                                        value={userFilterEnabled}
-                                    />
-                                </div>
+                                <Checkbox
+                                    id="user-filter-enabled"
+                                    handler={handleUserRulesToggle}
+                                    value={userFilterEnabled}
+                                    className="checkbox__label--actions"
+                                />
                             </label>
                         )
                     }

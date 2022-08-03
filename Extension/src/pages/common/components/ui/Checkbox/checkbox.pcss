@@ -50,6 +50,20 @@
             }
         }
 
+        &--actions {
+            @media (min-width: 640px) {
+                transform: translate(-40px, 6px);
+            }
+
+            &:hover {
+                background-color: transparent;
+
+                @media (prefers-color-scheme: dark) {
+                    background-color: transparent;
+                }
+            }
+        }
+
         &:before {
             content: "";
             position: absolute;
