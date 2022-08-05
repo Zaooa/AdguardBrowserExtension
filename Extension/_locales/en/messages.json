@@ -20,6 +20,9 @@
     "popup_header_cta_link": {
         "message": "Want to block more?"
     },
+    "popup_header_update_filters": {
+        "message": "Check for filter updates"
+    },
     "options_popup_import_settings_wrong_file_ext": {
         "message": "The file extension must be %extension%"
     },
@@ -795,7 +798,7 @@
         "message": "Block trackers"
     },
     "options_block_known_trackers_description": {
-        "message": "Block web analytics tools with AdGuard Tracking Protection filter."
+        "message": "Block trackers and web analytics tools with AdGuard Tracking Protection filter."
     },
     "options_third_party_title": {
         "message": "Self-destruction of third-party cookies"

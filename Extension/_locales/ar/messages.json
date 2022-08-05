@@ -20,6 +20,9 @@
     "popup_header_cta_link": {
         "message": "هل تريد حظر المزيد؟"
     },
+    "popup_header_update_filters": {
+        "message": "بحث عن تحديثات الفلاتر"
+    },
     "options_popup_import_settings_wrong_file_ext": {
         "message": "يجب أن يكون امتداد الملف %extension%"
     },
@@ -788,15 +791,6 @@
     "options_strip_tracking_params_title": {
         "message": "إزالة معلمات التتبع"
     },
-    "options_strip_tracking_params_description": {
-        "message": "عند التفعيل، يتم استخدام فلتر AdGuard URL Tracking لإزالة علامات التتبع من عناوين URL للصفحات."
-    },
-    "options_block_known_trackers_title": {
-        "message": "منع المتتبعون المعروفون"
-    },
-    "options_block_known_trackers_description": {
-        "message": "عند التفعيل ، يتم استخدام فلتر حماية التتبع AdGuard لحظر أجهزة التتبع المعروفة."
-    },
     "options_third_party_title": {
         "message": "التدمير الذاتي لملفات تعريف الارتباط للجهات الخارجية"
     },
@@ -862,6 +856,9 @@
     },
     "options_remove_filter_confirm_modal_ok_button": {
         "message": "حذف"
+    },
+    "options_nav_better_than_extension": {
+        "message": "لماذا تطبيق AdGuard أفضل من الإضافة فقط ؟"
     },
     "options_nav_compare": {
         "message": "قارن"

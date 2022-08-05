@@ -20,6 +20,9 @@
     "popup_header_cta_link": {
         "message": "Blokir lebih banyak?"
     },
+    "popup_header_update_filters": {
+        "message": "Periksa pembaruan penyaring"
+    },
     "options_popup_import_settings_wrong_file_ext": {
         "message": "Ekstensi berkas harus %extension%"
     },
@@ -772,15 +775,6 @@
     },
     "options_strip_tracking_params_title": {
         "message": "Hapus parameter pelacak"
-    },
-    "options_strip_tracking_params_description": {
-        "message": "Jika diaktifkan, filter Pelacak URL AdGuard akan digunakan untuk menghapus parameter pelacakan dari halaman URL."
-    },
-    "options_block_known_trackers_title": {
-        "message": "Blokir pelacak yang dikenal"
-    },
-    "options_block_known_trackers_description": {
-        "message": "Saat diaktifkan, filter Perlindungan Pelacakan AdGuard digunakan untuk memblokir pelacak yang dikenal."
     },
     "options_third_party_title": {
         "message": "Penghancuran otomatis untuk kuki pihak ketika"

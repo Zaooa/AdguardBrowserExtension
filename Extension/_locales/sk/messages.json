@@ -20,6 +20,9 @@
     "popup_header_cta_link": {
         "message": "Chcete zablokovať viac?"
     },
+    "popup_header_update_filters": {
+        "message": "Skontrolovať aktualizácie filtrov"
+    },
     "options_popup_import_settings_wrong_file_ext": {
         "message": "Rozšírenie súboru musí byť %extension%"
     },
@@ -784,15 +787,6 @@
     },
     "options_strip_tracking_params_title": {
         "message": "Odstrániť parametre sledovania"
-    },
-    "options_strip_tracking_params_description": {
-        "message": "Ak je zapnuté, AdGuard filter sledovania URL adries sa používa na odstránenie parametrov sledovania z URL adries."
-    },
-    "options_block_known_trackers_title": {
-        "message": "Blokuje známe sledovače"
-    },
-    "options_block_known_trackers_description": {
-        "message": "Ak je zapnuté, AdGuard filter proti sledovaniu sa použije na blokovanie známych sledovačov."
     },
     "options_third_party_title": {
         "message": "Automatická deštrukcia cookie súborov tretích strán"

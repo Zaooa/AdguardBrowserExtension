@@ -20,6 +20,9 @@
     "popup_header_cta_link": {
         "message": "Chcesz zablokować więcej?"
     },
+    "popup_header_update_filters": {
+        "message": "Sprawdź, czy są aktualizacje filtrów"
+    },
     "options_popup_import_settings_wrong_file_ext": {
         "message": "Plik musi mieć rozszerzenie %extension%"
     },
@@ -775,15 +778,6 @@
     },
     "options_strip_tracking_params_title": {
         "message": "Usunięto parametry śledzenia"
-    },
-    "options_strip_tracking_params_description": {
-        "message": "Po włączeniu, filtr śledzenia URL AdGuard jest używany do usuwania parametrów śledzenia z adresów URL stron"
-    },
-    "options_block_known_trackers_title": {
-        "message": "Blokuj znane trackery"
-    },
-    "options_block_known_trackers_description": {
-        "message": "Po włączeniu Filtr elementów szpiegujących służy do blokowania znanych trackerów."
     },
     "options_third_party_title": {
         "message": "Samoniszczące ciasteczka firm trzecich"
