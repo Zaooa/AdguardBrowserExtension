@@ -77,6 +77,21 @@ export class FiltersApi {
     }
 
     /**
+     * Checks if filter is trusted
+     *
+     * @param filterId - filter id
+     */
+    public static isFilterTrusted(filterId: number): boolean {
+        if (!CustomFilterApi.isCustomFilter(filterId)) {
+            return true;
+        }
+
+        const metadata = CustomFilterApi.getCustomFilterMetadata(filterId);
+
+        return metadata.trusted;
+    }
+
+    /**
      * Checks if filter is common
      *
      * @param filterId - filter id
@@ -121,7 +136,13 @@ export class FiltersApi {
      */
     public static async loadAndEnableFilters(filtersIds: number[], remote = true) {
         await FiltersApi.loadFilters(filtersIds, remote);
+
         await filtersState.enableFilters(filtersIds);
+
+        /**
+         * we enable filters groups if it was never enabled or disabled early
+         */
+        FiltersApi.enableGroupsWereNotToggled(filtersIds);
     }
 
     /**
@@ -259,7 +280,7 @@ export class FiltersApi {
             AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
         ];
 
-        if (UserAgent.isMobile) {
+        if (UserAgent.isAndroid) {
             filterIds.push(AntiBannerFiltersId.MOBILE_ADS_FILTER_ID);
         }
 
@@ -336,5 +357,34 @@ export class FiltersApi {
             lastUpdateTime: new Date(timeUpdated).getTime(),
             lastCheckTime: Date.now(),
         });
+    }
+
+    /**
+     * Enable filters groups that were not toggled by users
+     *
+     * Called on filter enabling
+     *
+     * @param filtersIds - filters ids
+     */
+    private static enableGroupsWereNotToggled(filtersIds: number[]) {
+        const groupIds = [];
+
+        for (let i = 0; i < filtersIds.length; i += 1) {
+            const filterId = filtersIds[i];
+
+            const filterMetadata = FiltersApi.getFilterMetadata(filterId);
+
+            const groupId = filterMetadata?.groupId;
+
+            if (groupId) {
+                const group = groupsState.get(groupId);
+
+                if (!group.toggled) {
+                    groupIds.push(filterMetadata.groupId);
+                }
+            }
+        }
+
+        groupsState.enableGroups(groupIds);
     }
 }

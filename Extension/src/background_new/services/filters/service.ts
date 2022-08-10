@@ -15,11 +15,13 @@ import { FiltersApi } from './api';
 import { pageStats } from './page-stats';
 import { SettingsService } from '../settings';
 import { SettingOption } from '../../../common/settings';
+import { localeDetect } from './locale-detect';
 
 export class FiltersService {
     static async init() {
         await FiltersApi.initMetadata();
         pageStats.init();
+        localeDetect.init();
 
         // TODO: debounce message events
         messageHandler.addListener(MessageType.ADD_AND_ENABLE_FILTER, FiltersService.onFilterEnable);

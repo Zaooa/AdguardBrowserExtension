@@ -11,6 +11,7 @@ import { Engine } from '../../engine';
 import { Categories } from '../filters/filters-categories';
 import { listeners } from '../../notifier';
 import { SettingsEvents } from './events';
+import { fullscreenUserRulesEditor } from '../fullscreen-user-rules-editor';
 
 export class SettingsService {
     static onSettingChange = new SettingsEvents();
@@ -49,7 +50,7 @@ export class SettingsService {
     }
 
     static getOptionsData() {
-        return Promise.resolve({
+        return {
             settings: settingsStorage.getData(),
             appVersion: browser.runtime.getManifest().version,
             environmentOptions: {
@@ -62,8 +63,8 @@ export class SettingsService {
                 rulesCount: Engine.api.getRulesCount(),
             },
             filtersMetadata: Categories.getFiltersMetadata(),
-            fullscreenUserRulesEditorIsOpen: false,
-        });
+            fullscreenUserRulesEditorIsOpen: fullscreenUserRulesEditor.isOpen(),
+        };
     }
 
     static getConfiguration() {

@@ -3,6 +3,7 @@ import { FiltersStorage } from '../filters-storage';
 import { settingsStorage } from '../../settings';
 import { SettingOption } from '../../../../common/settings';
 import { listeners } from '../../../notifier';
+import { editorStorage } from './editor-storage';
 
 export class UserRulesApi {
     static async init() {
@@ -49,18 +50,16 @@ export class UserRulesApi {
      * Set user rule list to storage
      */
     static async setUserRules(rules: string[]) {
-        /**
-         * remove empty strings
-         */
-        rules = rules.filter(domain => !!domain);
-
-        /**
-         * remove duplicates
-         */
-        rules = Array.from(new Set(rules));
-
         await FiltersStorage.set(AntiBannerFiltersId.USER_FILTER_ID, rules);
 
         listeners.notifyListeners(listeners.USER_FILTER_UPDATED);
+    }
+
+    static getEditorStorageData(): string | undefined {
+        return editorStorage.get();
+    }
+
+    static setEditorStorageData(data: string): void {
+        editorStorage.set(data);
     }
 }

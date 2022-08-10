@@ -68,11 +68,14 @@ export class CustomFilterService {
         if (requestType !== RequestType.Document && requestType !== RequestType.Subdocument) {
             return;
         }
-
-        browser.tabs.executeScript(tabId, {
-            file: '/content-script/subscribe.js',
-            runAt: 'document_start',
-            frameId,
-        });
+        try {
+            browser.tabs.executeScript(tabId, {
+                file: '/content-script/subscribe.js',
+                runAt: 'document_start',
+                frameId,
+            });
+        } catch (e) {
+            // do nothing
+        }
     }
 }

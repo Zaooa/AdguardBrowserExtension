@@ -40,7 +40,7 @@ export class App {
         await AllowlistService.init();
         await UserRulesService.init();
         FilteringLogService.init();
-        UiService.init();
+        await UiService.init();
         PopupService.init();
         eventService.init();
         safebrowsingService.init();
@@ -61,14 +61,14 @@ export class App {
         }
     }
 
-    private static async onCheckRequestFilterReady() {
+    private static onCheckRequestFilterReady() {
         const ready = Engine.api.isStarted;
 
         if (ready) {
             messageHandler.removeListener(MessageType.CHECK_REQUEST_FILTER_READY);
         }
 
-        return Promise.resolve({ ready });
+        return { ready };
     }
 
     private static async setUninstallUrl() {

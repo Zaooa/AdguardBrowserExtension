@@ -21,7 +21,14 @@ export class TabsApi {
         await browser.windows.update(windowId, { focused: true });
     }
 
-    static async getAllTabs(): Promise<Tabs.Tab[]> {
+    static async getAll(): Promise<Tabs.Tab[]> {
         return browser.tabs.query({});
+    }
+
+    static async getActive(): Promise<Tabs.Tab | null> {
+        return TabsApi.findOne({
+            currentWindow: true,
+            active: true,
+        });
     }
 }

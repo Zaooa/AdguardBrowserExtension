@@ -7,10 +7,12 @@ import {
     ExtractedMessage,
     APP_MESSAGE_HANDLER_NAME,
     FILTERING_LOG,
+    FULLSCREEN_USER_RULES_EDITOR,
 } from '../common/constants';
 import { log } from '../common/log';
 import { listeners } from './notifier';
 import { filteringLogApi } from './services/filtering-log';
+import { fullscreenUserRulesEditor } from './services/fullscreen-user-rules-editor';
 
 type MessageListener<T> = (message: T, sender: Runtime.MessageSender) => unknown;
 
@@ -47,7 +49,7 @@ export class MessageHandler {
       if (message.handlerName === APP_MESSAGE_HANDLER_NAME) {
           const listener = this.messageListeners.get(message.type) as MessageListener<T>;
           if (listener) {
-              return listener(message, sender);
+              return Promise.resolve(listener(message, sender));
           }
       }
   }
@@ -89,12 +91,12 @@ export class MessageHandler {
               filteringLogApi.onOpenFilteringLogPage();
               break;
           }
-          /*
+
           case port.name.startsWith(FULLSCREEN_USER_RULES_EDITOR): {
               fullscreenUserRulesEditor.onOpenPage();
               break;
           }
-          */
+
           default: {
               throw new Error(`There is no such pages ${port.name}`);
           }
@@ -107,12 +109,12 @@ export class MessageHandler {
               filteringLogApi.onCloseFilteringLogPage();
               break;
           }
-          /*
+
           case port.name.startsWith(FULLSCREEN_USER_RULES_EDITOR): {
               fullscreenUserRulesEditor.onClosePage();
               break;
           }
-          */
+
           default: {
               throw new Error(`There is no such pages ${port.name}`);
           }

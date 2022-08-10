@@ -201,7 +201,7 @@ export class FilteringLogApi {
      * Synchronize currently opened tabs with out state
      */
     public async synchronizeOpenTabs() {
-        const tabs = await TabsApi.getAllTabs();
+        const tabs = await TabsApi.getAll();
 
         // As Object.keys() returns strings we convert them to integers,
         // because tabId is integer in extension API

@@ -18,6 +18,8 @@ export class UserRulesService {
         messageHandler.addListener(MessageType.SAVE_USER_RULES, UserRulesService.handleUserRulesSave);
         messageHandler.addListener(MessageType.ADD_USER_RULE, UserRulesService.handleUserRuleAdd);
         messageHandler.addListener(MessageType.REMOVE_USER_RULE, UserRulesService.handleUserRuleRemove);
+        messageHandler.addListener(MessageType.GET_EDITOR_STORAGE_CONTENT, UserRulesService.getEditorStorageContent);
+        messageHandler.addListener(MessageType.SET_EDITOR_STORAGE_CONTENT, UserRulesService.setEditorStorageContent);
 
         Engine.api.onAssistantCreateRule.subscribe(UserRulesService.addUserRule);
 
@@ -74,5 +76,15 @@ export class UserRulesService {
 
     static async handleEnableStateChange() {
         await Engine.update();
+    }
+
+    static getEditorStorageContent(): string {
+        return UserRulesApi.getEditorStorageData();
+    }
+
+    static setEditorStorageContent(message): void {
+        const { content } = message.data;
+
+        UserRulesApi.setEditorStorageData(content);
     }
 }

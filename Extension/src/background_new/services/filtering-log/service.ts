@@ -217,21 +217,21 @@ export class FilteringLogService {
         await browser.tabs.reload(data.tabId);
     }
 
-    static async onGetFilteringLogInfoById({ data }) {
+    static onGetFilteringLogInfoById({ data }) {
         const { tabId } = data;
 
-        return Promise.resolve(filteringLogApi.getFilteringInfoByTabId(tabId));
+        return filteringLogApi.getFilteringInfoByTabId(tabId);
     }
 
     static async onSyncOpenTabs() {
         return filteringLogApi.synchronizeOpenTabs();
     }
 
-    static async onGetFilteringLogData() {
-        return Promise.resolve({
+    static onGetFilteringLogData() {
+        return {
             filtersMetadata: FiltersApi.getFiltersMetadata(),
             settings: settingsStorage.getData(),
             preserveLogEnabled: filteringLogApi.isPreserveLogEnabled(),
-        });
+        };
     }
 }

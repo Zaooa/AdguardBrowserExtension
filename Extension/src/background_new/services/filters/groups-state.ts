@@ -5,11 +5,13 @@ import { metadataStorage } from './metadata';
 
 export type GroupStateData = {
     enabled: boolean;
+    toggled: boolean;
 };
 
 export class GroupsState {
     static defaultState = {
         enabled: false,
+        toggled: false,
     };
 
     data: Record<number, GroupStateData> = {};
@@ -24,7 +26,6 @@ export class GroupsState {
         for (let i = 0; i < groupsMetadata.length; i += 1) {
             const { groupId } = groupsMetadata[i] as { groupId: number };
 
-            // TODO install state
             data[groupId] = data[groupId] || GroupsState.defaultState;
         }
 
@@ -54,19 +55,25 @@ export class GroupsState {
             .map(([id]) => Number(id));
     }
 
-    async enableGroups(groupIds: number[]) {
+    async enableGroups(groupIds: number[], toggled = true) {
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
-            this.data[groupId] = { enabled: true };
+            this.data[groupId] = {
+                enabled: true,
+                toggled,
+            };
         }
 
         await this.updateStorageData();
     }
 
-    async disableGroups(groupIds: number[]) {
+    async disableGroups(groupIds: number[], toggled = true) {
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
-            this.data[groupId] = { enabled: false };
+            this.data[groupId] = {
+                enabled: false,
+                toggled,
+            };
         }
 
         await this.updateStorageData();

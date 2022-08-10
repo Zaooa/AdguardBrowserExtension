@@ -14,7 +14,9 @@ import { BrowserUtils } from '../utils/browser-utils';
 import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
 import { FiltersApi } from './filters/api';
 import { listeners } from '../notifier';
+import { alerts } from './ui/alerts';
 
+// TODO: decomposite and move to ./ui
 export class UiService {
     static baseUrl = browser.runtime.getURL('/');
 
@@ -30,7 +32,9 @@ export class UiService {
 
     static extensionStoreUrl = UiService.getExtensionStoreUrl();
 
-    static init() {
+    static async init() {
+        await alerts.init();
+
         messageHandler.addListener(MessageType.OPEN_SETTINGS_TAB, UiService.openSettingsTab);
         messageHandler.addListener(MessageType.OPEN_FILTERING_LOG, UiService.openFilteringLog);
         messageHandler.addListener(MessageType.OPEN_ABUSE_TAB, UiService.openAbuseTab);
@@ -40,14 +44,22 @@ export class UiService {
         messageHandler.addListener(MessageType.OPEN_THANKYOU_PAGE, UiService.openThankYouPage);
         messageHandler.addListener(MessageType.OPEN_EXTENSION_STORE, UiService.openExtensionStore);
         messageHandler.addListener(MessageType.OPEN_COMPARE_PAGE, UiService.openComparePage);
+        messageHandler.addListener(MessageType.OPEN_FULLSCREEN_USER_RULES, UiService.openFullscreenUserRules);
         messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
 
         tabsApi.onUpdate.subscribe((tab) => {
             UiService.debounceUpdateTabIcon(tab.info.id);
         });
 
-        browser.tabs.onActivated.addListener((data) => {
-            UiService.debounceUpdateTabIcon(data.tabId);
+        tabsApi.onActivated.subscribe((tab) => {
+            UiService.debounceUpdateTabIcon(tab.info.id);
+        });
+
+        // on filter auto-enabled event
+        listeners.addListener((event, enabledFilters) => {
+            if (event === listeners.ENABLE_FILTER_SHOW_POPUP) {
+                alerts.showFiltersEnabledAlertMessage(enabledFilters as any[]);
+            }
         });
     }
 
@@ -61,6 +73,18 @@ export class UiService {
         } else {
             await browser.tabs.create({ url: UiService.settingsUrl });
         }
+    }
+
+    static async openFullscreenUserRules(): Promise<void> {
+        const theme = settingsStorage.get(SettingOption.APPEARANCE_THEME);
+        const url = UiService.getExtensionPageUrl(`fullscreen-user-rules.html?theme=${theme}`);
+
+        await browser.windows.create({
+            url,
+            type: 'popup',
+            focused: true,
+            state: 'fullscreen',
+        });
     }
 
     static async openFilteringLog(): Promise<void> {
@@ -181,7 +205,7 @@ export class UiService {
             }
         });
 
-        return Promise.resolve({
+        return {
             userSettings: settingsStorage.getData(),
             enabledFilters,
             filtersMetadata: FiltersApi.getFiltersMetadata(),
@@ -202,7 +226,7 @@ export class UiService {
                 AntiBannerFiltersId,
                 EventNotifierTypes: listeners.events,
             },
-        });
+        };
     }
 
     // helpers

@@ -1,4 +1,4 @@
-import { TsWebExtension, Configuration, MESSAGE_HANDLER_NAME } from '@adguard/tswebextension';
+import { TsWebExtension, ConfigurationMV2, MESSAGE_HANDLER_NAME } from '@adguard/tswebextension';
 import { FiltersStorage } from './services/filters/filters-storage';
 import { SettingsService } from './services/settings';
 import { log } from '../common/log';
@@ -45,7 +45,7 @@ export class Engine {
     /**
      * Creates tswebextension configuration based on current app state
      */
-    private static async getConfiguration(): Promise<Configuration> {
+    private static async getConfiguration(): Promise<ConfigurationMV2> {
         const enabledFilters = FiltersApi.getEnabledFilters();
 
         const filters = [];
@@ -53,11 +53,14 @@ export class Engine {
         const tasks = enabledFilters.map(async (filterId) => {
             const rules = await FiltersStorage.get(filterId);
 
+            const trusted = FiltersApi.isFilterTrusted(filterId);
+
             const rulesTexts = rules.join('\n');
 
             filters.push({
                 filterId,
                 content: rulesTexts,
+                trusted,
             });
         });
 
@@ -79,6 +82,16 @@ export class Engine {
 
         if (UserRulesApi.isEnabled()) {
             userrules = await UserRulesApi.getUserRules();
+
+            /**
+             * remove empty strings
+             */
+            userrules = userrules.filter(rule => !!rule);
+
+            /**
+             * remove duplicates
+             */
+            userrules = Array.from(new Set(userrules));
         }
 
         return {

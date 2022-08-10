@@ -44,12 +44,8 @@ export class UserAgent {
         for (let i = 0; i < browserDataEntries.length; i += 1) {
             const [name, data] = browserDataEntries[i];
 
-            for (let j = 0; j < brandsData.length; j += 1) {
-                const brandData = brandsData[i];
-
-                if (brandData.brand === data.brand) {
-                    return name;
-                }
+            if (brandsData?.some((brandData) => brandData.brand === data.brand)) {
+                return name;
             }
 
             if (navigator.userAgent.indexOf(data.uaStringName) >= 0) {
@@ -88,7 +84,7 @@ export class UserAgent {
      * Check if current platform is as given
      */
     static isTargetPlatform(platformName: string): boolean {
-        const platformString = navigator.userAgentData?.platform;
+        const platformString = navigator?.userAgentData?.platform;
 
         return platformString
             ? platformString.toUpperCase().indexOf(platformName) >= 0
@@ -111,9 +107,10 @@ export class UserAgent {
             uaStringMask = /\sFirefox\/(\d+)\./;
         }
 
-        const brandsData = navigator.userAgentData?.brands;
-        if ((!brandsData || !brand) && uaStringMask) {
-            const match = uaStringMask.exec(navigator.userAgent);
+        const brandsData = navigator?.userAgentData?.brands;
+
+        if (!brandsData || !brand) {
+            const match = uaStringMask ? uaStringMask.exec(navigator.userAgent) : null;
             return match === null ? null : Number.parseInt(match[1], 10);
         }
 
