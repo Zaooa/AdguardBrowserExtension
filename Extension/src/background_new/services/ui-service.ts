@@ -54,13 +54,6 @@ export class UiService {
         tabsApi.onActivated.subscribe((tab) => {
             UiService.debounceUpdateTabIcon(tab.info.id);
         });
-
-        // on filter auto-enabled event
-        listeners.addListener((event, enabledFilters) => {
-            if (event === listeners.ENABLE_FILTER_SHOW_POPUP) {
-                alerts.showFiltersEnabledAlertMessage(enabledFilters as any[]);
-            }
-        });
     }
 
     // listeners

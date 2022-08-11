@@ -2,7 +2,6 @@ import browser from 'webextension-polyfill';
 
 import { translator } from '../../../common/translators/translator';
 import { TabsApi } from '../../extension-api';
-import { FiltersApi } from '../filters/api';
 import { UiApi } from './api';
 
 export class Alerts {
@@ -24,24 +23,21 @@ export class Alerts {
                 isAdguardTab: UiApi.isExtensionTab(tab),
                 title,
                 text,
-                // TODO: fix
                 alertStyles: this.styles,
             });
         }
     }
 
-    public showFiltersEnabledAlertMessage(enabledFilters: any[]) {
-        const { title, text } = Alerts.getFiltersEnabledResultMessage(enabledFilters);
+    public showFiltersEnabledAlertMessage(filters: any[]) {
+        const { title, text } = Alerts.getFiltersEnabledResultMessage(filters);
 
         this.showAlertMessage(title, text);
     }
 
-    private static getFiltersEnabledResultMessage(enabledFilters: number[]) {
+    private static getFiltersEnabledResultMessage(enabledFilters: any[]) {
         const title = translator.getMessage('alert_popup_filter_enabled_title');
 
         const text = enabledFilters
-            // TODO: optimization
-            .map(filterId => FiltersApi.getFilterMetadata(filterId))
             .sort((a, b) => a.displayNumber - b.displayNumber)
             .map(filter => translator.getMessage('alert_popup_filter_enabled_desc', { filter_name: filter.name }));
 

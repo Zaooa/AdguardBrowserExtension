@@ -19,27 +19,27 @@ import browser, { Tabs } from 'webextension-polyfill';
 import { isHttpRequest, getDomain } from '@adguard/tswebextension';
 import { FiltersApi } from './api';
 import { metadataStorage } from './metadata';
-import { listeners } from '../../notifier';
 import { UserAgent } from '../../../common/user-agent';
 import { settingsStorage } from '../settings';
 import { SettingOption } from '../../../common/settings';
-import { Alerts } from '../ui/alerts';
+import { Engine } from '../../engine';
+import { alerts } from '../ui/alerts';
+
+export type BrowsingLanguage = {
+    language: string,
+    time: number,
+};
 
 /**
- * Initialize LocaleDetectService.
  *
  * This service is used to auto-enable language-specific filters.
  */
-export const localeDetect = (function () {
-    const browsingLanguages: {
-        language: string,
-        time: number,
-    }[] = [];
+export class LocaleDetect {
+    static SUCCESS_HIT_COUNT = 3;
 
-    const SUCCESS_HIT_COUNT = 3;
-    const MAX_HISTORY_LENGTH = 10;
+    static MAX_HISTORY_LENGTH = 10;
 
-    const domainToLanguagesMap = {
+    static domainToLanguagesMap = {
         // Russian
         'ru': 'ru',
         'ua': 'ru',
@@ -104,63 +104,30 @@ export const localeDetect = (function () {
         'tr': 'tr',
     };
 
-    /**
-     * Called when LocaleDetectorService has detected language-specific filters we can enable.
-     *
-     * @param filterIds List of detected language-specific filters identifiers
-     * @private
-     */
-    async function onFilterDetectedByLocale(filterIds: number[]) {
-        if (!filterIds || filterIds.length === 0) {
-            return;
-        }
+    private browsingLanguages: BrowsingLanguage[] = [];
 
-        await FiltersApi.loadAndEnableFilters(filterIds);
-
-        listeners.notifyListeners(listeners.ENABLE_FILTER_SHOW_POPUP, filterIds);
+    constructor() {
+        this.onTabUpdated = this.onTabUpdated.bind(this);
     }
 
-    /**
-     * Stores language in the special array containing languages of the last visited pages.
-     * If user has visited enough pages with a specified language we call special callback
-     * to auto-enable filter for this language
-     *
-     * @param language Page language
-     * @private
-     */
-    function detectLanguage(language: string) {
-        /**
-         * For an unknown language "und" will be returned
-         * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/detectLanguage
-         */
-        if (!language || language === 'und') {
-            return;
-        }
+    public init() {
+        browser.tabs.onUpdated.addListener(this.onTabUpdated);
+    }
 
-        browsingLanguages.push({
-            language,
-            time: Date.now(),
-        });
-
-        if (browsingLanguages.length > MAX_HISTORY_LENGTH) {
-            browsingLanguages.shift();
-        }
-
-        const history = browsingLanguages.filter((h) => {
-            return h.language === language;
-        });
-
-        if (history.length >= SUCCESS_HIT_COUNT) {
-            const filterIds = metadataStorage.getFilterIdsForLanguage(language);
-            onFilterDetectedByLocale(filterIds);
+    private onTabUpdated(
+        _tabId: number,
+        _changeInfo: Tabs.OnUpdatedChangeInfoType,
+        tab: Tabs.Tab,
+    ) {
+        if (tab.status === 'complete') {
+            this.detectTabLanguage(tab);
         }
     }
 
     /**
-     * Detects language for the specified page
-     * @param tabContext - tswebextension tab context
+     * Detects language for the specified tab
      */
-    async function detectTabLanguage(tab: Tabs.Tab) {
+    private async detectTabLanguage(tab: Tabs.Tab) {
         const isDetectDisabled = settingsStorage.get(SettingOption.DISABLE_DETECT_FILTERS);
         const isFilteringDisabled = settingsStorage.get(SettingOption.DISABLE_FILTERING);
 
@@ -180,7 +147,7 @@ export const localeDetect = (function () {
                 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/detectLanguage
                 try {
                     const language = await browser.tabs.detectLanguage(tab.id);
-                    detectLanguage(language);
+                    this.detectLanguage(language);
                 } catch (e) {
                     // do nothing
                 }
@@ -195,21 +162,71 @@ export const localeDetect = (function () {
         if (host && host.length > 8) {
             const parts = host ? host.split('.') : [];
             const tld = parts[parts.length - 1];
-            const lang = domainToLanguagesMap[tld];
-            detectLanguage(lang);
+            const lang = LocaleDetect.domainToLanguagesMap[tld];
+            this.detectLanguage(lang);
         }
     }
 
-    const init = () => {
-        // Locale detect
-        browser.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
-            if (tab.status === 'complete') {
-                detectTabLanguage(tab);
-            }
-        });
-    };
+    /**
+     * Stores language in the special array containing languages of the last visited pages.
+     * If user has visited enough pages with a specified language we call special callback
+     * to auto-enable filter for this language
+     *
+     * @param language Page language
+     * @private
+     */
+    private detectLanguage(language: string) {
+        /**
+         * For an unknown language "und" will be returned
+         * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/detectLanguage
+         */
+        if (!language || language === 'und') {
+            return;
+        }
 
-    return {
-        init,
-    };
-})();
+        this.browsingLanguages.push({
+            language,
+            time: Date.now(),
+        });
+
+        if (this.browsingLanguages.length > LocaleDetect.MAX_HISTORY_LENGTH) {
+            this.browsingLanguages.shift();
+        }
+
+        const history = this.browsingLanguages.filter((h) => {
+            return h.language === language;
+        });
+
+        if (history.length >= LocaleDetect.SUCCESS_HIT_COUNT) {
+            const filterIds = metadataStorage.getFilterIdsForLanguage(language);
+            LocaleDetect.onFilterDetectedByLocale(filterIds);
+        }
+    }
+
+    /**
+     * Called when LocaleDetector has detected language-specific filters we can enable.
+     *
+     * @param filterIds List of detected language-specific filters identifiers
+     * @private
+     */
+    private static async onFilterDetectedByLocale(filterIds: number[]) {
+        if (!filterIds || filterIds.length === 0) {
+            return;
+        }
+
+        const disabledFiltersIds = filterIds.filter(filterId => !FiltersApi.isFilterEnabled(filterId));
+
+        if (disabledFiltersIds.length === 0) {
+            return;
+        }
+
+        await FiltersApi.loadAndEnableFilters(disabledFiltersIds);
+        await Engine.update();
+
+        const filters = disabledFiltersIds.map(filterId => FiltersApi.getFilterMetadata(filterId));
+
+        alerts.showFiltersEnabledAlertMessage(filters);
+    }
+}
+
+export const localeDetect = new LocaleDetect();
