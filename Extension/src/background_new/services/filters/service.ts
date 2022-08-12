@@ -16,6 +16,7 @@ import { pageStats } from './page-stats';
 import { SettingsService } from '../settings';
 import { SettingOption } from '../../../common/settings';
 import { localeDetect } from './locale-detect';
+import { alerts } from '../ui/alerts';
 
 export class FiltersService {
     static async init() {
@@ -65,16 +66,23 @@ export class FiltersService {
     }
 
     static async onFiltersUpdate() {
-        const enabledFilters = FiltersApi.getEnabledFilters();
+        try {
+            const enabledFilters = FiltersApi.getEnabledFilters();
 
-        const updatedFilters = await FiltersApi.updateFilters(enabledFilters);
+            const updatedFilters = await FiltersApi.updateFilters(enabledFilters);
 
-        await filtersState.enableFilters(enabledFilters);
+            await filtersState.enableFilters(enabledFilters);
 
-        await Engine.update();
+            await Engine.update();
 
-        listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY, updatedFilters);
-        return updatedFilters;
+            alerts.showFiltersUpdatedAlertMessage(true, updatedFilters);
+            listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY, updatedFilters);
+
+            return updatedFilters;
+        } catch (e) {
+            alerts.showFiltersUpdatedAlertMessage(false);
+            listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY);
+        }
     }
 
     static async onOptimizedFiltersSwitch() {
