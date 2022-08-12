@@ -23,7 +23,7 @@ import { UserAgent } from '../../../common/user-agent';
 import { settingsStorage } from '../settings';
 import { SettingOption } from '../../../common/settings';
 import { Engine } from '../../engine';
-import { alerts } from '../ui/alerts';
+import { toasts } from '../ui/toasts';
 
 export type BrowsingLanguage = {
     language: string,
@@ -225,7 +225,7 @@ export class LocaleDetect {
 
         const filters = disabledFiltersIds.map(filterId => FiltersApi.getFilterMetadata(filterId));
 
-        alerts.showFiltersEnabledAlertMessage(filters);
+        toasts.showFiltersEnabledAlertMessage(filters);
     }
 }
 

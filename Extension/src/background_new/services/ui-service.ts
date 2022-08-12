@@ -14,7 +14,7 @@ import { BrowserUtils } from '../utils/browser-utils';
 import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
 import { FiltersApi } from './filters/api';
 import { listeners } from '../notifier';
-import { alerts } from './ui/alerts';
+import { toasts } from './ui/toasts';
 
 // TODO: decomposite and move to ./ui
 export class UiService {
@@ -33,7 +33,7 @@ export class UiService {
     static extensionStoreUrl = UiService.getExtensionStoreUrl();
 
     static async init() {
-        await alerts.init();
+        await toasts.init();
 
         messageHandler.addListener(MessageType.OPEN_SETTINGS_TAB, UiService.openSettingsTab);
         messageHandler.addListener(MessageType.OPEN_FILTERING_LOG, UiService.openFilteringLog);

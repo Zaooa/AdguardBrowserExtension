@@ -4,13 +4,13 @@ import { translator } from '../../../common/translators/translator';
 import { TabsApi } from '../../extension-api';
 import { UiApi } from './api';
 
-export class Alerts {
+export class Toasts {
     static stylesUrl = browser.runtime.getURL('/assets/css/alert-popup.css');
 
     private styles: string;
 
     public async init() {
-        const response = await fetch(Alerts.stylesUrl);
+        const response = await fetch(Toasts.stylesUrl);
         this.styles = await response.text();
     }
 
@@ -29,13 +29,13 @@ export class Alerts {
     }
 
     public showFiltersEnabledAlertMessage(filters: any[]) {
-        const { title, text } = Alerts.getFiltersEnabledResultMessage(filters);
+        const { title, text } = Toasts.getFiltersEnabledResultMessage(filters);
 
         this.showAlertMessage(title, text);
     }
 
     public showFiltersUpdatedAlertMessage(success: boolean, filters?: any[]) {
-        const { title, text } = Alerts.getFiltersUpdateResultMessage(success, filters);
+        const { title, text } = Toasts.getFiltersUpdateResultMessage(success, filters);
 
         this.showAlertMessage(title, text);
     }
@@ -93,4 +93,4 @@ export class Alerts {
     }
 }
 
-export const alerts = new Alerts();
+export const toasts = new Toasts();

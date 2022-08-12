@@ -16,7 +16,7 @@ import { pageStats } from './page-stats';
 import { SettingsService } from '../settings';
 import { SettingOption } from '../../../common/settings';
 import { localeDetect } from './locale-detect';
-import { alerts } from '../ui/alerts';
+import { toasts } from '../ui/toasts';
 
 export class FiltersService {
     static async init() {
@@ -75,12 +75,12 @@ export class FiltersService {
 
             await Engine.update();
 
-            alerts.showFiltersUpdatedAlertMessage(true, updatedFilters);
+            toasts.showFiltersUpdatedAlertMessage(true, updatedFilters);
             listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY, updatedFilters);
 
             return updatedFilters;
         } catch (e) {
-            alerts.showFiltersUpdatedAlertMessage(false);
+            toasts.showFiltersUpdatedAlertMessage(false);
             listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY);
         }
     }
