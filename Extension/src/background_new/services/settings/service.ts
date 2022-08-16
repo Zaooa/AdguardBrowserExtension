@@ -12,6 +12,7 @@ import { Categories } from '../filters/filters-categories';
 import { listeners } from '../../notifier';
 import { SettingsEvents } from './events';
 import { fullscreenUserRulesEditor } from '../fullscreen-user-rules-editor';
+import { SettingsApi } from './api';
 
 export class SettingsService {
     static onSettingChange = new SettingsEvents();
@@ -21,6 +22,7 @@ export class SettingsService {
         messageHandler.addListener(MessageType.GET_OPTIONS_DATA, SettingsService.getOptionsData);
         messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.resetSettings);
         messageHandler.addListener(MessageType.CHANGE_USER_SETTING, SettingsService.changeUserSettings);
+        messageHandler.addListener(MessageType.APPLY_SETTINGS_JSON, SettingsService.importSettings);
 
         SettingsService.onSettingChange.addListener(SettingOption.DISABLE_STEALTH_MODE, Engine.update);
         SettingsService.onSettingChange.addListener(SettingOption.HIDE_REFERRER, Engine.update);
@@ -71,6 +73,7 @@ export class SettingsService {
         return settingsStorage.getConfiguration();
     }
 
+    // TODO: fix
     static async resetSettings() {
         await settingsStorage.reset();
         return true;
@@ -86,5 +89,16 @@ export class SettingsService {
             propertyName: key,
             propertyValue: value,
         });
+    }
+
+    static async importSettings(message) {
+        const { json } = message.data;
+
+        const isImported = SettingsApi.importSettings(json);
+
+        await Engine.update();
+
+        listeners.notifyListeners(listeners.SETTINGS_UPDATED, isImported);
+        return isImported;
     }
 }

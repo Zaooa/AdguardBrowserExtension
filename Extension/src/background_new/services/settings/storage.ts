@@ -8,6 +8,7 @@ import {
     DEFAULT_THIRD_PARTY_COOKIES_SELF_DESTRUCT_MIN,
     ADGUARD_SETTINGS_KEY,
     AppearanceTheme,
+    SettingsBackup,
 } from '../../../common/settings';
 
 export class SettingsStorage {
@@ -121,6 +122,81 @@ export class SettingsStorage {
                 selfDestructFirstPartyCookiesTime: this.settings[SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME],
             },
         };
+    }
+
+    async importSettings(backup: SettingsBackup) {
+        const stealthSettings = backup['stealth'];
+
+        if (stealthSettings) {
+            // set "block webrtc" setting as soon as possible. AG-9980
+        // don't set the actual value to avoid requesting permissions
+            if (this.settings[SettingOption.BLOCK_WEBRTC] !== !!stealthSettings['stealth-block-webrtc']) {
+                this.settings[SettingOption.BLOCK_WEBRTC] = !!stealthSettings['stealth-block-webrtc'];
+            }
+
+            this.settings[SettingOption.DISABLE_STEALTH_MODE] = !!stealthSettings['stealth_disable_stealth_mode'];
+            this.settings[SettingOption.HIDE_REFERRER] = !!stealthSettings['stealth-hide-referrer'];
+            this.settings[SettingOption.HIDE_SEARCH_QUERIES] = !!stealthSettings['stealth-hide-search-queries'];
+            this.settings[SettingOption.SEND_DO_NOT_TRACK] = !!stealthSettings['stealth-send-do-not-track'];
+            this.settings[SettingOption.BLOCK_CHROME_CLIENT_DATA] = !!stealthSettings['stealth-remove-x-client'];
+            this.settings[SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES] = !!stealthSettings[
+                'stealth-block-third-party-cookies'
+            ];
+
+            if (stealthSettings['stealth-block-third-party-cookies-time']) {
+                this.settings[SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME] = stealthSettings[
+                    'stealth-block-third-party-cookies-time'
+                ];
+            }
+
+            this.settings[SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES] = !!stealthSettings[
+                'stealth-block-first-party-cookies'
+            ];
+
+            if (stealthSettings['stealth-block-first-party-cookies-time']) {
+                this.settings[SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME] = stealthSettings[
+                    'stealth-block-third-party-cookies-time'
+                ];
+            }
+        }
+
+        const generalSettings = backup['general-settings'];
+
+        if (generalSettings) {
+            this.settings[SettingOption.DISABLE_SHOW_PAGE_STATS] = !!generalSettings['show-blocked-ads-count'];
+            this.settings[SettingOption.DISABLE_DETECT_FILTERS] = !!generalSettings['autodetect-filters'];
+            this.settings[SettingOption.DISABLE_SAFEBROWSING] = !!generalSettings['safebrowsing-enabled'];
+
+            if (generalSettings['filters-update-period']) {
+                this.settings[SettingOption.FILTERS_UPDATE_PERIOD] = generalSettings['filters-update-period'];
+            }
+
+            if (generalSettings['appearance-theme'] === AppearanceTheme.DARK
+            || generalSettings['appearance-theme'] === AppearanceTheme.LIGHT
+            || generalSettings['appearance-theme'] === AppearanceTheme.SYSTEM
+            ) {
+                this.settings[SettingOption.APPEARANCE_THEME] = generalSettings['appearance-theme'];
+            }
+        }
+
+        const extensionSpecificSettings = backup['extension-specific-settings'];
+
+        if (extensionSpecificSettings) {
+            this.settings[SettingOption.USE_OPTIMIZED_FILTERS] = !!extensionSpecificSettings['use-optimized-filters'];
+            this.settings[SettingOption.DISABLE_COLLECT_HITS] = !extensionSpecificSettings['collect-hits-count'];
+            this.settings[SettingOption.DISABLE_SHOW_CONTEXT_MENU] = !extensionSpecificSettings['show-context-menu'];
+            this.settings[SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO] = !extensionSpecificSettings[
+                'show-info-about-adguard'
+            ];
+            this.settings[SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION] = !extensionSpecificSettings[
+                'show-app-updated-info'
+            ];
+
+            this.settings[SettingOption.HIDE_RATE_BLOCK] = !!extensionSpecificSettings['hide-rate-adguard'];
+            this.settings[SettingOption.USER_RULES_EDITOR_WRAP] = !!extensionSpecificSettings['user-rules-editor-wrap'];
+        }
+
+        await storage.set(ADGUARD_SETTINGS_KEY, this.settings);
     }
 
     private static isPromoInfoDisabled(): boolean {

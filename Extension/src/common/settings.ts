@@ -124,60 +124,72 @@ export type Settings = {
     [SettingOption.INVERTED_ALLOWLIST_DOMAINS]?: string,
 };
 
-// TODO: use setting import validation in settings service
-// when filters service will be implemented
-export const settingsValidator = z.object({
-    'protocol-version': z.string(),
-    'general-settings': z.object({
-        'app-language': z.string().optional(),
-        'allow-acceptable-ads': z.boolean(),
-        'show-blocked-ads-count': z.boolean(),
-        'autodetect-filters': z.boolean(),
-        'safebrowsing-enabled': z.boolean(),
-        'filters-update-period': z.any(),
-        'appearance-theme': z.string().optional(),
-    }),
-    'extension-specific-settings': z.object({
-        'use-optimized-filters': z.boolean(),
-        'collect-hits-count': z.boolean(),
-        'show-context-menu': z.boolean(),
-        'show-info-about-adguard': z.boolean(),
-        'show-app-updated-info': z.boolean(),
-        'hide-rate-adguard': z.boolean(),
-        'user-rules-editor-wrap': z.boolean(),
-    }),
-    filters: z.object({
-        'enabled-groups': z.array(z.any()),
-        'enabled-filters': z.array(z.any()),
-        'custom-filters': z.array(z.any()),
-        'user-filter': z.object({
-            rules: z.string(),
-            'disabled-rules': z.string(),
-            enabled: z.boolean().optional(),
-        }),
-        whitelist: z.object({
-            inverted: z.boolean(),
-            domains: z.array(z.string()),
-            'inverted-domains': z.array(z.string()),
-            enabled: z.boolean().optional(),
-        }),
-    }),
-    stealth: z
-        .object({
-            stealth_disable_stealth_mode: z.boolean(),
-            'stealth-hide-referrer': z.boolean(),
-            'stealth-hide-search-queries': z.boolean(),
-            'stealth-send-do-not-track': z.boolean(),
-            'stealth-block-webrtc': z.boolean(),
-            'stealth-remove-x-client': z.boolean(),
-            'stealth-block-third-party-cookies': z.boolean(),
-            'stealth-block-third-party-cookies-time': z.number().optional(),
-            'stealth-block-first-party-cookies': z.boolean(),
-            'stealth-block-first-party-cookies-time': z.number().optional(),
-            'block-known-trackers': z.boolean().optional(),
-            'strip-tracking-parameters': z.boolean(),
-        })
-        .optional(),
+export const generalSettingsBackupValidator = z.object({
+    'app-language': z.string().optional(),
+    'allow-acceptable-ads': z.boolean(),
+    'show-blocked-ads-count': z.boolean(),
+    'autodetect-filters': z.boolean(),
+    'safebrowsing-enabled': z.boolean(),
+    'filters-update-period': z.any(),
+    'appearance-theme': z.string().optional(),
 });
 
-// export type Settings = z.infer<typeof settingsValidator>;
+export type GeneralSettingsBackup = z.infer<typeof generalSettingsBackupValidator>;
+
+export const extensionSpecificSettingsBackupValidator = z.object({
+    'use-optimized-filters': z.boolean(),
+    'collect-hits-count': z.boolean(),
+    'show-context-menu': z.boolean(),
+    'show-info-about-adguard': z.boolean(),
+    'show-app-updated-info': z.boolean(),
+    'hide-rate-adguard': z.boolean(),
+    'user-rules-editor-wrap': z.boolean(),
+});
+
+export type ExtensionSpecificSettingsBackup = z.infer<typeof extensionSpecificSettingsBackupValidator>;
+
+export const filtersBackupValidator = z.object({
+    'enabled-groups': z.array(z.any()),
+    'enabled-filters': z.array(z.any()),
+    'custom-filters': z.array(z.any()),
+    'user-filter': z.object({
+        rules: z.string(),
+        'disabled-rules': z.string(),
+        enabled: z.boolean().optional(),
+    }),
+    whitelist: z.object({
+        inverted: z.boolean(),
+        domains: z.array(z.string()),
+        'inverted-domains': z.array(z.string()),
+        enabled: z.boolean().optional(),
+    }),
+});
+
+export type FiltersBackup = z.infer<typeof filtersBackupValidator>;
+
+export const stealthBackupValidator = z.object({
+    stealth_disable_stealth_mode: z.boolean(),
+    'stealth-hide-referrer': z.boolean(),
+    'stealth-hide-search-queries': z.boolean(),
+    'stealth-send-do-not-track': z.boolean(),
+    'stealth-block-webrtc': z.boolean(),
+    'stealth-remove-x-client': z.boolean(),
+    'stealth-block-third-party-cookies': z.boolean(),
+    'stealth-block-third-party-cookies-time': z.number().optional(),
+    'stealth-block-first-party-cookies': z.boolean(),
+    'stealth-block-first-party-cookies-time': z.number().optional(),
+    'block-known-trackers': z.boolean().optional(),
+    'strip-tracking-parameters': z.boolean(),
+});
+
+export type StealthBackup = z.infer<typeof stealthBackupValidator>;
+
+export const settingsBackupValidator = z.object({
+    'protocol-version': z.string(),
+    'general-settings': generalSettingsBackupValidator,
+    'extension-specific-settings': extensionSpecificSettingsBackupValidator,
+    filters: filtersBackupValidator,
+    stealth: stealthBackupValidator.optional(),
+});
+
+export type SettingsBackup = z.infer<typeof settingsBackupValidator>;
