@@ -48,7 +48,7 @@ export class SettingsStorage {
         [SettingOption.DISABLE_SHOW_CONTEXT_MENU]: false,
     };
 
-    settings = SettingsStorage.defaultSettings;
+    settings: Settings = { ...SettingsStorage.defaultSettings };
 
     isInit = false;
 
@@ -98,11 +98,6 @@ export class SettingsStorage {
         };
     }
 
-    async reset() {
-        this.settings = SettingsStorage.defaultSettings;
-        await storage.set(ADGUARD_SETTINGS_KEY, SettingsStorage.defaultSettings);
-    }
-
     getConfiguration() {
         return {
             collectStats: !this.settings[SettingOption.DISABLE_COLLECT_HITS],
@@ -124,12 +119,21 @@ export class SettingsStorage {
         };
     }
 
-    async importSettings(backup: SettingsBackup) {
-        const stealthSettings = backup['stealth'];
+    async reset() {
+        this.settings = { ...SettingsStorage.defaultSettings };
+        await storage.set(ADGUARD_SETTINGS_KEY, this.settings);
+    }
+
+    async import(backup: SettingsBackup) {
+        this.settings = { ...SettingsStorage.defaultSettings };
+
+        const stealthSettings = backup.stealth;
 
         if (stealthSettings) {
-            // set "block webrtc" setting as soon as possible. AG-9980
-        // don't set the actual value to avoid requesting permissions
+            /**
+             * set "block webrtc" setting as soon as possible. AG-9980
+             * don't set the actual value to avoid requesting permissions
+             */
             if (this.settings[SettingOption.BLOCK_WEBRTC] !== !!stealthSettings['stealth-block-webrtc']) {
                 this.settings[SettingOption.BLOCK_WEBRTC] = !!stealthSettings['stealth-block-webrtc'];
             }
@@ -194,6 +198,38 @@ export class SettingsStorage {
 
             this.settings[SettingOption.HIDE_RATE_BLOCK] = !!extensionSpecificSettings['hide-rate-adguard'];
             this.settings[SettingOption.USER_RULES_EDITOR_WRAP] = !!extensionSpecificSettings['user-rules-editor-wrap'];
+        }
+
+        const filtersSettings = backup.filters;
+
+        if (filtersSettings) {
+            if (filtersSettings?.['user-filter']) {
+                const userRulesEnabledFlag = filtersSettings['user-filter']?.enabled;
+
+                if (typeof userRulesEnabledFlag === 'boolean') {
+                    this.settings[SettingOption.USER_FILTER_ENABLED] = userRulesEnabledFlag;
+                } else {
+                    this.settings[SettingOption.USER_FILTER_ENABLED] = true;
+                }
+            }
+
+            if (filtersSettings?.whitelist) {
+                const allowlistEnabledFlag = filtersSettings.whitelist?.enabled;
+
+                if (typeof allowlistEnabledFlag === 'boolean') {
+                    this.settings[SettingOption.USER_FILTER_ENABLED] = allowlistEnabledFlag;
+                } else {
+                    this.settings[SettingOption.USER_FILTER_ENABLED] = true;
+                }
+
+                const allowlistInvertedFlag = filtersSettings.whitelist?.inverted;
+
+                if (typeof allowlistInvertedFlag === 'boolean') {
+                    this.settings[SettingOption.DEFAULT_ALLOWLIST_MODE] = !allowlistInvertedFlag;
+                } else {
+                    this.settings[SettingOption.DEFAULT_ALLOWLIST_MODE] = true;
+                }
+            }
         }
 
         await storage.set(ADGUARD_SETTINGS_KEY, this.settings);

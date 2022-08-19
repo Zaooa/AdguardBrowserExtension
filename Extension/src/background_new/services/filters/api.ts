@@ -1,18 +1,21 @@
-import browser from 'webextension-polyfill';
-import { AntiBannerFiltersId, ANTIBANNER_GROUPS_ID } from '../../../common/constants';
 import { log } from '../../../common/log';
-import { SettingOption } from '../../../common/settings';
-import { UserAgent } from '../../../common/user-agent';
-import { BrowserUtils } from '../../utils/browser-utils';
-import { networkService } from '../network/network-service';
-import { settingsStorage } from '../settings/storage';
-import { CustomFilterApi, CustomFilterMetadataStorage } from './custom';
+import { CustomFilterApi, CustomFilterMetadata, customFilterMetadataStorage } from './custom';
+import { CommonFilterApi } from './common';
 import { filtersState } from './filters-state';
-import { FiltersStorage } from './filters-storage';
 import { filtersVersion } from './filters-version';
 import { groupsState } from './groups-state';
 import { i18nMetadataStorage } from './i18n-metadata';
-import { metadataStorage } from './metadata';
+import { metadataStorage, CommonFilterMetadata, MetadataStorage } from './metadata';
+import { networkService } from '../network/network-service';
+import {
+    AntiBannerFiltersId,
+    ANTIBANNER_GROUPS_ID,
+    CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER,
+} from '../../../common/constants';
+import { translator } from '../../../common/translators/translator';
+import { SettingsBackup } from '../../../common/settings';
+import { UserRulesApi } from './userrules';
+// import { AllowlistApi } from './allowlist';
 
 /**
  * Encapsulates the logic for managing filter data that is stored in the extension.
@@ -23,16 +26,129 @@ export class FiltersApi {
      *
      * Called while filters service initialization.
      */
-    public static async initMetadata(): Promise<void> {
-        await metadataStorage.init();
-        await i18nMetadataStorage.init();
-        await metadataStorage.applyI18nMetadata(i18nMetadataStorage.data);
+    public static async init(): Promise<void> {
+        await FiltersApi.initI18nMetadata();
+        await FiltersApi.initMetadata();
 
-        await CustomFilterMetadataStorage.init();
+        await customFilterMetadataStorage.init([]);
 
-        filtersState.init();
-        groupsState.init();
-        filtersVersion.init();
+        await filtersState.init();
+        await groupsState.init();
+        await filtersVersion.init();
+    }
+
+    /**
+     * Reset filters data to default
+     */
+    public static async reset() {
+        /**
+         * Clean up states
+         */
+        await filtersState.clear();
+        await groupsState.clear();
+        await filtersVersion.clear();
+
+        /**
+         * Force reload filters data from local source
+         */
+        await FiltersApi.loadMetadata(false);
+
+        /**
+         * Enable default filters
+         */
+        await CommonFilterApi.initDefaultFilters();
+    }
+
+    /**
+     * Import filters from settings backup
+     */
+    public static async import(settingsBackup: SettingsBackup) {
+        await FiltersApi.reset();
+
+        const stealthSettings = settingsBackup.stealth;
+
+        if (stealthSettings) {
+            const stripTrackingParameterFlag = stealthSettings?.['strip-tracking-parameters'];
+
+            if (typeof stripTrackingParameterFlag === 'boolean') {
+                if (stripTrackingParameterFlag) {
+                    await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
+                } else {
+                    await filtersState.disableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
+                }
+            }
+        }
+
+        const generalSettings = settingsBackup['general-settings'];
+
+        if (generalSettings) {
+            const allowAcceptableAdsFlag = generalSettings?.['allow-acceptable-ads'];
+
+            if (typeof allowAcceptableAdsFlag === 'boolean') {
+                if (allowAcceptableAdsFlag) {
+                    await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
+                } else {
+                    await filtersState.disableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
+                }
+            }
+        }
+
+        const filtersSettings = settingsBackup.filters;
+
+        if (filtersSettings) {
+            const enabledGroups = filtersSettings?.['enabled-groups'];
+
+            if (Array.isArray(enabledGroups)) {
+                await groupsState.enableGroups(enabledGroups);
+            }
+
+            const enabledFilters = filtersSettings?.['enabled-filters'];
+
+            if (Array.isArray(enabledFilters)) {
+                await FiltersApi.loadAndEnableFilters(enabledFilters);
+            }
+
+            const customFilters = filtersSettings?.['custom-filters'];
+
+            if (Array.isArray(customFilters)) {
+                for (let i = 0; i < customFilters.length; i += 1) {
+                    const customFilter = customFilters[i];
+
+                    const { customUrl } = customFilter;
+
+                    const customFilterOptions = {
+                        trusted: !!customFilter?.trusted,
+                        ...customFilter?.title && { name: customFilter.title },
+                    };
+
+                    // eslint-disable-next-line no-await-in-loop
+                    const { filterId } = await CustomFilterApi.createFilter(customUrl, customFilterOptions);
+
+                    if (customFilter?.enabled) {
+                        filtersState.enableFilters([filterId]);
+                    }
+                }
+            }
+
+            const userFilter = filtersSettings?.['user-filter'];
+
+            if (userFilter?.rules) {
+                await UserRulesApi.setUserRules(userFilter.rules.split('\n'));
+            }
+
+            // TODO: fix
+            /*
+            const allowlist = filtersSettings?.whitelist;
+
+            if (allowlist?.domains) {
+                await AllowlistApi.setInvertedAllowlistDomains(allowlist['inverted-domains']);
+            }
+
+            if (allowlist?.['inverted-domains']) {
+                await AllowlistApi.setAllowlistDomains(allowlist['inverted-domains']);
+            }
+            */
+        }
     }
 
     /**
@@ -43,13 +159,15 @@ export class FiltersApi {
      * @param remote - is metadata loaded from backend
      */
     public static async loadMetadata(remote: boolean): Promise<void> {
-        await metadataStorage.loadMetadata(remote);
-        await i18nMetadataStorage.loadMetadata(remote);
-        await metadataStorage.applyI18nMetadata(i18nMetadataStorage.data);
+        await FiltersApi.loadI18nMetadataFromBackend(remote);
+        await FiltersApi.loadMetadataFromFromBackend(remote);
 
-        filtersState.init();
-        groupsState.init();
-        filtersVersion.init();
+        /**
+         * Reload states with new metadata
+         */
+        await filtersState.init();
+        await groupsState.init();
+        await filtersVersion.init();
     }
 
     /**
@@ -86,20 +204,9 @@ export class FiltersApi {
             return true;
         }
 
-        const metadata = CustomFilterApi.getCustomFilterMetadata(filterId);
+        const metadata = CustomFilterApi.getFilterMetadata(filterId);
 
         return metadata.trusted;
-    }
-
-    /**
-     * Checks if filter is common
-     *
-     * @param filterId - filter id
-     */
-    public static isCommonFilter(filterId: number): boolean {
-        return !CustomFilterApi.isCustomFilter(filterId)
-        && filterId !== AntiBannerFiltersId.USER_FILTER_ID
-        && filterId !== AntiBannerFiltersId.ALLOWLIST_FILTER_ID;
     }
 
     /**
@@ -124,13 +231,14 @@ export class FiltersApi {
 
         await FiltersApi.loadMetadata(remote);
 
-        await Promise.allSettled(unloadedFilters.map(id => FiltersApi.loadFilterRulesFromBackend(id, remote)));
+        await Promise.allSettled(unloadedFilters.map(id => CommonFilterApi.loadFilterRulesFromBackend(id, remote)));
     }
 
     /**
-     * Load and enable fitler.
+     * Load and enable filter
      *
      * Called on filter option switch
+     *
      * @param filtersIds - filters ids
      * @param remote - is metadata and rules loaded from backend
      */
@@ -157,41 +265,13 @@ export class FiltersApi {
         /**
          * Ignore custom filters
          */
-        const commonFilters = filtersIds.filter(id => FiltersApi.isCommonFilter(id));
+        const commonFilters = filtersIds.filter(id => CommonFilterApi.isCommonFilter(id));
 
         await FiltersApi.loadMetadata(true);
 
-        await Promise.allSettled(commonFilters.map(id => FiltersApi.loadFilterRulesFromBackend(id, true)));
+        await Promise.allSettled(commonFilters.map(id => CommonFilterApi.loadFilterRulesFromBackend(id, true)));
 
         await filtersState.enableFilters(filtersIds);
-    }
-
-    /**
-     * @param filterId - filter id
-     */
-    public static async updateFilter(filterId: number): Promise<any> {
-        log.info(`Update filter ${filterId}`);
-
-        const filterMetadata = metadataStorage.getFilter(filterId);
-
-        if (!filterMetadata) {
-            log.error(`Can't find filter ${filterId} metadata`);
-            return null;
-        }
-
-        if (!FiltersApi.isFilterNeedUpdate(filterMetadata)) {
-            log.info(`Filter ${filterId} is already updated`);
-            return null;
-        }
-
-        try {
-            await FiltersApi.loadFilterRulesFromBackend(filterId, true);
-            log.info(`Successfully update filter ${filterId}`);
-            return filterMetadata;
-        } catch (e) {
-            log.error(e);
-            return null;
-        }
     }
 
     /**
@@ -214,9 +294,9 @@ export class FiltersApi {
             let filterMetadata;
 
             if (CustomFilterApi.isCustomFilter(filterId)) {
-                filterMetadata = await CustomFilterApi.updateCustomFilter(filterId);
+                filterMetadata = await CustomFilterApi.updateFilter(filterId);
             } else {
-                filterMetadata = await FiltersApi.updateFilter(filterId);
+                filterMetadata = await CommonFilterApi.updateFilter(filterId);
             }
 
             if (filterMetadata) {
@@ -234,18 +314,21 @@ export class FiltersApi {
      *
      * @param filterId - filter id
      */
-    public static getFilterMetadata(filterId: number) {
+    public static getFilterMetadata(filterId: number): CustomFilterMetadata | CommonFilterMetadata {
         if (CustomFilterApi.isCustomFilter(filterId)) {
-            return CustomFilterApi.getCustomFilterMetadata(filterId);
+            return CustomFilterApi.getFilterMetadata(filterId);
         }
-        return metadataStorage.getFilter(filterId);
+        return CommonFilterApi.getFilterMetadata(filterId);
     }
 
     /**
      * Get filters metadata from both common and custom filters storage.
      */
-    public static getFiltersMetadata() {
-        return metadataStorage.getFilters().concat(CustomFilterApi.getCustomFiltersMetadata());
+    public static getFiltersMetadata(): (CustomFilterMetadata | CommonFilterMetadata)[] {
+        return [
+            ...CommonFilterApi.getFiltersMetadata(),
+            ...CustomFilterApi.getFiltersMetadata(),
+        ];
     }
 
     /**
@@ -259,103 +342,6 @@ export class FiltersApi {
             const filterMetadata = FiltersApi.getFilterMetadata(id);
 
             return enableGroups.some(groupId => groupId === filterMetadata.groupId);
-        });
-    }
-
-    /**
-     * Load and enable default fitlers.
-     *
-     * Called on extension installation
-     */
-    public static async initDefaultFilters() {
-        await groupsState.enableGroups([
-            1,
-            ANTIBANNER_GROUPS_ID.LANGUAGE_FILTERS_GROUP_ID,
-            ANTIBANNER_GROUPS_ID.OTHER_FILTERS_GROUP_ID,
-            ANTIBANNER_GROUPS_ID.CUSTOM_FILTERS_GROUP_ID,
-        ]);
-
-        const filterIds = [
-            AntiBannerFiltersId.ENGLISH_FILTER_ID,
-            AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
-        ];
-
-        if (UserAgent.isAndroid) {
-            filterIds.push(AntiBannerFiltersId.MOBILE_ADS_FILTER_ID);
-        }
-
-        filterIds.push(...FiltersApi.getLangSuitableFilters());
-
-        await Promise.allSettled(filterIds.map(id => FiltersApi.loadFilterRulesFromBackend(id, false)));
-
-        await filtersState.enableFilters(filterIds);
-    }
-
-    /**
-     * Get language-specific filters by user locale
-     */
-    private static getLangSuitableFilters(): number[] {
-        let filterIds = [];
-
-        let localeFilterIds = metadataStorage.getFilterIdsForLanguage(browser.i18n.getUILanguage());
-        filterIds = filterIds.concat(localeFilterIds);
-
-        // Get language-specific filters by navigator languages
-        // Get all used languages
-        const languages = BrowserUtils.getNavigatorLanguages();
-        for (let i = 0; i < languages.length; i += 1) {
-            localeFilterIds = metadataStorage.getFilterIdsForLanguage(languages[i]);
-            filterIds = filterIds.concat(localeFilterIds);
-        }
-
-        return Array.from(new Set(filterIds));
-    }
-
-    /**
-     * Checks if common filter need update.
-     * Matches version from metadata with data in filter version storage.
-     */
-    private static isFilterNeedUpdate(filterMetadata: any): boolean {
-        log.info(`Check if filter ${filterMetadata.filterId} need to update`);
-
-        const filterVersion = filtersVersion.get(filterMetadata.filterId);
-
-        if (!filterVersion) {
-            return true;
-        }
-
-        return !BrowserUtils.isGreaterOrEqualsVersion(filterVersion.version, filterMetadata.version);
-    }
-
-    /**
-     * Download filter rules from backend and update filter state and metadata
-     * @param filterId - filter id
-     * @param remote - is filter rules loaded from backend
-     */
-    private static async loadFilterRulesFromBackend(filterId: number, remote: boolean) {
-        const isOptimized = settingsStorage.get(SettingOption.USE_OPTIMIZED_FILTERS);
-
-        const rules = await networkService.downloadFilterRules(filterId, remote, isOptimized) as string[];
-
-        await FiltersStorage.set(filterId, rules);
-
-        await filtersState.set(filterId, {
-            installed: true,
-            loaded: true,
-            enabled: false,
-        });
-
-        const {
-            version,
-            expires,
-            timeUpdated,
-        } = metadataStorage.getFilter(filterId);
-
-        await filtersVersion.set(filterId, {
-            version,
-            expires,
-            lastUpdateTime: new Date(timeUpdated).getTime(),
-            lastCheckTime: Date.now(),
         });
     }
 
@@ -386,5 +372,62 @@ export class FiltersApi {
         }
 
         groupsState.enableGroups(groupIds);
+    }
+
+    /**
+     * Load i18n metadata from remote source
+     */
+    private static async loadI18nMetadataFromBackend(remote: boolean) {
+        const i18nMetadata = remote
+            ? await networkService.downloadI18nMetadataFromBackend()
+            : await networkService.getLocalFiltersI18nMetadata();
+
+        await i18nMetadataStorage.setData(i18nMetadata);
+    }
+
+    /**
+     * Load metadata from remote source
+     */
+    private static async loadMetadataFromFromBackend(remote: boolean) {
+        const metadata = remote
+            ? await networkService.downloadMetadataFromBackend()
+            : await networkService.getLocalFiltersMetadata();
+
+        const localizedMetadata = MetadataStorage.applyI18nMetadata(
+            metadata,
+            i18nMetadataStorage.getData(),
+        );
+
+        localizedMetadata.groups.push({
+            groupId: ANTIBANNER_GROUPS_ID.CUSTOM_FILTERS_GROUP_ID,
+            displayNumber: CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER,
+            groupName: translator.getMessage('options_antibanner_custom_group'),
+        });
+
+        await metadataStorage.setData(localizedMetadata);
+    }
+
+    /**
+     * Read i18n metadata from storage
+     * if data is not exist, load it from local assets
+     */
+    private static async initI18nMetadata() {
+        const isI18nMetadataPersisted = await i18nMetadataStorage.init();
+
+        if (!isI18nMetadataPersisted) {
+            await FiltersApi.loadI18nMetadataFromBackend(false);
+        }
+    }
+
+    /**
+     * Read metadata from local storage
+     * if data is not exist, load it from local assets
+     */
+    private static async initMetadata() {
+        const isMetadataPersisted = await metadataStorage.init();
+
+        if (!isMetadataPersisted) {
+            await FiltersApi.loadMetadataFromFromBackend(false);
+        }
     }
 }

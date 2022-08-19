@@ -8,13 +8,13 @@ import { UiService } from './services/ui-service';
 import { PopupService } from './services/popup-service';
 import { SettingsService } from './services/settings';
 import { FiltersService } from './services/filters/service';
-import { FiltersApi } from './services/filters/api';
 import { AllowlistService } from './services/filters/allowlist/service';
 import { UserRulesService } from './services/filters/userrules';
 import { CustomFilterService } from './services/filters/custom/service';
 import { FilteringLogService } from './services/filtering-log';
 import { eventService } from './services/event-service';
 import { safebrowsingService } from './services/safebrowsing-service';
+import { CommonFilterApi } from './services/filters/common';
 
 export class App {
     private isFirstInstall = false;
@@ -49,7 +49,7 @@ export class App {
         if (this.isFirstInstall) {
             messageHandler.addListener(MessageType.CHECK_REQUEST_FILTER_READY, App.onCheckRequestFilterReady);
             await UiService.openFiltersDownloadPage();
-            await FiltersApi.initDefaultFilters();
+            await CommonFilterApi.initDefaultFilters();
         }
 
         await Engine.start();

@@ -16,7 +16,7 @@ export class GroupsState {
 
     data: Record<number, GroupStateData> = {};
 
-    init() {
+    async init() {
         const groupsMetadata = metadataStorage.getGroups();
 
         const storageData = settingsStorage.get(SettingOption.GROUPS_STATE_PROP);
@@ -31,7 +31,7 @@ export class GroupsState {
 
         this.data = data;
 
-        this.updateStorageData();
+        await this.updateStorageData();
     }
 
     get(groupId: number): GroupStateData | undefined {
@@ -76,6 +76,11 @@ export class GroupsState {
             };
         }
 
+        await this.updateStorageData();
+    }
+
+    async clear() {
+        this.data = {};
         await this.updateStorageData();
     }
 

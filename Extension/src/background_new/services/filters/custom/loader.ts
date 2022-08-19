@@ -1,5 +1,8 @@
 import { networkService } from '../../network/network-service';
 
+/**
+ * Helper class for custom filters downloading
+ */
 export class CustomFilterLoader {
     /**
      * Custom filter downloading limit in ms

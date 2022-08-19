@@ -7,6 +7,9 @@ export type CustomFilterParsedData = {
     timeUpdated: string,
 };
 
+/**
+ * Helper class for parsing custom filter metadata, loaded from remote source
+ */
 export class CustomFilterParser {
     /**
      * Amount of lines to parse metadata from filter's header
@@ -15,8 +18,6 @@ export class CustomFilterParser {
 
     /**
      * Parses filter metadata from rules header
-     *
-     * @param rules
      */
     static parseFilterDataFromHeader(rules: string[]): CustomFilterParsedData {
         return {
@@ -29,6 +30,9 @@ export class CustomFilterParser {
         };
     }
 
+    /**
+     * Parses data from specified rules header
+     */
     private static parseTag(tagName: string, rules: string[]): string {
         let result = '';
 

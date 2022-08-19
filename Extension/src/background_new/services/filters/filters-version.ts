@@ -13,7 +13,7 @@ export type FilterVersionData = {
 export class FiltersVersion {
     data: Record<number, FilterVersionData> = {};
 
-    init() {
+    async init() {
         const filtersMetadata = FiltersApi.getFiltersMetadata();
 
         const storageData = settingsStorage.get(SettingOption.FILTERS_VERSION_PROP);
@@ -26,12 +26,7 @@ export class FiltersVersion {
                 version,
                 expires,
                 timeUpdated,
-            } = filtersMetadata[i] as {
-                filterId: number,
-                version: string,
-                expires: number,
-                timeUpdated: string,
-            };
+            } = filtersMetadata[i];
 
             if (!data[filterId]) {
                 data[filterId] = {
@@ -45,7 +40,7 @@ export class FiltersVersion {
 
         this.data = data;
 
-        this.updateStorageData();
+        await this.updateStorageData();
     }
 
     get(filterId: number): FilterVersionData | undefined {
@@ -59,6 +54,11 @@ export class FiltersVersion {
 
     async delete(filterId: number) {
         delete this.data[filterId];
+        await this.updateStorageData();
+    }
+
+    async clear() {
+        this.data = {};
         await this.updateStorageData();
     }
 

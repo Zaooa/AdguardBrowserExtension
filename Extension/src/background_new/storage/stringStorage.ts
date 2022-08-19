@@ -1,39 +1,48 @@
 import { StorageInterface } from './storage';
 
 /**
- * Class for managing list data that is persisted as string
+ * Class for managing data that is persisted as string
  *
  * Parses string from storage field on initialization once,
  * caches parsing result and sync cache with string data
  *
  */
-export class ListStorage<K, V> {
-    private key: K;
+export class StringStorage<K, V> {
+    protected key: K;
 
-    private storage: StorageInterface<K>;
+    protected storage: StorageInterface<K>;
 
-    private data: V[];
+    protected data: V | undefined;
 
-    constructor(key: K, storage: StorageInterface<K>) {
+    constructor(
+        key: K,
+        storage: StorageInterface<K>,
+    ) {
         this.key = key;
         this.storage = storage;
     }
 
-    public async init() {
+    public async init(defaultData?: V) {
         const storageData = this.storage.get(this.key);
 
         if (typeof storageData === 'string') {
             this.data = JSON.parse(storageData);
-        } else {
-            await this.setData([]);
+            return true;
         }
+
+        if (defaultData) {
+            await this.setData(defaultData);
+            return true;
+        }
+
+        return false;
     }
 
-    public getData(): V[] {
+    public getData(): V | undefined {
         return this.data;
     }
 
-    public async setData(data: V[]) {
+    public async setData(data: V) {
         this.data = data;
         await this.storage.set(this.key, JSON.stringify(this.data));
     }

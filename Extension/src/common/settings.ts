@@ -149,9 +149,16 @@ export const extensionSpecificSettingsBackupValidator = z.object({
 export type ExtensionSpecificSettingsBackup = z.infer<typeof extensionSpecificSettingsBackupValidator>;
 
 export const filtersBackupValidator = z.object({
-    'enabled-groups': z.array(z.any()),
-    'enabled-filters': z.array(z.any()),
-    'custom-filters': z.array(z.any()),
+    'enabled-groups': z.array(z.number()),
+    'enabled-filters': z.array(z.number()),
+    'custom-filters': z.array(
+        z.object({
+            customUrl: z.string(),
+            title: z.string().optional(),
+            trusted: z.boolean().optional(),
+            enabled: z.boolean().optional(),
+        }),
+    ),
     'user-filter': z.object({
         rules: z.string(),
         'disabled-rules': z.string(),

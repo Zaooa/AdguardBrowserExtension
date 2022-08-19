@@ -4,36 +4,51 @@ import { tabsApi } from '@adguard/tswebextension';
 import {
     BACKGROUND_TAB_ID,
     MessageType,
+    LoadCustomFilterInfoMessage,
+    SubscribeToCustomFilterMessage,
+    RemoveAntiBannerFilterMessage,
 } from '../../../../common/constants';
 import { CustomFilterApi } from './api';
 import { filtersState } from '../filters-state';
 import { messageHandler } from '../../../message-handler';
 import { Engine } from '../../../engine';
 
+/**
+ * Service for processing events with custom filters
+ */
 export class CustomFilterService {
+    /**
+     * Init handlers
+     */
     static async init() {
         messageHandler.addListener(MessageType.LOAD_CUSTOM_FILTER_INFO, CustomFilterService.onCustomFilterInfoLoad);
         messageHandler.addListener(
             MessageType.SUBSCRIBE_TO_CUSTOM_FILTER,
-            CustomFilterService.onCustomFilterSubscribtion,
+            CustomFilterService.onCustomFilterSubscription,
         );
         messageHandler.addListener(MessageType.REMOVE_ANTIBANNER_FILTER, CustomFilterService.onCustomFilterRemove);
 
-        browser.webNavigation.onCommitted.addListener(CustomFilterService.onTabCommited);
+        browser.webNavigation.onCommitted.addListener(CustomFilterService.injectSubscriptionScript);
     }
 
-    static async onCustomFilterInfoLoad(message) {
+    /**
+     * Get custom filter info for modal window
+     */
+    static async onCustomFilterInfoLoad(message: LoadCustomFilterInfoMessage) {
         const { url, title } = message.data;
 
-        return CustomFilterApi.getCustomFilterInfo(url, title);
+        return CustomFilterApi.getFilterInfo(url, title);
     }
 
-    static async onCustomFilterSubscribtion(message) {
+    /**
+     * Add new custom filter
+     */
+    static async onCustomFilterSubscription(message: SubscribeToCustomFilterMessage) {
         const { filter } = message.data;
 
         const { customUrl, name, trusted } = filter;
 
-        const filterMetadata = await CustomFilterApi.createCustomFilter(customUrl, { name, trusted });
+        const filterMetadata = await CustomFilterApi.createFilter(customUrl, { name, trusted });
 
         await filtersState.enableFilters([filterMetadata.filterId]);
 
@@ -42,13 +57,19 @@ export class CustomFilterService {
         return filterMetadata;
     }
 
-    static async onCustomFilterRemove(message) {
+    /**
+     * Remove custom filter
+     */
+    static async onCustomFilterRemove(message: RemoveAntiBannerFilterMessage) {
         const { filterId } = message.data;
 
         await CustomFilterApi.removeCustomFilter(filterId);
     }
 
-    static onTabCommited(details: WebNavigation.OnCommittedDetailsType) {
+    /**
+     * Inject custom filter subscription content script to tab
+     */
+    static injectSubscriptionScript(details: WebNavigation.OnCommittedDetailsType) {
         const { tabId, frameId } = details;
 
         if (tabId === BACKGROUND_TAB_ID) {
@@ -68,6 +89,7 @@ export class CustomFilterService {
         if (requestType !== RequestType.Document && requestType !== RequestType.Subdocument) {
             return;
         }
+
         try {
             browser.tabs.executeScript(tabId, {
                 file: '/content-script/subscribe.js',

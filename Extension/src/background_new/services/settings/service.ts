@@ -20,9 +20,9 @@ export class SettingsService {
     static async init() {
         await settingsStorage.init();
         messageHandler.addListener(MessageType.GET_OPTIONS_DATA, SettingsService.getOptionsData);
-        messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.resetSettings);
+        messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.reset);
         messageHandler.addListener(MessageType.CHANGE_USER_SETTING, SettingsService.changeUserSettings);
-        messageHandler.addListener(MessageType.APPLY_SETTINGS_JSON, SettingsService.importSettings);
+        messageHandler.addListener(MessageType.APPLY_SETTINGS_JSON, SettingsService.import);
 
         SettingsService.onSettingChange.addListener(SettingOption.DISABLE_STEALTH_MODE, Engine.update);
         SettingsService.onSettingChange.addListener(SettingOption.HIDE_REFERRER, Engine.update);
@@ -73,12 +73,6 @@ export class SettingsService {
         return settingsStorage.getConfiguration();
     }
 
-    // TODO: fix
-    static async resetSettings() {
-        await settingsStorage.reset();
-        return true;
-    }
-
     static async changeUserSettings(message) {
         const { key, value } = message.data;
         await settingsStorage.set(key, value);
@@ -91,10 +85,20 @@ export class SettingsService {
         });
     }
 
-    static async importSettings(message) {
+    static async reset() {
+        try {
+            await SettingsApi.reset();
+            await Engine.update();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    static async import(message) {
         const { json } = message.data;
 
-        const isImported = SettingsApi.importSettings(json);
+        const isImported = await SettingsApi.import(json);
 
         await Engine.update();
 

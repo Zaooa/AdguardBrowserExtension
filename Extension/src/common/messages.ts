@@ -174,6 +174,39 @@ export type SaveUserRulesMessage = {
   }
 };
 
+export type AddAllowlistDomainPopupMessage = {
+  type: MessageType.ADD_ALLOWLIST_DOMAIN_POPUP
+  data: {
+    tabId: number,
+  }
+};
+
+export type RemoveAllowlistDomainMessage = {
+  type: MessageType.REMOVE_ALLOWLIST_DOMAIN
+  data: {
+    tabId: number,
+  }
+};
+
+export type LoadCustomFilterInfoMessage = {
+  type: MessageType.LOAD_CUSTOM_FILTER_INFO
+  data: {
+    url: string,
+    title: string,
+  }
+};
+
+export type SubscribeToCustomFilterMessage = {
+  type: MessageType.SUBSCRIBE_TO_CUSTOM_FILTER
+  data: {
+    filter: {
+      customUrl: string,
+      name: string,
+      trusted: boolean,
+    }
+  }
+};
+
 export type Message = (
   | GetTabInfoForPopupMessage
   | ChangeApplicationFilteringDisabledMessage
@@ -190,6 +223,10 @@ export type Message = (
   | RemoveAntiBannerFilterMessage
   | SaveAllowlistDomainsMessage
   | SaveUserRulesMessage
+  | AddAllowlistDomainPopupMessage
+  | RemoveAllowlistDomainMessage
+  | LoadCustomFilterInfoMessage
+  | SubscribeToCustomFilterMessage
 ) &
   MessageCommonProps;
 

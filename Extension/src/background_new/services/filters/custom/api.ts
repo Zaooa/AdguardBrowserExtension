@@ -2,7 +2,7 @@ import MD5 from 'crypto-js/md5';
 
 import { log } from '../../../../common/log';
 import { ANTIBANNER_GROUPS_ID, CUSTOM_FILTERS_START_ID } from '../../../../common/constants';
-import { CustomFilterMetadataStorage, CustomFilterMetadata } from './metadata';
+import { customFilterMetadataStorage, CustomFilterMetadata } from './metadata';
 import { filtersVersion } from '../filters-version';
 import { filtersState } from '../filters-state';
 import { FiltersStorage } from '../filters-storage';
@@ -12,6 +12,9 @@ import { CustomFilterLoader } from './loader';
 import { BrowserUtils } from '../../../utils/browser-utils';
 import { networkService } from '../../network/network-service';
 
+/**
+ * User-defined custom filter options
+ */
 export type CreateCustomFilterOptions = {
     name?: string,
     trusted?: boolean,
@@ -30,10 +33,19 @@ export type GetRemoteCustomFilterResult = {
     parsed: CustomFilterParsedData,
 };
 
+/**
+ * API for managing custom filters
+ */
 export class CustomFilterApi {
-    public static async getCustomFilterInfo(url: string, title?: string): Promise<GetCustomFilterInfoResult> {
+    /**
+     * Get custom filter info for modal window
+     *
+     * @param url - filter subscription url
+     * @param title - user-defined filter title
+     */
+    public static async getFilterInfo(url: string, title?: string): Promise<GetCustomFilterInfoResult> {
         // Check if filter from this url was added before
-        if (CustomFilterMetadataStorage.getByUrl(url)) {
+        if (customFilterMetadataStorage.getByUrl(url)) {
             return { errorAlreadyExists: true };
         }
 
@@ -56,13 +68,19 @@ export class CustomFilterApi {
         return { filter };
     }
 
-    public static async createCustomFilter(
+    /**
+     * Add custom filter
+     *
+     * @param url - filter subscription url
+     * @param options - user-defined filter options
+     */
+    public static async createFilter(
         url: string,
         options: CreateCustomFilterOptions,
     ): Promise<CustomFilterMetadata> {
-        const { rules, parsed, checksum } = await CustomFilterApi.getRemoteCustomFilterData(url);
+        const { rules, parsed, checksum } = await CustomFilterApi.getRemoteFilterData(url);
 
-        const filterId = CustomFilterApi.genCustomFilterId();
+        const filterId = CustomFilterApi.genFilterId();
 
         log.info(`Create new custom filter with id ${filterId}`);
 
@@ -88,14 +106,16 @@ export class CustomFilterApi {
             tags: [0],
             customUrl: url,
             trusted,
+            expires: Number(expires),
+            timeUpdated: new Date(timeUpdated).getTime(),
         };
 
-        await CustomFilterMetadataStorage.set(filterMetadata);
+        await customFilterMetadataStorage.set(filterMetadata);
 
         await filtersVersion.set(filterId, {
             version,
-            expires: Number(expires),
-            lastUpdateTime: new Date(timeUpdated).getTime(),
+            expires: filterMetadata.expires,
+            lastUpdateTime: filterMetadata.timeUpdated,
             lastCheckTime: Date.now(),
         });
 
@@ -110,10 +130,13 @@ export class CustomFilterApi {
         return filterMetadata;
     }
 
-    public static async updateCustomFilter(filterId: number): Promise<CustomFilterMetadata | null> {
+    /**
+     * Update custom filter
+     */
+    public static async updateFilter(filterId: number): Promise<CustomFilterMetadata | null> {
         log.info(`Update Custom filter ${filterId} ...`);
 
-        const filterMetadata = CustomFilterMetadataStorage.getById(filterId);
+        const filterMetadata = customFilterMetadataStorage.getById(filterId);
 
         if (!filterMetadata) {
             log.error(`Can't find custom filter ${filterId} metadata`);
@@ -122,21 +145,24 @@ export class CustomFilterApi {
 
         const { customUrl } = filterMetadata;
 
-        const fitlerRemoteData = await CustomFilterApi.getRemoteCustomFilterData(customUrl);
+        const filterRemoteData = await CustomFilterApi.getRemoteFilterData(customUrl);
 
-        if (!CustomFilterApi.isFilterNeedUpdate(filterMetadata, fitlerRemoteData)) {
+        if (!CustomFilterApi.isFilterNeedUpdate(filterMetadata, filterRemoteData)) {
             log.info(`Custom filter ${filterId} is already updated`);
             return null;
         }
 
         log.info(`Successfully update custom filter ${filterId}`);
-        return CustomFilterApi.updateCustomFilterData(filterMetadata, fitlerRemoteData);
+        return CustomFilterApi.updateFilterData(filterMetadata, filterRemoteData);
     }
 
+    /**
+     * Remove custom filter
+     */
     public static async removeCustomFilter(filterId: number): Promise<void> {
         log.info(`Remove Custom filter ${filterId} ...`);
 
-        await CustomFilterMetadataStorage.remove(filterId);
+        await customFilterMetadataStorage.remove(filterId);
         await filtersVersion.delete(filterId);
 
         const filterState = filtersState.get(filterId);
@@ -150,22 +176,31 @@ export class CustomFilterApi {
         }
     }
 
+    /**
+     * Check if filter is custom
+     */
     public static isCustomFilter(filterId: number): boolean {
         return filterId >= CUSTOM_FILTERS_START_ID;
     }
 
-    public static getCustomFilterMetadata(filterId: number): CustomFilterMetadata {
-        return CustomFilterMetadataStorage.getById(filterId);
+    /**
+     * Get custom filter metadata
+     */
+    public static getFilterMetadata(filterId: number): CustomFilterMetadata {
+        return customFilterMetadataStorage.getById(filterId);
     }
 
-    public static getCustomFiltersMetadata(): CustomFilterMetadata[] {
-        return CustomFilterMetadataStorage.getData();
+    /**
+     * Get metadata for all custom filters
+     */
+    public static getFiltersMetadata(): CustomFilterMetadata[] {
+        return customFilterMetadataStorage.getData();
     }
 
     /**
      * Update filter metadata, version state and stored rules
      */
-    private static async updateCustomFilterData(
+    private static async updateFilterData(
         filterMetadata: CustomFilterMetadata,
         { rules, checksum, parsed }: GetRemoteCustomFilterResult,
     ): Promise<CustomFilterMetadata> {
@@ -186,7 +221,7 @@ export class CustomFilterApi {
             checksum,
         };
 
-        await CustomFilterMetadataStorage.set(newFilterMetadata);
+        await customFilterMetadataStorage.set(newFilterMetadata);
 
         await FiltersStorage.set(filterId, rules);
 
@@ -196,9 +231,9 @@ export class CustomFilterApi {
     /**
      * Gets new filter id for custom filter
      */
-    private static genCustomFilterId(): number {
+    private static genFilterId(): number {
         let max = 0;
-        CustomFilterMetadataStorage.getData().forEach((f) => {
+        customFilterMetadataStorage.getData().forEach((f) => {
             if (f.filterId > max) {
                 max = f.filterId;
             }
@@ -215,6 +250,9 @@ export class CustomFilterApi {
         return MD5(rulesText).toString();
     }
 
+    /**
+     * Check if custom filter need to update
+     */
     private static isFilterNeedUpdate(
         filter: CustomFilterMetadata,
         { checksum, parsed }: GetRemoteCustomFilterResult,
@@ -232,7 +270,10 @@ export class CustomFilterApi {
         return checksum !== filter.checksum;
     }
 
-    private static async getRemoteCustomFilterData(url: string): Promise<GetRemoteCustomFilterResult> {
+    /**
+     * Load filter from specified url
+     */
+    private static async getRemoteFilterData(url: string): Promise<GetRemoteCustomFilterResult> {
         log.info(`Get custom filter data from ${url}`);
 
         const rules = await CustomFilterLoader.downloadRulesWithTimeout(url);

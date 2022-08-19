@@ -1,5 +1,5 @@
 import { SettingOption } from '../../../../common/settings';
-import { ListStorage } from '../../../storage';
+import { StringStorage } from '../../../storage';
 import { settingsStorage } from '../../settings/storage';
 
 export type CustomFilterMetadata = {
@@ -13,40 +13,49 @@ export type CustomFilterMetadata = {
     trusted: boolean,
     checksum: string | null,
     version: string,
+    expires: number,
+    timeUpdated: number,
 };
 
-export class CustomFilterMetadataStorage {
-    private static storage = new ListStorage<SettingOption, CustomFilterMetadata>(
-        SettingOption.CUSTOM_FILTERS,
-        settingsStorage,
-    );
-
-    public static async init() {
-        await CustomFilterMetadataStorage.storage.init();
+/**
+ * Storage for custom filters metadata
+ */
+export class CustomFilterMetadataStorage extends StringStorage<SettingOption, CustomFilterMetadata[]> {
+    /**
+     * Get custom filter metadata by filter id
+     */
+    getById(filterId: number): CustomFilterMetadata | undefined {
+        return this.getData().find(f => f.filterId === filterId);
     }
 
-    public static getData(): CustomFilterMetadata[] {
-        return CustomFilterMetadataStorage.storage.getData();
+    /**
+     * Get custom filter metadata by filter subscription url
+     */
+    public getByUrl(url: string): CustomFilterMetadata | undefined {
+        return this.getData().find(f => f.customUrl === url);
     }
 
-    public static getById(filterId: number): CustomFilterMetadata | undefined {
-        return CustomFilterMetadataStorage.storage.getData().find(f => f.filterId === filterId);
-    }
-
-    public static getByUrl(url: string): CustomFilterMetadata | undefined {
-        return CustomFilterMetadataStorage.storage.getData().find(f => f.customUrl === url);
-    }
-
-    public static async set(filter: CustomFilterMetadata): Promise<void> {
-        const data = CustomFilterMetadataStorage.storage.getData().filter(f => f.filterId !== filter.filterId);
+    /**
+     * Set custom filter metadata with filterId key
+     */
+    public async set(filter: CustomFilterMetadata): Promise<void> {
+        const data = this.getData().filter(f => f.filterId !== filter.filterId);
 
         data.push(filter);
 
-        await this.storage.setData(data);
+        await this.setData(data);
     }
 
-    public static async remove(filterId: number): Promise<void> {
-        const data = this.storage.getData().filter(f => f.filterId !== filterId);
-        await this.storage.setData(data);
+    /**
+     * Remove custom filter metadata
+     */
+    public async remove(filterId: number): Promise<void> {
+        const data = this.getData().filter(f => f.filterId !== filterId);
+        await this.setData(data);
     }
 }
+
+export const customFilterMetadataStorage = new CustomFilterMetadataStorage(
+    SettingOption.CUSTOM_FILTERS,
+    settingsStorage,
+);

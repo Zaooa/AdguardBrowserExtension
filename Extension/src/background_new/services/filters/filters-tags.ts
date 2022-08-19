@@ -1,5 +1,5 @@
 import { AntiBannerFiltersId } from '../../../common/constants';
-import { metadata } from './metadata';
+import { metadataStorage } from './metadata';
 
 export class FilterTags {
     static RECOMMENDED_TAG_ID = 10;
@@ -35,7 +35,7 @@ export class FilterTags {
     }
 
     static getPurposeGroupedFilters() {
-        const filters = metadata
+        const filters = metadataStorage
             .getFilters()
             .filter(({ filterId }) => filterId !== AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID);
 

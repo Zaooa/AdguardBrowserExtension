@@ -3,6 +3,8 @@ import browser from 'webextension-polyfill';
 import {
     MessageType,
     SaveAllowlistDomainsMessage,
+    AddAllowlistDomainPopupMessage,
+    RemoveAllowlistDomainMessage,
 } from '../../../../common/constants';
 import { messageHandler } from '../../../message-handler';
 import { Engine } from '../../../engine';
@@ -10,7 +12,13 @@ import { SettingsService } from '../../settings';
 import { SettingOption } from '../../../../common/settings';
 import { AllowlistApi } from './api';
 
+/**
+ * Service for processing events with a allowlist
+ */
 export class AllowlistService {
+    /**
+     * Initialize handlers
+     */
     static async init() {
         await AllowlistApi.init();
 
@@ -30,6 +38,9 @@ export class AllowlistService {
         );
     }
 
+    /**
+     * Gets domains depending on current allowlist mode
+     */
     static async onGetAllowlistDomains() {
         const domains = AllowlistApi.isInverted()
             ? AllowlistApi.getInvertedAllowlistDomains()
@@ -40,7 +51,11 @@ export class AllowlistService {
         return { content, appVersion: browser.runtime.getManifest().version };
     }
 
-    static async onAddAllowlistDomain(message) {
+    /**
+     * If default allowlist mode, adds domain to the list
+     * If inverted allowlist mode, removes domain from the list
+     */
+    static async onAddAllowlistDomain(message: AddAllowlistDomainPopupMessage) {
         const { tabId } = message.data;
 
         const mainFrame = tabsApi.getTabMainFrame(tabId);
@@ -62,7 +77,11 @@ export class AllowlistService {
         await browser.tabs.reload(tabId);
     }
 
-    static async onRemoveAllowlistDomain(message) {
+    /**
+     * If default allowlist mode, removes domain from the list
+     * If inverted allowlist mode, adds domain to the list
+     */
+    static async onRemoveAllowlistDomain(message: RemoveAllowlistDomainMessage) {
         const { tabId } = message.data;
 
         const mainFrame = tabsApi.getTabMainFrame(tabId);
@@ -84,6 +103,9 @@ export class AllowlistService {
         await browser.tabs.reload(tabId);
     }
 
+    /**
+     * Stores domains depending on current allowlist mode
+     */
     static async handleDomainsSave(message: SaveAllowlistDomainsMessage) {
         const { value } = message.data;
 
@@ -98,10 +120,16 @@ export class AllowlistService {
         await Engine.update();
     }
 
+    /**
+     * Triggers engine update on enabling
+     */
     static async onEnableStateChange() {
         await Engine.update();
     }
 
+    /**
+     * Triggers engine update on mode switch
+     */
     static async onAllowlistModeChange() {
         await Engine.update();
     }

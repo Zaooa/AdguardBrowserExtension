@@ -20,7 +20,7 @@ import { toasts } from '../ui/toasts';
 
 export class FiltersService {
     static async init() {
-        await FiltersApi.initMetadata();
+        await FiltersApi.init();
         pageStats.init();
         localeDetect.init();
 
@@ -51,14 +51,14 @@ export class FiltersService {
         await Engine.update();
     }
 
-    static async onGroupEnable(message: any) {
+    static async onGroupEnable(message) {
         const { groupId } = message.data;
 
         await groupsState.enableGroups([groupId]);
         await Engine.update();
     }
 
-    static async onGroupDisable(message: any) {
+    static async onGroupDisable(message) {
         const { groupId } = message.data;
 
         await groupsState.disableGroups([groupId]);

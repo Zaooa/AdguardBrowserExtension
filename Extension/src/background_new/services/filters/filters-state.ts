@@ -26,11 +26,11 @@ export class FiltersState {
 
     data: Record<number, FilterStateData> = {};
 
-    init() {
+    async init() {
         const filtersMetadata = metadataStorage
             .getFilters()
             /**
-             * Don't create filter state context for allowlist and userrules lists
+             * Don't create filter state context for allowlist and user rules lists
              * Their state is controlled by separate modules
              */
             .filter(({ filterId }) => {
@@ -42,14 +42,14 @@ export class FiltersState {
         const data = storageData ? JSON.parse(storageData) : {};
 
         for (let i = 0; i < filtersMetadata.length; i += 1) {
-            const { filterId } = filtersMetadata[i] as { filterId: number };
+            const { filterId } = filtersMetadata[i];
 
             data[filterId] = data[filterId] || FiltersState.defaultState;
         }
 
         this.data = data;
 
-        this.updateStorageData();
+        await this.updateStorageData();
     }
 
     get(filterId: number): FilterStateData | undefined {
@@ -93,6 +93,11 @@ export class FiltersState {
             this.data[filterId] = { ...this.data[filterId], enabled: false };
         }
 
+        await this.updateStorageData();
+    }
+
+    async clear() {
+        this.data = {};
         await this.updateStorageData();
     }
 
