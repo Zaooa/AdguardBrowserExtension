@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Import settings"
     },
+    "options_report_bug": {
+        "message": "Report a bug"
+    },
+    "options_leave_feedback": {
+        "message": "Leave feedback"
+    },
     "options_privacy": {
         "message": "Stealth Mode"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Hide full text"
+    },
+    "close_button_title": {
+        "message": "Close"
     }
 }

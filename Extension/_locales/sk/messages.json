@@ -641,6 +641,12 @@
     "options_import_settings": {
         "message": "Import nastavení"
     },
+    "options_report_bug": {
+        "message": "Nahlásiť chybu"
+    },
+    "options_leave_feedback": {
+        "message": "Zanechajte spätnú väzbu"
+    },
     "options_privacy": {
         "message": "Súkromie"
     },
@@ -1015,5 +1021,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Skryť celý text"
+    },
+    "close_button_title": {
+        "message": "Ukončiť"
     }
 }

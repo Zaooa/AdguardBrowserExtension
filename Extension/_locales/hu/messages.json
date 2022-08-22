@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Beállítások importálása"
     },
+    "options_report_bug": {
+        "message": "Hiba jelentése"
+    },
+    "options_leave_feedback": {
+        "message": "Visszajelzés küldése"
+    },
     "options_privacy": {
         "message": "Lopakodó mód"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Teljes szöveg elrejtése"
+    },
+    "close_button_title": {
+        "message": "Bezárás"
     }
 }

@@ -1,6 +1,7 @@
 import React, { useRef, forwardRef, useEffect } from 'react';
 import cn from 'classnames';
 import { Icon } from '../../../common/components/ui/Icon';
+import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { isMacOs } from '../../../../common/user-agent-utils';
 
 import './search.pcss';
@@ -17,6 +18,7 @@ const Search = forwardRef(({
             if (e[modifierKeyProperty] && code === 'KeyF') {
                 e.preventDefault();
                 localSearchInputRef.current.focus();
+                localSearchInputRef.current.select();
             }
         };
 
@@ -47,6 +49,7 @@ const Search = forwardRef(({
                 <button
                     type="button"
                     className="search__clear"
+                    aria-label={reactTranslator.getMessage('close_button_title')}
                     onClick={onClear}
                 >
                     <Icon id="#cross" classname="search__cross" />

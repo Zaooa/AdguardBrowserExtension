@@ -168,7 +168,7 @@
         "message": "فلاتر"
     },
     "options_antibanner_rules_count": {
-        "message": "عدد قواعد التصفية: ٪ rules_count٪"
+        "message": "عدد قواعد التصفية: %rules_count%"
     },
     "options_antibanner_custom_group": {
         "message": "مخصص"
@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "استيراد الإعدادات.."
     },
+    "options_report_bug": {
+        "message": "الإبلاغ عن خطأ"
+    },
+    "options_leave_feedback": {
+        "message": "اترك ملاحظاتك"
+    },
     "options_privacy": {
         "message": "وضع التخفي"
     },
@@ -1027,5 +1033,8 @@
     },
     "text_collapser_hide_default": {
         "message": "إخفاء النص بالكامل"
+    },
+    "close_button_title": {
+        "message": "إغلاق"
     }
 }

@@ -465,7 +465,7 @@
         "message": "Фільтр"
     },
     "filtering_table_empty_reload_page_desc": {
-        "message": "Адключыць фільтры ці <a>перазагрузіць старонку<\/a>, каб убачыць часопіс."
+        "message": "<reset>Адключыце фільтры<\/reset> або <refresh>перазагрузіце старонку<\/refresh> , каб убачыць журналы падзей фільтрацыі."
     },
     "filtering_modal_info_title": {
         "message": "Інфармацыя пра запыт"
@@ -643,6 +643,12 @@
     },
     "options_import_settings": {
         "message": "Імпарт налад"
+    },
+    "options_report_bug": {
+        "message": "Паведаміць пра памылку"
+    },
+    "options_leave_feedback": {
+        "message": "Пакінуць водгук"
     },
     "options_privacy": {
         "message": "Антытрэкінг"
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Схаваць поўны тэкст"
+    },
+    "close_button_title": {
+        "message": "Зачыніць"
     }
 }
