@@ -23,6 +23,7 @@ export class SettingsService {
         messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.reset);
         messageHandler.addListener(MessageType.CHANGE_USER_SETTING, SettingsService.changeUserSettings);
         messageHandler.addListener(MessageType.APPLY_SETTINGS_JSON, SettingsService.import);
+        messageHandler.addListener(MessageType.LOAD_SETTINGS_JSON, SettingsService.export);
 
         SettingsService.onSettingChange.addListener(SettingOption.DISABLE_STEALTH_MODE, Engine.update);
         SettingsService.onSettingChange.addListener(SettingOption.HIDE_REFERRER, Engine.update);
@@ -104,5 +105,13 @@ export class SettingsService {
 
         listeners.notifyListeners(listeners.SETTINGS_UPDATED, isImported);
         return isImported;
+    }
+
+    static async export() {
+        const content = await SettingsApi.export();
+        return {
+            content,
+            appVersion: browser.runtime.getManifest().version,
+        };
     }
 }

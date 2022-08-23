@@ -1,7 +1,7 @@
 import { SettingOption } from '../../../../common/settings';
 import { listeners } from '../../../notifier';
 
-import { settingsStorage } from '../../settings';
+import { settingsStorage } from '../../settings/storage';
 import { StringStorage } from '../../../storage';
 
 export type DomainsStorage = StringStorage<SettingOption, string[]>;

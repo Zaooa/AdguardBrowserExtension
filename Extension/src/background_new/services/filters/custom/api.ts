@@ -12,12 +12,11 @@ import { CustomFilterLoader } from './loader';
 import { BrowserUtils } from '../../../utils/browser-utils';
 import { networkService } from '../../network/network-service';
 
-/**
- * User-defined custom filter options
- */
-export type CreateCustomFilterOptions = {
-    name?: string,
-    trusted?: boolean,
+export type CustomFilterDTO = {
+    customUrl: string;
+    title?: string;
+    trusted?: boolean;
+    enabled?: boolean;
 };
 
 export type CustomFilterInfo = CustomFilterParsedData & {
@@ -70,22 +69,18 @@ export class CustomFilterApi {
 
     /**
      * Add custom filter
-     *
-     * @param url - filter subscription url
-     * @param options - user-defined filter options
      */
-    public static async createFilter(
-        url: string,
-        options: CreateCustomFilterOptions,
-    ): Promise<CustomFilterMetadata> {
-        const { rules, parsed, checksum } = await CustomFilterApi.getRemoteFilterData(url);
+    public static async createFilter(filterData: CustomFilterDTO): Promise<CustomFilterMetadata> {
+        const { customUrl } = filterData;
+        const { rules, parsed, checksum } = await CustomFilterApi.getRemoteFilterData(customUrl);
 
         const filterId = CustomFilterApi.genFilterId();
 
         log.info(`Create new custom filter with id ${filterId}`);
 
-        const trusted = !!options.trusted;
-        const name = options.name ? options.name : parsed.name;
+        const trusted = !!filterData.trusted;
+        const enabled = !!filterData.enabled;
+        const name = filterData.title ? filterData.title : parsed.name;
 
         const {
             description,
@@ -104,7 +99,7 @@ export class CustomFilterApi {
             version,
             checksum,
             tags: [0],
-            customUrl: url,
+            customUrl,
             trusted,
             expires: Number(expires),
             timeUpdated: new Date(timeUpdated).getTime(),
@@ -122,12 +117,21 @@ export class CustomFilterApi {
         await filtersState.set(filterId, {
             loaded: true,
             installed: true,
-            enabled: false,
+            enabled,
         });
 
         await FiltersStorage.set(filterId, rules);
 
         return filterMetadata;
+    }
+
+    /**
+     * Add custom filters
+     */
+    public static async createFilters(filtersData: CustomFilterDTO[]) {
+        const tasks = filtersData.map(filterData => CustomFilterApi.createFilter(filterData));
+
+        await Promise.allSettled(tasks);
     }
 
     /**
@@ -159,7 +163,7 @@ export class CustomFilterApi {
     /**
      * Remove custom filter
      */
-    public static async removeCustomFilter(filterId: number): Promise<void> {
+    public static async removeFilter(filterId: number): Promise<void> {
         log.info(`Remove Custom filter ${filterId} ...`);
 
         await customFilterMetadataStorage.remove(filterId);
@@ -195,6 +199,25 @@ export class CustomFilterApi {
      */
     public static getFiltersMetadata(): CustomFilterMetadata[] {
         return customFilterMetadataStorage.getData();
+    }
+
+    /**
+     * Get custom filters data
+     */
+    public static getFiltersData(): CustomFilterDTO[] {
+        const filtersMetadata = CustomFilterApi.getFiltersMetadata();
+
+        return filtersMetadata.map(({
+            filterId,
+            customUrl,
+            name,
+            trusted,
+        }) => ({
+            customUrl,
+            title: name,
+            trusted,
+            enabled: !!filtersState.get(filterId)?.enabled,
+        }));
     }
 
     /**

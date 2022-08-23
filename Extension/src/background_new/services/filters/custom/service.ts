@@ -9,7 +9,6 @@ import {
     RemoveAntiBannerFilterMessage,
 } from '../../../../common/constants';
 import { CustomFilterApi } from './api';
-import { filtersState } from '../filters-state';
 import { messageHandler } from '../../../message-handler';
 import { Engine } from '../../../engine';
 
@@ -48,9 +47,12 @@ export class CustomFilterService {
 
         const { customUrl, name, trusted } = filter;
 
-        const filterMetadata = await CustomFilterApi.createFilter(customUrl, { name, trusted });
-
-        await filtersState.enableFilters([filterMetadata.filterId]);
+        const filterMetadata = await CustomFilterApi.createFilter({
+            customUrl,
+            title: name,
+            trusted,
+            enabled: true,
+        });
 
         await Engine.update();
 
@@ -63,7 +65,7 @@ export class CustomFilterService {
     static async onCustomFilterRemove(message: RemoveAntiBannerFilterMessage) {
         const { filterId } = message.data;
 
-        await CustomFilterApi.removeCustomFilter(filterId);
+        await CustomFilterApi.removeFilter(filterId);
     }
 
     /**

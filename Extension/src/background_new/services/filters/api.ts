@@ -1,5 +1,10 @@
 import { log } from '../../../common/log';
-import { CustomFilterApi, CustomFilterMetadata, customFilterMetadataStorage } from './custom';
+import {
+    CustomFilterDTO,
+    CustomFilterApi,
+    CustomFilterMetadata,
+    customFilterMetadataStorage,
+} from './custom';
 import { CommonFilterApi } from './common';
 import { filtersState } from './filters-state';
 import { filtersVersion } from './filters-version';
@@ -15,7 +20,7 @@ import {
 import { translator } from '../../../common/translators/translator';
 import { SettingsBackup } from '../../../common/settings';
 import { UserRulesApi } from './userrules';
-// import { AllowlistApi } from './allowlist';
+import { AllowlistApi } from './allowlist';
 
 /**
  * Encapsulates the logic for managing filter data that is stored in the extension.
@@ -49,9 +54,17 @@ export class FiltersApi {
         await filtersVersion.clear();
 
         /**
-         * Force reload filters data from local source
+         * Force reload metadata
          */
         await FiltersApi.loadMetadata(false);
+        await customFilterMetadataStorage.setData([]);
+
+        /**
+         * Clean up allowlist and userrules
+         */
+        await UserRulesApi.setUserRules([]);
+        await AllowlistApi.setAllowlistDomains([]);
+        await AllowlistApi.setInvertedAllowlistDomains([]);
 
         /**
          * Enable default filters
@@ -75,6 +88,16 @@ export class FiltersApi {
                     await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
                 } else {
                     await filtersState.disableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
+                }
+            }
+
+            const blockKnownTrackersFlag = stealthSettings?.['block-known-trackers'];
+
+            if (typeof blockKnownTrackersFlag === 'boolean') {
+                if (blockKnownTrackersFlag) {
+                    await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
+                } else {
+                    await filtersState.disableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
                 }
             }
         }
@@ -111,23 +134,7 @@ export class FiltersApi {
             const customFilters = filtersSettings?.['custom-filters'];
 
             if (Array.isArray(customFilters)) {
-                for (let i = 0; i < customFilters.length; i += 1) {
-                    const customFilter = customFilters[i];
-
-                    const { customUrl } = customFilter;
-
-                    const customFilterOptions = {
-                        trusted: !!customFilter?.trusted,
-                        ...customFilter?.title && { name: customFilter.title },
-                    };
-
-                    // eslint-disable-next-line no-await-in-loop
-                    const { filterId } = await CustomFilterApi.createFilter(customUrl, customFilterOptions);
-
-                    if (customFilter?.enabled) {
-                        filtersState.enableFilters([filterId]);
-                    }
-                }
+                await CustomFilterApi.createFilters(customFilters as CustomFilterDTO[]);
             }
 
             const userFilter = filtersSettings?.['user-filter'];
@@ -136,8 +143,6 @@ export class FiltersApi {
                 await UserRulesApi.setUserRules(userFilter.rules.split('\n'));
             }
 
-            // TODO: fix
-            /*
             const allowlist = filtersSettings?.whitelist;
 
             if (allowlist?.domains) {
@@ -147,7 +152,6 @@ export class FiltersApi {
             if (allowlist?.['inverted-domains']) {
                 await AllowlistApi.setAllowlistDomains(allowlist['inverted-domains']);
             }
-            */
         }
     }
 

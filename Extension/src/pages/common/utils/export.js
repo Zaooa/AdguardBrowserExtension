@@ -16,7 +16,7 @@
  */
 import { format } from 'date-fns';
 
-import { runtimeImpl } from '../../../common/common-script';
+import { messenger } from '../../services/messenger';
 import { MessageType } from '../../../common/constants';
 
 /**
@@ -59,7 +59,7 @@ export const exportData = async (type) => {
     } = exportMetadata[type];
 
     const currentTimeString = format(Date.now(), 'yyyyMMdd_HHmmss');
-    const { content, appVersion } = await runtimeImpl.sendMessage({ type: messageType });
+    const { content, appVersion } = await messenger.sendMessage(messageType);
     const filename = `${currentTimeString}_adg_ext_${name}_${appVersion}.${ext}`;
 
     const blob = new Blob([content]);

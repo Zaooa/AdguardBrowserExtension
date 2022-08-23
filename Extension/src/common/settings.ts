@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const ADGUARD_SETTINGS_KEY = 'adguard-settings';
 
 export enum SettingOption {
-    CLIENT_ID = 'clentId',
+    CLIENT_ID = 'clientId',
 
     // filters states
 
@@ -148,17 +148,21 @@ export const extensionSpecificSettingsBackupValidator = z.object({
 
 export type ExtensionSpecificSettingsBackup = z.infer<typeof extensionSpecificSettingsBackupValidator>;
 
+export const customFiltersBackupValidator = z.array(
+    z.object({
+        customUrl: z.string(),
+        title: z.string().optional(),
+        trusted: z.boolean().optional(),
+        enabled: z.boolean().optional(),
+    }),
+);
+
+export type CustomFiltersBackup = z.infer<typeof customFiltersBackupValidator>;
+
 export const filtersBackupValidator = z.object({
     'enabled-groups': z.array(z.number()),
     'enabled-filters': z.array(z.number()),
-    'custom-filters': z.array(
-        z.object({
-            customUrl: z.string(),
-            title: z.string().optional(),
-            trusted: z.boolean().optional(),
-            enabled: z.boolean().optional(),
-        }),
-    ),
+    'custom-filters': customFiltersBackupValidator,
     'user-filter': z.object({
         rules: z.string(),
         'disabled-rules': z.string(),
