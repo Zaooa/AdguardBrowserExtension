@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill';
 import { storage } from '../../storage';
 import { UserAgent } from '../../../common/user-agent';
 import {
@@ -18,7 +19,7 @@ export class SettingsStorage {
      */
     static defaultSettings: Settings = {
         [SettingOption.CLIENT_ID]: SettingsStorage.genClientId(),
-
+        [SettingOption.APP_VERSION]: browser.runtime.getManifest().version,
         // user settings
         [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: SettingsStorage.isPromoInfoDisabled(),
         [SettingOption.DISABLE_SAFEBROWSING]: true,

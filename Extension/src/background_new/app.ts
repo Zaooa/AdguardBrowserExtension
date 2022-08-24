@@ -6,7 +6,7 @@ import { MessageType } from '../common/messages';
 import { log } from '../common/log';
 import { UiService } from './services/ui-service';
 import { PopupService } from './services/popup-service';
-import { SettingsService } from './services/settings';
+import { SettingsService, settingsStorage } from './services/settings';
 import { FiltersService } from './services/filters/service';
 import { AllowlistService } from './services/filters/allowlist/service';
 import { UserRulesService } from './services/filters/userrules';
@@ -15,9 +15,13 @@ import { FilteringLogService } from './services/filtering-log';
 import { eventService } from './services/event-service';
 import { safebrowsingService } from './services/safebrowsing-service';
 import { CommonFilterApi } from './services/filters/common';
+import { SettingOption } from '../common/settings';
+import { toasts } from './services/ui/toasts';
 
 export class App {
     private isFirstInstall = false;
+
+    private isUpdated = false;
 
     // eslint-disable-next-line max-len
     static uninstallUrl = 'https://adguard.com/forward.html?action=adguard_uninstal_ext&from=background&app=browser_extension';
@@ -52,12 +56,27 @@ export class App {
             await CommonFilterApi.initDefaultFilters();
         }
 
+        if (this.isUpdated) {
+            const prevVersion = settingsStorage.get(SettingOption.APP_VERSION);
+            const currentVersion = browser.runtime.getManifest().version;
+
+            await settingsStorage.set(SettingOption.APP_VERSION, currentVersion);
+
+            if (!settingsStorage.get(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION)) {
+                toasts.showApplicationUpdatedPopup(currentVersion, prevVersion);
+            }
+        }
+
         await Engine.start();
     }
 
     private async onInstall({ reason }: Runtime.OnInstalledDetailsType) {
         if (reason === 'install') {
             this.isFirstInstall = true;
+        }
+
+        if (reason === 'update') {
+            this.isUpdated = true;
         }
     }
 

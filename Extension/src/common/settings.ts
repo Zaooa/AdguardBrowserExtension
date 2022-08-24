@@ -4,6 +4,7 @@ export const ADGUARD_SETTINGS_KEY = 'adguard-settings';
 
 export enum SettingOption {
     CLIENT_ID = 'clientId',
+    APP_VERSION = 'app-version',
 
     // filters states
 
@@ -80,6 +81,7 @@ export const DEFAULT_THIRD_PARTY_COOKIES_SELF_DESTRUCT_MIN = 2880;
 
 export type Settings = {
     [SettingOption.CLIENT_ID]: string,
+    [SettingOption.APP_VERSION]: string,
 
     [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: boolean,
     [SettingOption.DISABLE_SAFEBROWSING]: boolean,
