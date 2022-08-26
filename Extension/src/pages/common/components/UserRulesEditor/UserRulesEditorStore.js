@@ -109,7 +109,10 @@ class UserRulesEditorStore {
 
     @computed
     get userFilterEnabled() {
-        return this.settings.values[this.userFilterEnabledSettingId];
+        if (this.settings) {
+            return this.settings.values[this.userFilterEnabledSettingId];
+        }
+        return false;
     }
 
     // eslint-disable-next-line class-methods-use-this

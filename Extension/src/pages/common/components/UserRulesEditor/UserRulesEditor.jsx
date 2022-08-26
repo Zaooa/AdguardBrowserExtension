@@ -1,5 +1,4 @@
 import React, {
-    useState,
     useContext,
     useEffect,
     useRef,
@@ -31,7 +30,6 @@ import { exportData, ExportTypes } from '../../utils/export';
  */
 export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
     const store = useContext(userRulesEditorStore);
-    const [userFilterEnabled, setUserFilterEnabledSettingId] = useState(false);
 
     const editorRef = useRef(null);
     const inputRef = useRef(null);
@@ -45,7 +43,27 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
     useEffect(() => {
         (async () => {
             await store.requestSettingsData();
-            setUserFilterEnabledSettingId(store.userFilterEnabled);
+
+            const events = [
+                NOTIFIER_TYPES.SETTING_UPDATED,
+            ];
+            await messenger.createEventListener(
+                events,
+                async (message) => {
+                    const { type } = message;
+
+                    switch (type) {
+                        case NOTIFIER_TYPES.SETTING_UPDATED: {
+                            await store.requestSettingsData();
+                            break;
+                        }
+                        default: {
+                            log.debug('Undefined message type:', type);
+                            break;
+                        }
+                    }
+                },
+            );
         })();
     }, [store]);
 
@@ -329,7 +347,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                                 <Checkbox
                                     id="user-filter-enabled"
                                     handler={handleUserRulesToggle}
-                                    value={userFilterEnabled}
+                                    value={store.userFilterEnabled}
                                     className="checkbox__label--actions"
                                 />
                             </label>
