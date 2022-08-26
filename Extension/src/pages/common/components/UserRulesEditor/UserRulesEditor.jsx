@@ -41,13 +41,15 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
     }
 
     useEffect(() => {
+        let removeListenerCallback = () => {};
+
         (async () => {
             await store.requestSettingsData();
 
             const events = [
                 NOTIFIER_TYPES.SETTING_UPDATED,
             ];
-            await messenger.createEventListener(
+            removeListenerCallback = await messenger.createEventListener(
                 events,
                 async (message) => {
                     const { type } = message;
@@ -65,6 +67,10 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                 },
             );
         })();
+
+        return () => {
+            removeListenerCallback();
+        };
     }, [store]);
 
     // Get initial storage content and set to the editor
