@@ -9,8 +9,8 @@ import {
 import find from 'lodash/find';
 import truncate from 'lodash/truncate';
 
+import { RequestTypes } from '../../../common/constants';
 import { reactTranslator } from '../../../common/translators/reactTranslator';
-import { RequestTypes } from '../../../background/utils/request-types';
 import { messenger } from '../../services/messenger';
 import { getFilterName } from '../components/RequestWizard/utils';
 import { matchesSearch } from './helpers';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import beautify from 'js-beautify';
 
-import { RequestTypes } from '../../../../../background/utils/request-types';
+import { RequestTypes } from '../../../../../common/constants';
 
 const getBeautifier = (type) => {
     switch (type) {

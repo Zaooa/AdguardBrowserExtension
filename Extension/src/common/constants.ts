@@ -114,3 +114,22 @@ export const WASTE_CHARACTERS = /[.*+?^${}()|[\]\\]/g;
 export const SCROLLBAR_WIDTH = 12 as const;
 
 export const BACKGROUND_TAB_ID = -1 as const;
+
+export const enum RequestTypes {
+    DOCUMENT = 'DOCUMENT',
+    SUBDOCUMENT = 'SUBDOCUMENT',
+    SCRIPT = 'SCRIPT',
+    STYLESHEET = 'STYLESHEET',
+    OBJECT = 'OBJECT',
+    IMAGE = 'IMAGE',
+    XMLHTTPREQUEST = 'XMLHTTPREQUEST',
+    MEDIA = 'MEDIA',
+    FONT = 'FONT',
+    WEBSOCKET = 'WEBSOCKET',
+    WEBRTC = 'WEBRTC',
+    OTHER = 'OTHER',
+    CSP = 'CSP',
+    COOKIE = 'COOKIE',
+    PING = 'PING',
+    CSP_REPORT = 'CSP_REPORT',
+}

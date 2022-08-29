@@ -1,1 +1,1 @@
-import '../../src/background_new';
+import '../../src/background';

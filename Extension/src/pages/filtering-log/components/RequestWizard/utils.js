@@ -1,7 +1,6 @@
-import { AntiBannerFiltersId } from '../../../../common/constants';
+import { AntiBannerFiltersId, RequestTypes } from '../../../../common/constants';
 import { strings } from '../../../../common/strings';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
-import { RequestTypes } from '../../../../background/utils/request-types';
 
 /**
  * Url utils

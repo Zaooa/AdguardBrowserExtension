@@ -2,11 +2,11 @@ import React, { useContext, useState, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { useMachine } from '@xstate/react';
 
+import { RequestTypes } from '../../../../../common/constants';
 import { Icon } from '../../../../common/components/ui/Icon';
 import { reactTranslator } from '../../../../../common/translators/reactTranslator';
 import { fetchMachine, FetchEvents, FetchStates } from '../../../../common/machines/fetchMachine';
 import { rootStore } from '../../../stores/RootStore';
-import { RequestTypes } from '../../../../../background/utils/request-types';
 import { ImageRequest } from './ImageRequest';
 import { TextRequest } from './TextRequest';
 import { fetchText, fetchImage } from './fetchers';
