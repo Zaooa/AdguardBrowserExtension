@@ -14,16 +14,11 @@ export type DomainsStorage = StringStorage<SettingOption, string[]>;
  */
 export class AllowlistApi {
     /**
-     * Init domain storages
+     * Init domains storages
      */
-    public static async init() {
-        // Init allowlist domains
-        const domains = JSON.parse(settingsStorage.get(SettingOption.ALLOWLIST_DOMAINS));
-        allowlistDomainsStorage.setCache(domains);
-
-        // Init inverted allowlist domains
-        const invertedDomains = JSON.parse(settingsStorage.get(SettingOption.INVERTED_ALLOWLIST_DOMAINS));
-        invertedAllowlistDomainsStorage.setCache(invertedDomains);
+    public static init() {
+        AllowlistApi.initDomainsStorage();
+        AllowlistApi.initInvertedDomainsStorage();
     }
 
     /**
@@ -58,68 +53,68 @@ export class AllowlistApi {
      * Set domain list to allowlist storage
      * @param domains - array of domains
      */
-    public static async setAllowlistDomains(domains: string[]) {
-        await AllowlistApi.setDomains(domains, allowlistDomainsStorage);
+    public static setAllowlistDomains(domains: string[]) {
+        AllowlistApi.setDomains(domains, allowlistDomainsStorage);
     }
 
     /**
      * Set domain list to inverted allowlist storage
      * @param domains - array of domains
      */
-    public static async setInvertedAllowlistDomains(domains: string[]) {
-        await AllowlistApi.setDomains(domains, invertedAllowlistDomainsStorage);
+    public static setInvertedAllowlistDomains(domains: string[]) {
+        AllowlistApi.setDomains(domains, invertedAllowlistDomainsStorage);
     }
 
     /**
      * Add domain to allowlist storage
      * @param domain - domain string
      */
-    public static async addAllowlistDomain(domain: string) {
-        await AllowlistApi.addDomain(domain, allowlistDomainsStorage);
+    public static addAllowlistDomain(domain: string) {
+        AllowlistApi.addDomain(domain, allowlistDomainsStorage);
     }
 
     /**
      * Add domain to inverted allowlist storage
      * @param domain - domain string
      */
-    public static async addInvertedAllowlistDomain(domain: string) {
-        await AllowlistApi.addDomain(domain, invertedAllowlistDomainsStorage);
+    public static addInvertedAllowlistDomain(domain: string) {
+        AllowlistApi.addDomain(domain, invertedAllowlistDomainsStorage);
     }
 
     /**
      * Remove domain from allowlist storage
      * @param domain - domain string
      */
-    public static async removeAllowlistDomain(domain: string) {
-        await AllowlistApi.removeDomain(domain, allowlistDomainsStorage);
+    public static removeAllowlistDomain(domain: string) {
+        AllowlistApi.removeDomain(domain, allowlistDomainsStorage);
     }
 
     /**
      * Remove domain from inverted allowlist storage
      * @param domain - domain string
      */
-    public static async removeInvertedAllowlistDomain(domain: string) {
-        await AllowlistApi.removeDomain(domain, invertedAllowlistDomainsStorage);
+    public static removeInvertedAllowlistDomain(domain: string) {
+        AllowlistApi.removeDomain(domain, invertedAllowlistDomainsStorage);
     }
 
     /**
      * Add domain to specified storage
      */
-    private static async addDomain(domain: string, storage: DomainsStorage) {
+    private static addDomain(domain: string, storage: DomainsStorage) {
         const domains = storage.getData();
 
         domains.push(domain);
 
-        await AllowlistApi.setDomains(domains, storage);
+        AllowlistApi.setDomains(domains, storage);
     }
 
     /**
      * Remove domain to specified storage
      */
-    private static async removeDomain(domain: string, storage: DomainsStorage) {
+    private static removeDomain(domain: string, storage: DomainsStorage) {
         const domains = storage.getData();
 
-        await AllowlistApi.setDomains(domains.filter(d => d !== domain), storage);
+        AllowlistApi.setDomains(domains.filter(d => d !== domain), storage);
     }
 
     /**
@@ -132,7 +127,7 @@ export class AllowlistApi {
     /**
      * Set domains list to specified storage
      */
-    private static async setDomains(domains: string[], storage: DomainsStorage) {
+    private static setDomains(domains: string[], storage: DomainsStorage) {
         /**
          * remove empty strings
          */
@@ -143,8 +138,46 @@ export class AllowlistApi {
          */
         domains = Array.from(new Set(domains));
 
-        await storage.setData(domains);
+        storage.setData(domains);
 
         listeners.notifyListeners(listeners.UPDATE_ALLOWLIST_FILTER_RULES);
+    }
+
+    /**
+     * Read stringified domains array from settings storage,
+     * parse it and set memory cache
+     *
+     * if data is not exist, set empty array
+     */
+    private static initDomainsStorage() {
+        try {
+            const storageData = settingsStorage.get(SettingOption.ALLOWLIST_DOMAINS);
+            if (storageData) {
+                allowlistDomainsStorage.setCache(JSON.parse(storageData));
+            } else {
+                allowlistDomainsStorage.setData([]);
+            }
+        } catch (e) {
+            allowlistDomainsStorage.setData([]);
+        }
+    }
+
+    /**
+     * Read stringified inverted domains array from settings storage,
+     * parse it and set memory cache
+     *
+     * if data is not exist, set empty array
+     */
+    private static initInvertedDomainsStorage() {
+        try {
+            const storageData = settingsStorage.get(SettingOption.INVERTED_ALLOWLIST_DOMAINS);
+            if (storageData) {
+                invertedAllowlistDomainsStorage.setCache(JSON.parse(storageData));
+            } else {
+                invertedAllowlistDomainsStorage.setData([]);
+            }
+        } catch (e) {
+            invertedAllowlistDomainsStorage.setData([]);
+        }
     }
 }

@@ -29,22 +29,22 @@ export class FilterStateStorage extends StringStorage<SettingOption, Record<numb
         return this.data[filterId];
     }
 
-    public async set(filterId: number, state: FilterState) {
+    public set(filterId: number, state: FilterState) {
         this.data[filterId] = state;
 
-        await this.save();
+        this.save();
     }
 
-    public async setEnabled(filterId: number, enabled: boolean) {
+    public setEnabled(filterId: number, enabled: boolean) {
         this.data[filterId].enabled = enabled;
 
-        await this.save();
+        this.save();
     }
 
-    public async delete(filterId: number) {
+    public delete(filterId: number) {
         delete this.data[filterId];
 
-        await this.save();
+        this.save();
     }
 
     public getEnabledFilters(): number[] {
@@ -54,25 +54,25 @@ export class FilterStateStorage extends StringStorage<SettingOption, Record<numb
             .map(([id]) => Number(id));
     }
 
-    public async enableFilters(filtersIds: number[]) {
+    public enableFilters(filtersIds: number[]) {
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
             this.data[filterId] = { ...this.data[filterId], enabled: true };
         }
 
-        await this.save();
+        this.save();
     }
 
-    public async disableFilters(filtersIds: number[]) {
+    public disableFilters(filtersIds: number[]) {
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
             this.data[filterId] = { ...this.data[filterId], enabled: false };
         }
 
-        await this.save();
+        this.save();
     }
 
-    public async update(states: Record<number, FilterState>, filtersMetadata: CommonFilterMetadata[]) {
+    public update(states: Record<number, FilterState>, filtersMetadata: CommonFilterMetadata[]) {
         /**
          * Don't create filter state context for allowlist and user rules lists
          * Their state is controlled by separate modules
@@ -89,7 +89,7 @@ export class FilterStateStorage extends StringStorage<SettingOption, Record<numb
             }
         }
 
-        await this.setData(states);
+        this.setData(states);
     }
 }
 

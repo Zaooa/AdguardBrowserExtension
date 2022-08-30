@@ -38,20 +38,20 @@ export class CustomFilterMetadataStorage extends StringStorage<SettingOption, Cu
     /**
      * Set custom filter metadata with filterId key
      */
-    public async set(filter: CustomFilterMetadata): Promise<void> {
+    public set(filter: CustomFilterMetadata): void {
         const data = this.getData().filter(f => f.filterId !== filter.filterId);
 
         data.push(filter);
 
-        await this.setData(data);
+        this.setData(data);
     }
 
     /**
      * Remove custom filter metadata
      */
-    public async remove(filterId: number): Promise<void> {
+    public remove(filterId: number): void {
         const data = this.getData().filter(f => f.filterId !== filterId);
-        await this.setData(data);
+        this.setData(data);
     }
 }
 

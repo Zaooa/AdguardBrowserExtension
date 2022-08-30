@@ -39,7 +39,7 @@ export class AllowlistService {
     /**
      * Gets domains depending on current allowlist mode
      */
-    static async onGetAllowlistDomains() {
+    static onGetAllowlistDomains() {
         const domains = AllowlistApi.isInverted()
             ? AllowlistApi.getInvertedAllowlistDomains()
             : AllowlistApi.getAllowlistDomains();

@@ -55,8 +55,7 @@ export type FilteringLogEvent = {
      frameDomain?: string,
      requestType?: ContentType,
      timestamp?: number,
-     // TODO: rename
-     requestThirdPatry?: boolean,
+     requestThirdParty?: boolean,
      method?: string,
      statusCode?: number,
      requestRule?: FilteringEventRuleData,

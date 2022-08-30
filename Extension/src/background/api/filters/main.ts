@@ -43,11 +43,11 @@ export class FiltersApi {
 
         pageStats.init();
         localeDetect.init();
-        await CustomFilterApi.init();
-        await AllowlistApi.init();
+        CustomFilterApi.init();
+        AllowlistApi.init();
         await UserRulesApi.init();
 
-        await FiltersApi.loadFilteringStates();
+        FiltersApi.loadFilteringStates();
     }
 
     /**
@@ -61,7 +61,7 @@ export class FiltersApi {
         await FiltersApi.loadI18nMetadataFromBackend(remote);
         await FiltersApi.loadMetadataFromFromBackend(remote);
 
-        await FiltersApi.loadFilteringStates();
+        FiltersApi.loadFilteringStates();
     }
 
     /**
@@ -139,12 +139,12 @@ export class FiltersApi {
     public static async loadAndEnableFilters(filtersIds: number[], remote = true) {
         await FiltersApi.loadFilters(filtersIds, remote);
 
-        await filterStateStorage.enableFilters(filtersIds);
+        filterStateStorage.enableFilters(filtersIds);
 
         /**
          * we enable filters groups if it was never enabled or disabled early
          */
-        await FiltersApi.enableGroupsWereNotToggled(filtersIds);
+        FiltersApi.enableGroupsWereNotToggled(filtersIds);
     }
 
     /**
@@ -165,7 +165,7 @@ export class FiltersApi {
 
         await Promise.allSettled(commonFilters.map(id => CommonFilterApi.loadFilterRulesFromBackend(id, true)));
 
-        await filterStateStorage.enableFilters(filtersIds);
+        filterStateStorage.enableFilters(filtersIds);
     }
 
     /**
@@ -245,7 +245,7 @@ export class FiltersApi {
      *
      * @param filtersIds - filters ids
      */
-    private static async enableGroupsWereNotToggled(filtersIds: number[]) {
+    private static enableGroupsWereNotToggled(filtersIds: number[]) {
         const groupIds: number[] = [];
 
         for (let i = 0; i < filtersIds.length; i += 1) {
@@ -265,23 +265,25 @@ export class FiltersApi {
         }
 
         if (groupIds.length > 0) {
-            await groupStateStorage.enableGroups(groupIds);
+            groupStateStorage.enableGroups(groupIds);
         }
     }
 
     /**
-     * Load i18n metadata from remote source
+     * Load i18n metadata from remote source and save it
      */
     private static async loadI18nMetadataFromBackend(remote: boolean) {
         const i18nMetadata = remote
             ? await network.downloadI18nMetadataFromBackend()
             : await network.getLocalFiltersI18nMetadata();
 
-        await i18nMetadataStorage.setData(i18nMetadata);
+        i18nMetadataStorage.setData(i18nMetadata);
     }
 
     /**
-     * Load metadata from remote source
+     * Load metadata from remote source,
+     * apply i18n metadata, add custom group
+     * and save it
      */
     private static async loadMetadataFromFromBackend(remote: boolean) {
         const metadata = remote
@@ -299,94 +301,112 @@ export class FiltersApi {
             groupName: translator.getMessage('options_antibanner_custom_group'),
         });
 
-        await metadataStorage.setData(localizedMetadata);
+        metadataStorage.setData(localizedMetadata);
     }
 
     /**
-     * Read i18n metadata from settings storage
+     * Read stringified i18n metadata from settings storage
      * if data is not exist, load it from local assets
      */
     private static async initI18nMetadata() {
-        const i18nMetadataString = settingsStorage.get(SettingOption.I18N_METADATA);
+        const storageData = settingsStorage.get(SettingOption.I18N_METADATA);
 
-        if (i18nMetadataString) {
-            const i18nMetadata = JSON.parse(i18nMetadataString);
-            i18nMetadataStorage.setCache(i18nMetadata);
-        } else {
+        if (!storageData) {
+            await FiltersApi.loadI18nMetadataFromBackend(false);
+            return;
+        }
+
+        try {
+            i18nMetadataStorage.setCache(JSON.parse(storageData));
+        } catch (e) {
             await FiltersApi.loadI18nMetadataFromBackend(false);
         }
     }
 
     /**
-     * Read metadata from settings storage
+     * Read stringified metadata from settings storage
      * if data is not exist, load it from local assets
      */
     private static async initMetadata() {
-        const metadataString = settingsStorage.get(SettingOption.METADATA);
+        const storageData = settingsStorage.get(SettingOption.METADATA);
 
-        if (metadataString) {
-            metadataStorage.setCache(JSON.parse(metadataString));
-        } else {
+        if (!storageData) {
+            await FiltersApi.loadMetadataFromFromBackend(false);
+            return;
+        }
+
+        try {
+            metadataStorage.setCache(JSON.parse(storageData));
+        } catch (e) {
             await FiltersApi.loadMetadataFromFromBackend(false);
         }
     }
 
     /**
-     * Set filtering states storages depends on app metadata
+     * Set filtering states storages based on app metadata
      */
-    private static async loadFilteringStates() {
+    private static loadFilteringStates() {
         const metadata = metadataStorage.getData();
 
-        await FiltersApi.initFilterStateStorage(metadata.filters);
-        await FiltersApi.initGroupStateStorage(metadata.groups);
-        await FiltersApi.initFilterVersionStorage(metadata.filters);
+        FiltersApi.initFilterStateStorage(metadata.filters);
+        FiltersApi.initGroupStateStorage(metadata.groups);
+        FiltersApi.initFilterVersionStorage(metadata.filters);
     }
 
     /**
-     * Read filter states from settings storage
-     * if state is not exist, set default value
+     * Read stringified filter states data from settings storage
+     * if data is not exist or partial, update filter states storage based on current filter metadata
      */
-    private static async initFilterStateStorage(metadata: CommonFilterMetadata[]) {
-        const filterStatesString = settingsStorage.get(SettingOption.FILTERS_STATE_PROP);
+    private static initFilterStateStorage(metadata: CommonFilterMetadata[]) {
+        const storageData = settingsStorage.get(SettingOption.FILTERS_STATE_PROP);
 
-        if (filterStatesString) {
-            const filterStates = JSON.parse(filterStatesString);
+        if (!storageData) {
+            filterStateStorage.update({}, metadata);
+            return;
+        }
 
-            await filterStateStorage.update(filterStates, metadata);
-        } else {
-            await filterStateStorage.update({}, metadata);
+        try {
+            filterStateStorage.update(JSON.parse(storageData), metadata);
+        } catch (e) {
+            filterStateStorage.update({}, metadata);
         }
     }
 
     /**
-     * Read group states from settings storage
-     * if state is not exist, set default value
+     * Read stringified group states data from settings storage
+     * if data is not exist or partial, update group states storage based on current group metadata
      */
-    private static async initGroupStateStorage(metadata: GroupMetadata[]) {
-        const groupStatesString = settingsStorage.get(SettingOption.GROUPS_STATE_PROP);
+    private static initGroupStateStorage(metadata: GroupMetadata[]) {
+        const storageData = settingsStorage.get(SettingOption.GROUPS_STATE_PROP);
 
-        if (groupStatesString) {
-            const groupStates = JSON.parse(groupStatesString);
+        if (!storageData) {
+            groupStateStorage.update({}, metadata);
+            return;
+        }
 
-            await groupStateStorage.update(groupStates, metadata);
-        } else {
-            await groupStateStorage.update({}, metadata);
+        try {
+            groupStateStorage.update(JSON.parse(storageData), metadata);
+        } catch (e) {
+            groupStateStorage.update({}, metadata);
         }
     }
 
     /**
-     * Read filter version from settings storage
-     * if version is not exist, create it
+     * Read stringified filter version data from settings storage
+     * if data is not exist or partial, update filter version storage based on current filter metadata
      */
-    private static async initFilterVersionStorage(metadata: CommonFilterMetadata[]) {
-        const filterVersionsString = settingsStorage.get(SettingOption.FILTERS_VERSION_PROP);
+    private static initFilterVersionStorage(metadata: CommonFilterMetadata[]) {
+        const storageData = settingsStorage.get(SettingOption.FILTERS_VERSION_PROP);
 
-        if (filterVersionsString) {
-            const filterVersions = JSON.parse(filterVersionsString);
+        if (!storageData) {
+            filterVersionStorage.update({}, metadata);
+            return;
+        }
 
-            await filterVersionStorage.update(filterVersions, metadata);
-        } else {
-            await filterVersionStorage.update({}, metadata);
+        try {
+            filterVersionStorage.update(JSON.parse(storageData), metadata);
+        } catch (e) {
+            filterVersionStorage.update({}, metadata);
         }
     }
 }

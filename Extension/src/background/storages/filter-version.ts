@@ -15,19 +15,19 @@ export class FilterVersionStorage extends StringStorage<SettingOption, Record<nu
         return this.data[filterId];
     }
 
-    public async set(filterId: number, data: FilterVersionData) {
+    public set(filterId: number, data: FilterVersionData) {
         this.data[filterId] = data;
 
-        await this.save();
+        this.save();
     }
 
-    public async delete(filterId: number) {
+    public delete(filterId: number) {
         delete this.data[filterId];
 
-        await this.save();
+        this.save();
     }
 
-    public async update(data: Record<number, FilterVersionData>, filtersMetadata: CommonFilterMetadata[]) {
+    public update(data: Record<number, FilterVersionData>, filtersMetadata: CommonFilterMetadata[]) {
         for (let i = 0; i < filtersMetadata.length; i += 1) {
             const {
                 filterId,
@@ -46,7 +46,7 @@ export class FilterVersionStorage extends StringStorage<SettingOption, Record<nu
             }
         }
 
-        await this.setData(data);
+        this.setData(data);
     }
 }
 

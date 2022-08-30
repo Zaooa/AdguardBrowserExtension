@@ -9,7 +9,7 @@ import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { listeners } from '../notifier';
 import { FiltersApi, toasts } from '../api';
-import { filterStateStorage, groupStateStorage, settingsStorage } from '../storages';
+import { CommonFilterMetadata, filterStateStorage, groupStateStorage } from '../storages';
 import { SettingsService } from './settings';
 
 export class FiltersService {
@@ -38,7 +38,7 @@ export class FiltersService {
     static async onFilterDisable(message: DisableAntiBannerFilterMessage) {
         const { filterId } = message.data;
 
-        await filterStateStorage.disableFilters([filterId]);
+        filterStateStorage.disableFilters([filterId]);
 
         await Engine.update();
     }
@@ -46,14 +46,14 @@ export class FiltersService {
     static async onGroupEnable(message) {
         const { groupId } = message.data;
 
-        await groupStateStorage.enableGroups([groupId]);
+        groupStateStorage.enableGroups([groupId]);
         await Engine.update();
     }
 
     static async onGroupDisable(message) {
         const { groupId } = message.data;
 
-        await groupStateStorage.disableGroups([groupId]);
+        groupStateStorage.disableGroups([groupId]);
         await Engine.update();
     }
 
@@ -63,11 +63,12 @@ export class FiltersService {
 
             const updatedFilters = await FiltersApi.updateFilters(enabledFilters);
 
-            await filterStateStorage.enableFilters(enabledFilters);
+            filterStateStorage.enableFilters(enabledFilters);
 
             await Engine.update();
 
-            toasts.showFiltersUpdatedAlertMessage(true, updatedFilters);
+            // TODO: type-save alerts for custom filter updates
+            toasts.showFiltersUpdatedAlertMessage(true, updatedFilters as CommonFilterMetadata[]);
             listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY, updatedFilters);
 
             return updatedFilters;

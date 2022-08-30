@@ -42,16 +42,19 @@ export type GetRemoteCustomFilterResult = {
  */
 export class CustomFilterApi {
     /**
-     * Read custom filter metadata from settings storage
+     * Read stringified custom filter metadata from settings storage
      * if data is not exist, set empty array
      */
-    public static async init() {
-        const customFilterMetadataString = settingsStorage.get(SettingOption.CUSTOM_FILTERS);
-
-        if (customFilterMetadataString) {
-            customFilterMetadataStorage.setCache(JSON.parse(customFilterMetadataString));
-        } else {
-            await customFilterMetadataStorage.setData([]);
+    public static init() {
+        try {
+            const storageData = settingsStorage.get(SettingOption.CUSTOM_FILTERS);
+            if (storageData) {
+                customFilterMetadataStorage.setCache(JSON.parse(storageData));
+            } else {
+                customFilterMetadataStorage.setData([]);
+            }
+        } catch (e) {
+            customFilterMetadataStorage.setData([]);
         }
     }
 
@@ -124,16 +127,16 @@ export class CustomFilterApi {
             timeUpdated: new Date(timeUpdated).getTime(),
         };
 
-        await customFilterMetadataStorage.set(filterMetadata);
+        customFilterMetadataStorage.set(filterMetadata);
 
-        await filterVersionStorage.set(filterId, {
+        filterVersionStorage.set(filterId, {
             version,
             expires: filterMetadata.expires,
             lastUpdateTime: filterMetadata.timeUpdated,
             lastCheckTime: Date.now(),
         });
 
-        await filterStateStorage.set(filterId, {
+        filterStateStorage.set(filterId, {
             loaded: true,
             installed: true,
             enabled,
@@ -185,12 +188,12 @@ export class CustomFilterApi {
     public static async removeFilter(filterId: number): Promise<void> {
         log.info(`Remove Custom filter ${filterId} ...`);
 
-        await customFilterMetadataStorage.remove(filterId);
-        await filterVersionStorage.delete(filterId);
+        customFilterMetadataStorage.remove(filterId);
+        filterVersionStorage.delete(filterId);
 
         const filterState = filterStateStorage.get(filterId);
 
-        await filterStateStorage.delete(filterId);
+        filterStateStorage.delete(filterId);
 
         await FiltersStorage.remove(filterId);
 
@@ -250,7 +253,7 @@ export class CustomFilterApi {
 
         const { version, expires, timeUpdated } = parsed;
 
-        await filterVersionStorage.set(filterId, {
+        filterVersionStorage.set(filterId, {
             version,
             expires: Number(expires),
             lastUpdateTime: new Date(timeUpdated).getTime(),
@@ -263,7 +266,7 @@ export class CustomFilterApi {
             checksum,
         };
 
-        await customFilterMetadataStorage.set(newFilterMetadata);
+        customFilterMetadataStorage.set(newFilterMetadata);
 
         await FiltersStorage.set(filterId, rules);
 

@@ -86,7 +86,7 @@ export class CommonFilterApi {
 
         await FiltersStorage.set(filterId, rules);
 
-        await filterStateStorage.set(filterId, {
+        filterStateStorage.set(filterId, {
             installed: true,
             loaded: true,
             enabled: false,
@@ -98,7 +98,7 @@ export class CommonFilterApi {
             timeUpdated,
         } = CommonFilterApi.getFilterMetadata(filterId) as CommonFilterMetadata;
 
-        await filterVersionStorage.set(filterId, {
+        filterVersionStorage.set(filterId, {
             version,
             expires,
             lastUpdateTime: new Date(timeUpdated).getTime(),
@@ -112,7 +112,7 @@ export class CommonFilterApi {
      * Called on extension installation
      */
     public static async initDefaultFilters() {
-        await groupStateStorage.enableGroups([
+        groupStateStorage.enableGroups([
             1,
             ANTIBANNER_GROUPS_ID.LANGUAGE_FILTERS_GROUP_ID,
             ANTIBANNER_GROUPS_ID.OTHER_FILTERS_GROUP_ID,
@@ -132,7 +132,7 @@ export class CommonFilterApi {
 
         await Promise.allSettled(filterIds.map(id => CommonFilterApi.loadFilterRulesFromBackend(id, false)));
 
-        await filterStateStorage.enableFilters(filterIds);
+        filterStateStorage.enableFilters(filterIds);
     }
 
     /**

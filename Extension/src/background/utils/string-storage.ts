@@ -26,12 +26,12 @@ export class StringStorage<K, V> {
         this.data = data;
     }
 
-    public async save() {
-        await this.storage.set(this.key, JSON.stringify(this.data));
+    public setData(data: V) {
+        this.setCache(data);
+        this.save();
     }
 
-    public async setData(data: V) {
-        this.setCache(data);
-        await this.save();
+    public save() {
+        this.storage.set(this.key, JSON.stringify(this.data));
     }
 }

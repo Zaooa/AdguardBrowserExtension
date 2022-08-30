@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import {
     Settings,
     SettingOption,
@@ -11,6 +12,13 @@ import { storage } from './main';
  */
 export class SettingsStorage implements StorageInterface<SettingOption, Settings[SettingOption]> {
     static saveTimeoutMs = 100;
+
+    /**
+    * save settings in browser.storage.local
+    */
+   private save = debounce(() => {
+       storage.set(ADGUARD_SETTINGS_KEY, this.settings);
+   }, SettingsStorage.saveTimeoutMs);
 
     settings: Settings;
 
@@ -52,13 +60,6 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
      */
     public getSettings(): Partial<Settings> {
         return this.settings;
-    }
-
-    /**
-     * save settings in browser.storage.local
-     */
-    private save() {
-        storage.set(ADGUARD_SETTINGS_KEY, this.settings);
     }
 }
 

@@ -163,9 +163,9 @@ export class SettingsApi {
                 AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
                 false,
             );
-            await filterStateStorage.enableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
+            filterStateStorage.enableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
         } else {
-            await filterStateStorage.disableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
+            filterStateStorage.disableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
         }
     }
 
@@ -184,7 +184,7 @@ export class SettingsApi {
         };
     }
 
-    private static async importExtensionSpecificSettings({
+    private static importExtensionSpecificSettings({
         [ExtensionSpecificSettingsOptions.USE_OPTIMIZED_FILTERS]: useOptimizedFilters,
         [ExtensionSpecificSettingsOptions.COLLECT_HITS_COUNT]: collectHitsCount,
         [ExtensionSpecificSettingsOptions.SHOW_CONTEXT_MENU]: showContextMenu,
@@ -236,17 +236,17 @@ export class SettingsApi {
         [FiltersOptions.ALLOWLIST]: allowlist,
     }: FiltersConfig) {
         await SettingsApi.importUserFilter(userFilter);
-        await SettingsApi.importAllowlist(allowlist);
+        SettingsApi.importAllowlist(allowlist);
 
         const tasks = enabledFilters.map(async filterId => {
             await CommonFilterApi.loadFilterRulesFromBackend(filterId, false);
-            await filterStateStorage.enableFilters([filterId]);
+            filterStateStorage.enableFilters([filterId]);
         });
 
         await Promise.allSettled(tasks);
 
         await CustomFilterApi.createFilters(customFilters as CustomFilterDTO[]);
-        await groupStateStorage.enableGroups(enabledGroups);
+        groupStateStorage.enableGroups(enabledGroups);
     }
 
     private static async exportFilters(): Promise<FiltersConfig> {
@@ -280,7 +280,7 @@ export class SettingsApi {
         };
     }
 
-    private static async importAllowlist({
+    private static importAllowlist({
         [AllowlistOptions.ENABLED]: enabled,
         [AllowlistOptions.INVERTED]: inverted,
         [AllowlistOptions.DOMAINS]: domains,
@@ -298,8 +298,8 @@ export class SettingsApi {
             settingsStorage.set(SettingOption.DEFAULT_ALLOWLIST_MODE, true);
         }
 
-        await AllowlistApi.setAllowlistDomains(domains);
-        await AllowlistApi.setInvertedAllowlistDomains(invertedDomains);
+        AllowlistApi.setAllowlistDomains(domains);
+        AllowlistApi.setInvertedAllowlistDomains(invertedDomains);
     }
 
     private static exportAllowlist(): AllowlistConfig {
@@ -353,13 +353,13 @@ export class SettingsApi {
         if (stripTrackingParam) {
             await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
         } else {
-            await filterStateStorage.disableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
+            filterStateStorage.disableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
         }
 
         if (blockKnownTrackers) {
             await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
         } else {
-            await filterStateStorage.disableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
+            filterStateStorage.disableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
         }
     }
 

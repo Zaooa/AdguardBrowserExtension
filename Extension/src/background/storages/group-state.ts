@@ -18,16 +18,16 @@ export class GroupStateStorage extends StringStorage<SettingOption, Record<numbe
         return this.data[groupId];
     }
 
-    public async set(groupId: number, state: GroupState) {
+    public set(groupId: number, state: GroupState) {
         this.data[groupId] = state;
 
-        await this.save();
+        this.save();
     }
 
-    public async delete(groupId: number) {
+    public delete(groupId: number) {
         delete this.data[groupId];
 
-        await this.save();
+        this.save();
     }
 
     public getEnabledGroups(): number[] {
@@ -37,7 +37,7 @@ export class GroupStateStorage extends StringStorage<SettingOption, Record<numbe
             .map(([id]) => Number(id));
     }
 
-    public async enableGroups(groupIds: number[], toggled = true) {
+    public enableGroups(groupIds: number[], toggled = true) {
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
             this.data[groupId] = {
@@ -46,10 +46,10 @@ export class GroupStateStorage extends StringStorage<SettingOption, Record<numbe
             };
         }
 
-        await this.save();
+        this.save();
     }
 
-    public async disableGroups(groupIds: number[], toggled = true) {
+    public disableGroups(groupIds: number[], toggled = true) {
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
             this.data[groupId] = {
@@ -58,10 +58,10 @@ export class GroupStateStorage extends StringStorage<SettingOption, Record<numbe
             };
         }
 
-        await this.save();
+        this.save();
     }
 
-    public async update(states: Record<number, GroupState>, groupsMetadata: GroupMetadata[]) {
+    public update(states: Record<number, GroupState>, groupsMetadata: GroupMetadata[]) {
         for (let i = 0; i < groupsMetadata.length; i += 1) {
             const { groupId } = groupsMetadata[i];
 
@@ -70,7 +70,7 @@ export class GroupStateStorage extends StringStorage<SettingOption, Record<numbe
             }
         }
 
-        await this.setData(states);
+        this.setData(states);
     }
 }
 

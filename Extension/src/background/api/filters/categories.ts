@@ -26,6 +26,9 @@ export type CategoryData = (
     { filters?: CategoriesFilterData[] }
 );
 
+/**
+ * Helper class for aggregate filter groups data
+ */
 export class Categories {
     static getFiltersMetadata() {
         const groups = Categories.getGroups();

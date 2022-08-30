@@ -2,6 +2,9 @@ import { AntiBannerFiltersId } from '../../../common/constants';
 import { metadataStorage } from '../../storages';
 import { FilterMetadata } from './main';
 
+/**
+ * Helper class from aggregate filter tags data
+ */
 export class FilterTags {
     static RECOMMENDED_TAG_ID = 10;
 
