@@ -512,6 +512,12 @@
     "options_import_settings": {
         "message": "Importer innstillinger"
     },
+    "options_report_bug": {
+        "message": "Meld inn en feil"
+    },
+    "options_leave_feedback": {
+        "message": "Gi tilbakemelding"
+    },
     "options_privacy": {
         "message": "Snikemodus"
     },
@@ -712,6 +718,9 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Fortsett likevel"
+    },
+    "close_button_title": {
+        "message": "Lukk"
     },
     "description": {
         "message": "Unmatched adblock extension against advertising and pop-ups. Blocks ads on Facebook, YouTube and all other websites."

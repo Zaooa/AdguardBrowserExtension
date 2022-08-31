@@ -16,86 +16,72 @@
  */
 
 import { LRUMap } from 'lru_map';
-import { settingsStorage } from '../storages';
-import { log } from '../../common/log';
+import { StorageInterface } from '../../common/storage';
 
 /**
- * Cache with maxCacheSize stored in local storage, which automatically clears less recently used entries
- *
- * @param {string} storagePropertyName      Name of the local storage property.
- * @param {number} size                     Max cache size
+ * Cache with maxCacheSize stored in local storage,
+ * which automatically clears less recently used entries
  */
-export function LruCache(storagePropertyName: any, size?: number) {
-    const CACHE_SIZE = 1000;
+export class LruCache<StorageKey, Key, Value> {
+    protected key: StorageKey;
 
-    const maxCacheSize = size || CACHE_SIZE;
+    protected storage: StorageInterface<StorageKey, string>;
 
-    let cache;
-    let cacheSize;
+    protected maxCacheSize: number;
 
-    function getCacheFromLocalStorage() {
-        let entries = null;
+    protected cacheSize: number;
+
+    protected cache: LRUMap<Key, Value>;
+
+    constructor(
+        key: StorageKey,
+        storage: StorageInterface<StorageKey, string>,
+        maxCacheSize = 1000,
+    ) {
+        this.key = key;
+        this.storage = storage;
+        this.maxCacheSize = maxCacheSize;
+    }
+
+    public init() {
+        const storageData = this.storage.get(this.key);
+
+        if (!storageData) {
+            return this.setCache(null);
+        }
+
         try {
-            const json = settingsStorage.get(storagePropertyName);
-            if (json) {
-                const data = JSON.parse(json);
-                entries = data.map(x => [x.key, x.value]);
-            }
-        } catch (ex) {
-            // ignore
-            log.error('Error read from {0} cache, cause: {1}', storagePropertyName, ex);
-            settingsStorage.remove(storagePropertyName);
-        }
-
-        return new LRUMap(maxCacheSize, entries);
-    }
-
-    function saveCacheToLocalStorage() {
-        try {
-            settingsStorage.set(storagePropertyName, JSON.stringify(cache.toJSON()));
-        } catch (ex) {
-            log.error('Error save to {0} cache, cause: {1}', storagePropertyName, ex);
+            const entries = JSON.parse(storageData);
+            return this.setCache(entries);
+        } catch (e) {
+            return this.setCache(null);
         }
     }
 
-    /**
-     * Retrieves value from cache and checks if saved data is not expired yet.
-     * @param {string} key
-     * @returns {null|object} saved data
-     */
-    function getValue(key) {
-        return cache.get(key);
+    public setCache(data: Iterable<[Key, Value]>): void {
+        this.cache = new LRUMap(this.maxCacheSize, data);
+        this.cacheSize = this.cache.size;
     }
 
-    const saveValue = function (key, data) {
-        if (!key) {
-            return;
+    public saveCache() {
+        return this.storage.set(this.key, JSON.stringify(this.cache.toJSON()));
+    }
+
+    public get(key: Key) {
+        return this.cache.get(key);
+    }
+
+    public set(key: Key, value: Value) {
+        this.cache.set(key, value);
+        this.cacheSize += 1;
+
+        if (this.cacheSize % 20 === 0) {
+            return this.saveCache();
         }
+    }
 
-        cache.set(key, data);
-        cacheSize += 1;
-
-        if (cacheSize % 20 === 0) {
-            saveCacheToLocalStorage();
-        }
-    };
-
-    /**
-     * Clears cache
-     */
-    const clear = () => {
-        cache = new LRUMap(maxCacheSize, null);
-        cacheSize = cache.size;
-        saveCacheToLocalStorage();
-    };
-
-    // Load cache
-    cache = getCacheFromLocalStorage();
-    cacheSize = cache.size;
-
-    return {
-        getValue,
-        saveValue,
-        clear,
-    };
+    public clear() {
+        this.setCache(null);
+        return this.saveCache();
+    }
 }

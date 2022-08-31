@@ -1,31 +1,26 @@
-import { pageStats } from '../../../../Extension/src/background/filter/page-stats';
-import { subscriptions } from '../../../../Extension/src/background/filter/filters/subscription';
+/* eslint-disable class-methods-use-this */
+import { pageStats } from '../../../../Extension/src/background/api/filters/page-stats';
+import { metadataStorage } from '../../../../Extension/src/background/storages';
+import { StorageInterface } from '../../../../Extension/src/common/storage';
 
-jest.mock('../../../../Extension/src/background/utils/local-storage', () => {
-    const getItem = function (key) {
-        return global.localStorage.getItem(key);
-    };
+class MockStorage implements StorageInterface {
+    get(key: string) {
+        return JSON.parse(global.localStorage.getItem(key));
+    }
 
-    const setItem = function (key, value) {
-        global.localStorage.setItem(key, value);
-    };
+    set(key: string, value: unknown) {
+        global.localStorage.setItem(key, JSON.stringify(value));
+    }
 
-    const removeItem = function (key) {
+    remove(key) {
         global.localStorage.removeItem(key);
-    };
+    }
+}
 
-    const hasItem = function (key) {
-        return key in global.localStorage;
-    };
-
+jest.mock('../../../../Extension/src/background/storages/main', () => {
     return {
         __esModule: true,
-        localStorageImpl: {
-            getItem,
-            setItem,
-            removeItem,
-            hasItem,
-        },
+        storage: new MockStorage(),
     };
 });
 
@@ -41,13 +36,13 @@ describe('pageStats', () => {
         0: { groupId: 0, groupName: 'Custom', displayNumber: 99 },
     };
 
-    jest.spyOn(subscriptions, 'getGroups').mockImplementation(() => {
+    jest.spyOn(metadataStorage, 'getGroups').mockImplementation(() => {
         return Object.keys(groupsMap).map(key => {
             return groupsMap[key];
         });
     });
 
-    jest.spyOn(subscriptions, 'getGroup').mockImplementation((groupId) => {
+    jest.spyOn(metadataStorage, 'getGroup').mockImplementation((groupId) => {
         return groupsMap[groupId];
     });
 
@@ -59,7 +54,7 @@ describe('pageStats', () => {
         5: { filterId: 5, groupId: 5 },
     };
 
-    jest.spyOn(subscriptions, 'getFilter').mockImplementation((filterId) => {
+    jest.spyOn(metadataStorage, 'getFilter').mockImplementation((filterId) => {
         return filtersMap[filterId];
     });
 
@@ -89,7 +84,7 @@ describe('pageStats', () => {
 
     it('Test Page Stats', () => {
         // test that data is empty
-        pageStats.resetStats();
+        pageStats.reset();
 
         const now = new Date(2019, 0);
         now.setHours(0, 0, 0, 0);
@@ -119,7 +114,7 @@ describe('pageStats', () => {
         expect(totalBlocked).toBe(24);
 
         // test adding first filter data
-        const firstFilter = subscriptions.getFilter(1);
+        const firstFilter = metadataStorage.getFilter(1);
         pageStats.updateStats(firstFilter.filterId, 10, now);
         data = pageStats.getStatisticsData();
         expect(data).toBeTruthy();
@@ -138,7 +133,7 @@ describe('pageStats', () => {
         expect(data.lastYear.length).toBe(3);
 
         // Test adding second filter data
-        const secondFilter = subscriptions.getFilter(2);
+        const secondFilter = metadataStorage.getFilter(2);
         pageStats.updateStats(secondFilter.filterId, 100, now);
         data = pageStats.getStatisticsData();
         expect(data);
@@ -182,7 +177,7 @@ describe('pageStats', () => {
         expect(data.lastYear.length).toBe(3);
 
         // Test data is correctly added after 3 hours passed
-        const fourthFilter = subscriptions.getFilter(4);
+        const fourthFilter = metadataStorage.getFilter(4);
         const hoursShift = 3;
         const hoursShiftTime = new Date(now.getTime() + (hoursShift * 60 * 60 * 1000));
         pageStats.updateStats(fourthFilter.filterId, 1000, hoursShiftTime);
@@ -208,7 +203,7 @@ describe('pageStats', () => {
         expect(data.lastYear.length).toBe(3);
 
         // Test data is correctly added after 4 days passed
-        const fifthFilter = subscriptions.getFilter(5);
+        const fifthFilter = metadataStorage.getFilter(5);
         const daysShift = 4;
         const daysShiftTime = new Date(hoursShiftTime.getTime() + (daysShift * 24 * 60 * 60 * 1000));
         pageStats.updateStats(fifthFilter.filterId, 10000, daysShiftTime);

@@ -6,13 +6,13 @@ import { StorageInterface } from '../../common/storage';
 export class StringStorage<K, V> {
     protected key: K;
 
-    protected storage: StorageInterface<K>;
+    protected storage: StorageInterface<K, string>;
 
     protected data: V;
 
     constructor(
         key: K,
-        storage: StorageInterface<K>,
+        storage: StorageInterface<K, string>,
     ) {
         this.key = key;
         this.storage = storage;
@@ -22,16 +22,20 @@ export class StringStorage<K, V> {
         return this.data;
     }
 
-    public setCache(data: V) {
+    public setCache(data: V): void {
         this.data = data;
     }
 
     public setData(data: V) {
         this.setCache(data);
-        this.save();
+        return this.save();
     }
 
     public save() {
-        this.storage.set(this.key, JSON.stringify(this.data));
+        return this.storage.set(this.key, JSON.stringify(this.data));
+    }
+
+    public read() {
+        return this.storage.get(this.key);
     }
 }

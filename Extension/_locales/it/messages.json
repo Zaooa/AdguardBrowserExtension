@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Importa impostazioni"
     },
+    "options_report_bug": {
+        "message": "Segnala un bug"
+    },
+    "options_leave_feedback": {
+        "message": "Lascia feedback"
+    },
     "options_privacy": {
         "message": "Modalità furtiva"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Nascondi il testo completo"
+    },
+    "close_button_title": {
+        "message": "Chiudi"
     }
 }

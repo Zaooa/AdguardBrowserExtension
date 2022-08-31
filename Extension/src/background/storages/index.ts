@@ -10,3 +10,4 @@ export * from './inverted-allowlist';
 export * from './main';
 export * from './metadata';
 export * from './settings';
+export * from './rule-conversion';

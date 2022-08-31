@@ -1,13 +1,14 @@
 import { SettingOption } from '../../../common/settings';
 import { listeners } from '../../notifier';
-import { StringStorage } from '../../utils/string-storage';
 import {
     settingsStorage,
     allowlistDomainsStorage,
     invertedAllowlistDomainsStorage,
 } from '../../storages';
 
-export type DomainsStorage = StringStorage<SettingOption, string[]>;
+export type DomainsStorage =
+    | typeof allowlistDomainsStorage
+    | typeof invertedAllowlistDomainsStorage;
 
 /**
  * API for managing allowlist domain lists
@@ -17,8 +18,8 @@ export class AllowlistApi {
      * Init domains storages
      */
     public static init() {
-        AllowlistApi.initDomainsStorage();
-        AllowlistApi.initInvertedDomainsStorage();
+        AllowlistApi.initStorage(allowlistDomainsStorage);
+        AllowlistApi.initStorage(invertedAllowlistDomainsStorage);
     }
 
     /**
@@ -149,35 +150,16 @@ export class AllowlistApi {
      *
      * if data is not exist, set empty array
      */
-    private static initDomainsStorage() {
+    private static initStorage(storage: DomainsStorage, defaultData: string[] = []) {
         try {
-            const storageData = settingsStorage.get(SettingOption.ALLOWLIST_DOMAINS);
+            const storageData = storage.read();
             if (storageData) {
-                allowlistDomainsStorage.setCache(JSON.parse(storageData));
+                storage.setCache(JSON.parse(storageData));
             } else {
-                allowlistDomainsStorage.setData([]);
+                storage.setData(defaultData);
             }
         } catch (e) {
-            allowlistDomainsStorage.setData([]);
-        }
-    }
-
-    /**
-     * Read stringified inverted domains array from settings storage,
-     * parse it and set memory cache
-     *
-     * if data is not exist, set empty array
-     */
-    private static initInvertedDomainsStorage() {
-        try {
-            const storageData = settingsStorage.get(SettingOption.INVERTED_ALLOWLIST_DOMAINS);
-            if (storageData) {
-                invertedAllowlistDomainsStorage.setCache(JSON.parse(storageData));
-            } else {
-                invertedAllowlistDomainsStorage.setData([]);
-            }
-        } catch (e) {
-            invertedAllowlistDomainsStorage.setData([]);
+            storage.setData(defaultData);
         }
     }
 }

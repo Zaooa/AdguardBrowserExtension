@@ -632,6 +632,12 @@
     "options_import_settings": {
         "message": "Importowanie ustawień"
     },
+    "options_report_bug": {
+        "message": "Zgłoś błąd"
+    },
+    "options_leave_feedback": {
+        "message": "Zostaw opinię"
+    },
     "options_privacy": {
         "message": "Tryb Niewidzialności"
     },
@@ -1003,5 +1009,8 @@
     },
     "blocking_pages_btn_proceed": {
         "message": "Kontynuuj mimo to"
+    },
+    "close_button_title": {
+        "message": "Zamknij"
     }
 }

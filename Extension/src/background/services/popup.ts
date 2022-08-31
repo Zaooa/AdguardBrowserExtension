@@ -19,6 +19,7 @@ import { settingsStorage } from '../storages';
 import { pageStats, SettingsApi } from '../api';
 
 import { UiService } from './ui';
+import { notifications } from '../utils/notifications';
 
 export class PopupService {
     static init() {
@@ -36,7 +37,7 @@ export class PopupService {
 
         return {
             frameInfo: PopupService.getMainFrameInfo(tabId),
-            stats: await pageStats.getStatisticsData(),
+            stats: pageStats.getStatisticsData(),
             settings: SettingsApi.getData(),
             options: {
                 showStatsSupported: true,
@@ -44,7 +45,7 @@ export class PopupService {
                 showInfoAboutFullVersion: !settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 isMacOs: UserAgent.isMacOs,
                 isEdgeBrowser: UserAgent.isEdge || UserAgent.isEdgeChromium,
-                notification: null, // TODO
+                notification: notifications.getCurrentNotification(),
                 isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 hasCustomRulesToReset: false, // TODO,
             },
@@ -56,8 +57,8 @@ export class PopupService {
 
         const blockedCountIncrement = 1;
 
-        await pageStats.updateStats(rule.getFilterListId(), blockedCountIncrement, new Date());
-        await pageStats.updateTotalBlocked(blockedCountIncrement);
+        pageStats.updateStats(rule.getFilterListId(), blockedCountIncrement, new Date());
+        pageStats.updateTotalBlocked(blockedCountIncrement);
         UiService.debounceUpdateTabIcon(tabId);
     }
 

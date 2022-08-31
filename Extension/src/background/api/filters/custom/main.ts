@@ -9,13 +9,11 @@ import {
     filterStateStorage,
     FiltersStorage,
     filterVersionStorage,
-    settingsStorage,
 } from '../../../storages';
 import { Engine } from '../../../engine';
 import { network } from '../../network';
 import { CustomFilterParsedData, CustomFilterParser } from './parser';
 import { CustomFilterLoader } from './loader';
-import { SettingOption } from '../../../../common/settings';
 
 export type CustomFilterDTO = {
     customUrl: string;
@@ -47,7 +45,7 @@ export class CustomFilterApi {
      */
     public static init() {
         try {
-            const storageData = settingsStorage.get(SettingOption.CUSTOM_FILTERS);
+            const storageData = customFilterMetadataStorage.read();
             if (storageData) {
                 customFilterMetadataStorage.setCache(JSON.parse(storageData));
             } else {

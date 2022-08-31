@@ -13,8 +13,10 @@ import {
     CommonFilterMetadata,
     MetadataStorage,
     filterVersionStorage,
-    settingsStorage,
-    GroupMetadata,
+    FilterStateStorage,
+    Metadata,
+    GroupStateStorage,
+    FilterVersionStorage,
 } from '../../storages';
 
 import { network } from '../network';
@@ -23,8 +25,6 @@ import { AllowlistApi } from './allowlist';
 import { CommonFilterApi } from './common';
 import { CustomFilterApi } from './custom';
 import { pageStats } from './page-stats';
-import { SettingOption } from '../../../common/settings';
-import { localeDetect } from './locale-detect';
 
 export type FilterMetadata = CommonFilterMetadata | CustomFilterMetadata;
 
@@ -42,7 +42,6 @@ export class FiltersApi {
         await FiltersApi.initMetadata();
 
         pageStats.init();
-        localeDetect.init();
         CustomFilterApi.init();
         AllowlistApi.init();
         await UserRulesApi.init();
@@ -309,7 +308,7 @@ export class FiltersApi {
      * if data is not exist, load it from local assets
      */
     private static async initI18nMetadata() {
-        const storageData = settingsStorage.get(SettingOption.I18N_METADATA);
+        const storageData = i18nMetadataStorage.read();
 
         if (!storageData) {
             await FiltersApi.loadI18nMetadataFromBackend(false);
@@ -328,7 +327,7 @@ export class FiltersApi {
      * if data is not exist, load it from local assets
      */
     private static async initMetadata() {
-        const storageData = settingsStorage.get(SettingOption.METADATA);
+        const storageData = metadataStorage.read();
 
         if (!storageData) {
             await FiltersApi.loadMetadataFromFromBackend(false);
@@ -348,27 +347,32 @@ export class FiltersApi {
     private static loadFilteringStates() {
         const metadata = metadataStorage.getData();
 
-        FiltersApi.initFilterStateStorage(metadata.filters);
-        FiltersApi.initGroupStateStorage(metadata.groups);
-        FiltersApi.initFilterVersionStorage(metadata.filters);
+        FiltersApi.initFilterStateStorage(metadata);
+        FiltersApi.initGroupStateStorage(metadata);
+        FiltersApi.initFilterVersionStorage(metadata);
     }
 
     /**
      * Read stringified filter states data from settings storage
-     * if data is not exist or partial, update filter states storage based on current filter metadata
+     * if data is not exist or partial, update filter states storage based on current metadata
      */
-    private static initFilterStateStorage(metadata: CommonFilterMetadata[]) {
-        const storageData = settingsStorage.get(SettingOption.FILTERS_STATE_PROP);
+    private static initFilterStateStorage(metadata: Metadata) {
+        const storageData = filterStateStorage.read();
 
         if (!storageData) {
-            filterStateStorage.update({}, metadata);
+            filterStateStorage.setData(FilterStateStorage.applyMetadata({}, metadata));
             return;
         }
 
         try {
-            filterStateStorage.update(JSON.parse(storageData), metadata);
+            const data = FilterStateStorage.applyMetadata(
+                JSON.parse(storageData),
+                metadata,
+            );
+
+            filterStateStorage.setData(data);
         } catch (e) {
-            filterStateStorage.update({}, metadata);
+            filterStateStorage.setData(FilterStateStorage.applyMetadata({}, metadata));
         }
     }
 
@@ -376,18 +380,23 @@ export class FiltersApi {
      * Read stringified group states data from settings storage
      * if data is not exist or partial, update group states storage based on current group metadata
      */
-    private static initGroupStateStorage(metadata: GroupMetadata[]) {
-        const storageData = settingsStorage.get(SettingOption.GROUPS_STATE_PROP);
+    private static initGroupStateStorage(metadata: Metadata) {
+        const storageData = groupStateStorage.read();
 
         if (!storageData) {
-            groupStateStorage.update({}, metadata);
+            groupStateStorage.setData(GroupStateStorage.applyMetadata({}, metadata));
             return;
         }
 
         try {
-            groupStateStorage.update(JSON.parse(storageData), metadata);
+            const data = GroupStateStorage.applyMetadata(
+                JSON.parse(storageData),
+                metadata,
+            );
+
+            groupStateStorage.setData(data);
         } catch (e) {
-            groupStateStorage.update({}, metadata);
+            groupStateStorage.setData(GroupStateStorage.applyMetadata({}, metadata));
         }
     }
 
@@ -395,18 +404,23 @@ export class FiltersApi {
      * Read stringified filter version data from settings storage
      * if data is not exist or partial, update filter version storage based on current filter metadata
      */
-    private static initFilterVersionStorage(metadata: CommonFilterMetadata[]) {
-        const storageData = settingsStorage.get(SettingOption.FILTERS_VERSION_PROP);
+    private static initFilterVersionStorage(metadata: Metadata) {
+        const storageData = filterVersionStorage.read();
 
         if (!storageData) {
-            filterVersionStorage.update({}, metadata);
+            filterVersionStorage.setData(FilterVersionStorage.applyMetadata({}, metadata));
             return;
         }
 
         try {
-            filterVersionStorage.update(JSON.parse(storageData), metadata);
+            const data = FilterVersionStorage.applyMetadata(
+                JSON.parse(storageData),
+                metadata,
+            );
+
+            filterVersionStorage.setData(data);
         } catch (e) {
-            filterVersionStorage.update({}, metadata);
+            filterVersionStorage.setData(FilterVersionStorage.applyMetadata({}, metadata));
         }
     }
 }

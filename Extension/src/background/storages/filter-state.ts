@@ -1,7 +1,7 @@
 import { AntiBannerFiltersId } from '../../common/constants';
 import { SettingOption } from '../../common/settings';
 import { StringStorage } from '../utils/string-storage';
-import { CommonFilterMetadata } from './metadata';
+import { Metadata } from './metadata';
 import { settingsStorage } from './settings';
 
 export type FilterState = {
@@ -10,7 +10,9 @@ export type FilterState = {
     loaded: boolean;
 };
 
-export class FilterStateStorage extends StringStorage<SettingOption, Record<number, FilterState>> {
+export type FilterStateStorageData = Record<number, FilterState>;
+
+export class FilterStateStorage extends StringStorage<SettingOption.FILTERS_STATE_PROP, FilterStateStorageData> {
     /**
      * This filters have own complex state management
      */
@@ -72,12 +74,16 @@ export class FilterStateStorage extends StringStorage<SettingOption, Record<numb
         this.save();
     }
 
-    public update(states: Record<number, FilterState>, filtersMetadata: CommonFilterMetadata[]) {
+    public static applyMetadata(
+        states: FilterStateStorageData,
+        metadata: Metadata,
+    ) {
+        const { filters } = metadata;
         /**
          * Don't create filter state context for allowlist and user rules lists
          * Their state is controlled by separate modules
          */
-        const supportedFiltersMetadata = filtersMetadata.filter(({ filterId }) => {
+        const supportedFiltersMetadata = filters.filter(({ filterId }) => {
             return !FilterStateStorage.unsupportedFiltersIds.includes(filterId);
         });
 
@@ -89,7 +95,7 @@ export class FilterStateStorage extends StringStorage<SettingOption, Record<numb
             }
         }
 
-        this.setData(states);
+        return states;
     }
 }
 

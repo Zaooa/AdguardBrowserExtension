@@ -9,3 +9,4 @@ export * from './popup';
 export * from './ui';
 export * from './safebrowsing';
 export * from './filters';
+export * from './locale-detect';

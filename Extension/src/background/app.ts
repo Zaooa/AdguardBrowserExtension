@@ -20,6 +20,7 @@ import {
     FilteringLogService,
     eventService,
     safebrowsingService,
+    localeDetect,
 } from './services';
 
 export class App {
@@ -52,6 +53,7 @@ export class App {
         FilteringLogService.init();
         await UiService.init();
         PopupService.init();
+        localeDetect.init();
         eventService.init();
         safebrowsingService.init();
         await App.setUninstallUrl();

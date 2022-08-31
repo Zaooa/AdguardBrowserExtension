@@ -2,9 +2,9 @@
  * Common storage interface
  */
 export interface StorageInterface<K = string, V = unknown> {
-    set(key: K, value: V): void | Promise<void>
+    set(key: K, value: V): Awaited<void>
 
-    get(key: K): V | Promise<V>
+    get(key: K): Awaited<V | undefined>
 
-    remove(key: K): void | Promise<void>
+    remove(key: K): Awaited<void>
 }

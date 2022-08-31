@@ -100,6 +100,11 @@ export class Engine {
              * remove duplicates
              */
             userrules = Array.from(new Set(userrules));
+
+            /**
+             * Convert user rules
+             */
+            userrules = UserRulesApi.convertRules(userrules);
         }
 
         return {

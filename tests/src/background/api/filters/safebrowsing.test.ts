@@ -1,11 +1,11 @@
-import { utils } from '../../../../../Extension/src/background/utils/common';
-import safebrowsing from '../../../../../Extension/src/background/filter/services/safebrowsing/safebrowsing.browsers';
-import { backend } from '../../../../../Extension/src/background/filter/filters/service-client';
+import { UrlUtils } from '../../../../../Extension/src/background/utils/url';
+import safebrowsing from '../../../../../Extension/src/background/api/filters/safebrowsing';
+import { ExtensionXMLHttpRequest, network } from '../../../../../Extension/src/background/api/network';
 import { log } from '../../../../../Extension/src/common/log';
 
 describe('safebrowsing', () => {
     it('Calculate hash', () => {
-        const host = utils.url.getHost('http://test.yandex.ru/someurl.html');
+        const host = UrlUtils.getHost('http://test.yandex.ru/someurl.html');
         const hosts = safebrowsing.extractHosts(host);
 
         expect(hosts[0]).toBe('test.yandex.ru');
@@ -18,7 +18,7 @@ describe('safebrowsing', () => {
     });
 
     it('Process response', () => {
-        const host = utils.url.getHost('http://theballoonboss.com');
+        const host = UrlUtils.getHost('http://theballoonboss.com');
         const hosts = safebrowsing.extractHosts(host);
         const hashes = safebrowsing.createHashesMap(hosts);
 
@@ -31,10 +31,10 @@ describe('safebrowsing', () => {
     it('Test cache', async () => {
         let counter = 0;
         // Mock backend request
-        jest.spyOn(backend, 'lookupSafebrowsing').mockImplementation(() => {
+        jest.spyOn(network, 'lookupSafebrowsing').mockImplementation(() => {
             counter += 1;
 
-            return Promise.resolve({ status: 204 });
+            return Promise.resolve({ status: 204 }) as unknown as Promise<ExtensionXMLHttpRequest>;
         });
 
         const testUrl = 'http://google.com';
@@ -53,13 +53,13 @@ describe('safebrowsing', () => {
         let hashesChecked = [];
 
         // Mock backend request
-        jest.spyOn(backend, 'lookupSafebrowsing').mockImplementation((shortHashes) => {
+        jest.spyOn(network, 'lookupSafebrowsing').mockImplementation((shortHashes: string[]) => {
             counter += 1;
             hashesChecked = shortHashes;
 
             return Promise.resolve({
                 status: 204,
-            });
+            }) as unknown as Promise<ExtensionXMLHttpRequest>;
         });
 
         const testUrlOne = 'http://google.co.jp';
@@ -96,7 +96,7 @@ describe('safebrowsing', () => {
 
         // request error handling
 
-        jest.spyOn(backend, 'lookupSafebrowsing').mockImplementation(() => {
+        jest.spyOn(network, 'lookupSafebrowsing').mockImplementation(() => {
             // eslint-disable-next-line prefer-promise-reject-errors
             return Promise.reject({
                 status: 500,
@@ -113,10 +113,10 @@ describe('safebrowsing', () => {
 
         // 5xx status code
 
-        jest.spyOn(backend, 'lookupSafebrowsing').mockImplementation(() => {
+        jest.spyOn(network, 'lookupSafebrowsing').mockImplementation(() => {
             return Promise.resolve({
                 status: 500,
-            });
+            }) as unknown as Promise<ExtensionXMLHttpRequest>;
         });
 
         await safebrowsing.lookupUrl('https://example.com');
@@ -128,8 +128,8 @@ describe('safebrowsing', () => {
 
         // request resolve without response
 
-        jest.spyOn(backend, 'lookupSafebrowsing').mockImplementation(() => {
-            return Promise.resolve();
+        jest.spyOn(network, 'lookupSafebrowsing').mockImplementation(() => {
+            return Promise.resolve() as unknown as Promise<ExtensionXMLHttpRequest>;
         });
 
         await safebrowsing.lookupUrl('https://npmjs.com');

@@ -20,7 +20,7 @@ export type CustomFilterMetadata = {
 /**
  * Storage for custom filters metadata
  */
-export class CustomFilterMetadataStorage extends StringStorage<SettingOption, CustomFilterMetadata[]> {
+export class CustomFilterMetadataStorage extends StringStorage<SettingOption.CUSTOM_FILTERS, CustomFilterMetadata[]> {
     /**
      * Get custom filter metadata by filter id
      */

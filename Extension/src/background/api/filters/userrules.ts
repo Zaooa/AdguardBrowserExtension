@@ -1,3 +1,6 @@
+import { RuleConverter } from '@adguard/tsurlfilter';
+
+import { log } from '../../../common/log';
 import { AntiBannerFiltersId } from '../../../common/constants';
 import { SettingOption } from '../../../common/settings';
 import { listeners } from '../../notifier';
@@ -5,6 +8,7 @@ import {
     FiltersStorage,
     settingsStorage,
     editorStorage,
+    ruleConversionStorage,
 } from '../../storages';
 
 /**
@@ -78,5 +82,44 @@ export class UserRulesApi {
      */
     static setEditorStorageData(data: string): void {
         editorStorage.set(data);
+    }
+
+    /**
+     * Converts rules text lines with conversion map
+     */
+    static convertRules(rules: string[]): string[] {
+        ruleConversionStorage.clear();
+
+        const result = [];
+        for (let i = 0; i < rules.length; i += 1) {
+            const line = rules[i];
+            let converted = [];
+            try {
+                converted = RuleConverter.convertRule(line);
+            } catch (e) {
+                log.info(`Error converting rule ${line}, due to: ${e.message}`);
+            }
+            result.push(...converted);
+
+            if (converted.length > 0) {
+                if (converted.length > 1 || converted[0] !== line) {
+                    // Fill the map only for converted rules
+                    converted.forEach((x) => {
+                        ruleConversionStorage.set(x, line);
+                    });
+                }
+            }
+        }
+
+        log.debug('Converted {0} rules to {1} for user filter', rules.length, result.length);
+
+        return result;
+    }
+
+    /**
+     * Returns source rule text if the rule has been converted
+     */
+    static getSourceRule(rule: string): string | undefined {
+        return ruleConversionStorage.get(rule);
     }
 }

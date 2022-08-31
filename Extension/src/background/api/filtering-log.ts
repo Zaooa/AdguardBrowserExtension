@@ -31,6 +31,7 @@ import { AntiBannerFiltersId } from '../../common/constants';
 
 import { listeners } from '../notifier';
 import { TabsApi } from './extension/tabs';
+import { UserRulesApi } from './filters';
 
 export type FilteringEventRuleData = {
      filterId: number,
@@ -45,6 +46,7 @@ export type FilteringEventRuleData = {
      contentRule?: boolean,
      cssRule?: boolean,
      scriptRule?: boolean,
+     appliedRuleText?: string,
  };
 
 export type FilteringLogEvent = {
@@ -346,15 +348,13 @@ export class FilteringLogApi {
              }
          }
 
-         /*
          if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
-             const originalRule = userrules.getSourceRule(sourceRule.getText());
+             const originalRule = UserRulesApi.getSourceRule(rule.getText());
              if (originalRule) {
-                 dto.ruleText = originalRule;
-                 dto.appliedRuleText = rule.getText();
+                 data.ruleText = originalRule;
+                 data.appliedRuleText = rule.getText();
              }
          }
-         */
 
          return data;
      }

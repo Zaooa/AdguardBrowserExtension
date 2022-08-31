@@ -64,6 +64,14 @@ export enum SettingOption {
     /* UI misc */
     HIDE_RATE_BLOCK = 'hide-rate-block',
     USER_RULES_EDITOR_WRAP = 'user-rules-editor-wrap',
+
+    /* Notifications */
+    LAST_NOTIFICATION_TIME = 'viewed-notification-time',
+    VIEWED_NOTIFICATIONS = 'viewed-notifications',
+
+    /* Safebrowsing */
+    SB_LRU_CACHE = 'sb-lru-cache',
+    SB_SUSPENDED_CACHE = 'safebrowsing-suspended-from',
 }
 
 export const enum AppearanceTheme {
@@ -126,6 +134,12 @@ export type Settings = {
     [SettingOption.CUSTOM_FILTERS]?: string,
 
     [SettingOption.PAGE_STATISTIC]?: string,
+
+    [SettingOption.LAST_NOTIFICATION_TIME]?: number,
+    [SettingOption.VIEWED_NOTIFICATIONS]?: string[],
+
+    [SettingOption.SB_LRU_CACHE]?: string,
+    [SettingOption.SB_SUSPENDED_CACHE]?: number,
 };
 
 function isPromoInfoDisabled(): boolean {

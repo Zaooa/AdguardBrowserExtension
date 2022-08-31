@@ -1,6 +1,6 @@
 import { SettingOption } from '../../common/settings';
 import { StringStorage } from '../utils/string-storage';
-import { GroupMetadata } from './metadata';
+import { Metadata } from './metadata';
 import { settingsStorage } from './settings';
 
 export type GroupState = {
@@ -8,7 +8,12 @@ export type GroupState = {
     toggled: boolean;
 };
 
-export class GroupStateStorage extends StringStorage<SettingOption, Record<number, GroupState>> {
+export type GroupStateStorageData = Record<number, GroupState>;
+
+export class GroupStateStorage extends StringStorage<
+    SettingOption.GROUPS_STATE_PROP,
+    GroupStateStorageData
+> {
     private static defaultState = {
         enabled: false,
         toggled: false,
@@ -61,16 +66,21 @@ export class GroupStateStorage extends StringStorage<SettingOption, Record<numbe
         this.save();
     }
 
-    public update(states: Record<number, GroupState>, groupsMetadata: GroupMetadata[]) {
-        for (let i = 0; i < groupsMetadata.length; i += 1) {
-            const { groupId } = groupsMetadata[i];
+    public static applyMetadata(
+        states: GroupStateStorageData,
+        metadata: Metadata,
+    ) {
+        const { groups } = metadata;
+
+        for (let i = 0; i < groups.length; i += 1) {
+            const { groupId } = groups[i];
 
             if (!states[groupId]) {
                 states[groupId] = { ...GroupStateStorage.defaultState };
             }
         }
 
-        this.setData(states);
+        return states;
     }
 }
 

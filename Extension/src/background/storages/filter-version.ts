@@ -1,6 +1,6 @@
 import { SettingOption } from '../../common/settings';
 import { StringStorage } from '../utils/string-storage';
-import { CommonFilterMetadata } from './metadata';
+import { Metadata } from './metadata';
 import { settingsStorage } from './settings';
 
 export type FilterVersionData = {
@@ -10,7 +10,12 @@ export type FilterVersionData = {
     expires: number,
 };
 
-export class FilterVersionStorage extends StringStorage<SettingOption, Record<number, FilterVersionData>> {
+export type FilterVersionStorageData = Record<number, FilterVersionData>;
+
+export class FilterVersionStorage extends StringStorage<
+    SettingOption.FILTERS_VERSION_PROP,
+    FilterVersionStorageData
+> {
     public get(filterId: number): FilterVersionData {
         return this.data[filterId];
     }
@@ -27,14 +32,19 @@ export class FilterVersionStorage extends StringStorage<SettingOption, Record<nu
         this.save();
     }
 
-    public update(data: Record<number, FilterVersionData>, filtersMetadata: CommonFilterMetadata[]) {
-        for (let i = 0; i < filtersMetadata.length; i += 1) {
+    public static applyMetadata(
+        data: FilterVersionStorageData,
+        metadata: Metadata,
+    ) {
+        const { filters } = metadata;
+
+        for (let i = 0; i < filters.length; i += 1) {
             const {
                 filterId,
                 version,
                 expires,
                 timeUpdated,
-            } = filtersMetadata[i];
+            } = filters[i];
 
             if (!data[filterId]) {
                 data[filterId] = {
@@ -46,7 +56,7 @@ export class FilterVersionStorage extends StringStorage<SettingOption, Record<nu
             }
         }
 
-        this.setData(data);
+        return data;
     }
 }
 

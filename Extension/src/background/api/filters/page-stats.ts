@@ -51,9 +51,9 @@ export class PageStats {
      *
      * @param blocked Count of blocked requests
      */
-    public async updateTotalBlocked(blocked: number) {
+    public updateTotalBlocked(blocked: number) {
         this.stats.totalBlocked = (this.stats.totalBlocked || 0) + blocked;
-        await this.updateStorageData();
+        this.updateStorageData();
     }
 
     /**
@@ -87,7 +87,7 @@ export class PageStats {
      * @param blocked count
      * @param now date
      */
-    public async updateStats(filterId, blocked, now) {
+    public updateStats(filterId, blocked, now) {
         const blockedGroup = metadataStorage.getGroupByFilterId(filterId);
 
         if (!blockedGroup) {
@@ -105,17 +105,17 @@ export class PageStats {
         }
 
         this.stats.data = updated;
-        await this.updateStorageData();
+        this.updateStorageData();
     }
 
     /**
      * Returns statistics data object
-     * @param {Date} [date] - used in the tests to provide time of stats object creation
+     * @param date - used in the tests to provide time of stats object creation
      */
-    public async getStatisticsData(date = new Date()) {
+    public getStatisticsData(date = new Date()) {
         if (!this.stats.data) {
             this.stats.data = PageStats.createStatsData(date, null, 0);
-            await this.updateStorageData();
+            this.updateStorageData();
         }
 
         return {
@@ -128,7 +128,7 @@ export class PageStats {
         };
     }
 
-    private async updateStorageData(): Promise<void> {
+    private updateStorageData(): void {
         settingsStorage.set(SettingOption.PAGE_STATISTIC, JSON.stringify(this.stats));
     }
 

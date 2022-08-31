@@ -47,6 +47,7 @@ const Search = observer(() => {
             if (e[modifierKeyProperty] && code === 'KeyF') {
                 e.preventDefault();
                 searchInputRef.current.focus();
+                searchInputRef.current.select();
             }
         };
         const handleResetHotkey = (e) => {
@@ -108,6 +109,7 @@ const Search = observer(() => {
                 <button
                     type="button"
                     className="button"
+                    aria-label={reactTranslator.getMessage('close_button_title')}
                     onClick={searchCloseHandler}
                 >
                     <Icon id="#cross" classname="search__cross" />

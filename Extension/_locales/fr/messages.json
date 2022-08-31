@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Importer les paramètres"
     },
+    "options_report_bug": {
+        "message": "Signaler un bogue"
+    },
+    "options_leave_feedback": {
+        "message": "Envoyer un commentaire"
+    },
     "options_privacy": {
         "message": "Mode Furtif"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Masquer le texte complet"
+    },
+    "close_button_title": {
+        "message": "Fermer"
     }
 }

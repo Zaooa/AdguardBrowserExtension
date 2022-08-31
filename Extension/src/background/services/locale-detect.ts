@@ -18,16 +18,16 @@
 import browser, { Tabs } from 'webextension-polyfill';
 import { isHttpRequest, getDomain } from '@adguard/tswebextension';
 
-import { UserAgent } from '../../../common/user-agent';
-import { SettingOption } from '../../../common/settings';
+import { UserAgent } from '../../common/user-agent';
+import { SettingOption } from '../../common/settings';
 import {
     metadataStorage,
     settingsStorage,
-} from '../../storages';
-import { Engine } from '../../engine';
-import { toasts } from '../ui';
-import { FiltersApi } from './main';
-import { CommonFilterApi } from './common';
+} from '../storages';
+import { Engine } from '../engine';
+import { toasts } from '../api/ui';
+import { FiltersApi } from '../api/filters/main';
+import { CommonFilterApi } from '../api/filters/common';
 
 export type BrowsingLanguage = {
     language: string,

@@ -21,7 +21,10 @@ const safebrowsing = (function () {
     // Lazy initialized safebrowsing cache
     const safebrowsingCache = {
         get cache() {
-            return lazyGet(safebrowsingCache, 'cache', () => new LruCache('sb-lru-cache'));
+            return lazyGet(safebrowsingCache, 'cache', () => new LruCache(
+                SettingOption.SB_LRU_CACHE,
+                settingsStorage,
+            ));
         },
     };
 

@@ -47,7 +47,7 @@ export type Metadata = {
     tags: TagMetadata[]
 };
 
-export class MetadataStorage extends StringStorage<SettingOption, Metadata> {
+export class MetadataStorage extends StringStorage<SettingOption.METADATA, Metadata> {
     public getFilters() {
         return this.data.filters;
     }

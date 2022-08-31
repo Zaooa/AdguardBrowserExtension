@@ -3,7 +3,6 @@ export * from './common';
 export * from './custom';
 export * from './allowlist';
 export * from './userrules';
-export * from './locale-detect';
 export * from './tags';
 export * from './categories';
 export * from './page-stats';

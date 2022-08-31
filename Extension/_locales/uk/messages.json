@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Імпорт налаштувань"
     },
+    "options_report_bug": {
+        "message": "Повідомити про помилку"
+    },
+    "options_leave_feedback": {
+        "message": "Поділитись"
+    },
     "options_privacy": {
         "message": "Захист від стеження"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Скоротити текст"
+    },
+    "close_button_title": {
+        "message": "Закрити"
     }
 }

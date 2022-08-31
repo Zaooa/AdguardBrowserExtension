@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Instellingen importeren"
     },
+    "options_report_bug": {
+        "message": "Een fout rapporteren"
+    },
+    "options_leave_feedback": {
+        "message": "Feedback geven"
+    },
     "options_privacy": {
         "message": "Incognito modus"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Volledige tekst verbergen"
+    },
+    "close_button_title": {
+        "message": "Sluiten"
     }
 }

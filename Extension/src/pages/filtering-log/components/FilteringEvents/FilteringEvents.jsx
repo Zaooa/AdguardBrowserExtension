@@ -134,15 +134,24 @@ const Row = observer(({
     onClick,
     style,
 }) => {
+    const { logStore } = useContext(rootStore);
+
+    const className = cn(
+        'tr tr--tbody',
+        { 'tr--active': event.eventId === logStore.selectedEvent?.eventId },
+        getRowClassName(event),
+    );
+
     return (
-        <div
+        <button
             style={{
                 ...style,
                 top: `${parseFloat(style.top) + ITEM_HEIGHT_PX}px`,
             }}
             id={event.eventId}
             onClick={onClick}
-            className={cn('tr tr--tbody', getRowClassName(event))}
+            type="button"
+            className={className}
         >
             {
                 columns.map((column) => {
@@ -165,7 +174,7 @@ const Row = observer(({
                     );
                 })
             }
-        </div>
+        </button>
     );
 });
 

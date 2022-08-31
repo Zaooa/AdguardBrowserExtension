@@ -644,6 +644,12 @@
     "options_import_settings": {
         "message": "Uvezi postavke"
     },
+    "options_report_bug": {
+        "message": "Prijavi grešku"
+    },
+    "options_leave_feedback": {
+        "message": "Ostavite povratne informacije"
+    },
     "options_privacy": {
         "message": "Nevidljivi način rada"
     },
@@ -1036,5 +1042,8 @@
     },
     "text_collapser_hide_default": {
         "message": "Sakrij pun tekst"
+    },
+    "close_button_title": {
+        "message": "zatvori"
     }
 }

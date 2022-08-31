@@ -33,7 +33,7 @@ export type I18nMetadata = {
     tags: TagsI18n,
 };
 
-export const i18nMetadataStorage = new StringStorage<SettingOption, I18nMetadata>(
+export const i18nMetadataStorage = new StringStorage<SettingOption.I18N_METADATA, I18nMetadata>(
     SettingOption.I18N_METADATA,
     settingsStorage,
 );

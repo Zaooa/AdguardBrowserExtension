@@ -475,6 +475,11 @@ class LogStore {
         this.selectedEvent = find(this.filteringEvents, { eventId });
     };
 
+    @action
+    removeSelectedEvent = () => {
+        this.selectedEvent = null;
+    };
+
     @computed
     get appearanceTheme() {
         if (!this.settings) {

@@ -9,6 +9,7 @@ import { Engine } from '../engine';
 import { UrlUtils } from '../utils/url';
 import { settingsStorage } from '../storages';
 import { SettingOption } from '../../common/settings';
+import { notifications } from '../utils/notifications';
 import { BrowserUtils } from '../utils/browser-utils';
 import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
 import { listeners } from '../notifier';
@@ -20,7 +21,7 @@ import {
     SettingsApi,
 } from '../api';
 
-// TODO: decompose and move to ./ui
+// TODO: decompose
 export class UiService {
     static baseUrl = browser.runtime.getURL('/');
 
@@ -327,9 +328,9 @@ export class UiService {
     }
 
     static async updateTabIcon(tabId: number) {
-        let icon;
+        let icon: Record<string, string>;
         let badge: string;
-        const badgeColor = '#555';
+        let badgeColor = '#555';
 
         if (tabId === BACKGROUND_TAB_ID) {
             return;
@@ -381,8 +382,6 @@ export class UiService {
                 badge = String(blocked);
             }
 
-            // TODO: notifications
-            /*
             // If there's an active notification, indicate it on the badge
             const notification = notifications.getCurrentNotification();
             if (notification) {
@@ -399,7 +398,6 @@ export class UiService {
                     }
                 }
             }
-            */
 
             await browser.browserAction.setIcon({ tabId, imageData: await getIconImageData(icon) });
 
