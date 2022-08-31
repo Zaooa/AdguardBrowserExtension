@@ -216,8 +216,15 @@ const General = observer(() => {
                 >
                     {reactTranslator.getMessage('options_export_settings')}
                 </button>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                <input
+                    id="inputEl"
+                    type="file"
+                    accept="application/json"
+                    onChange={inputChangeHandler}
+                    className="actions__input-file"
+                />
                 <label
+                    htmlFor="inputEl"
                     className="links-menu__item"
                 >
                     <input
