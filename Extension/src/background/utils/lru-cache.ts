@@ -47,14 +47,14 @@ export class LruCache<StorageKey, Key, Value> {
         const storageData = this.storage.get(this.key);
 
         if (!storageData) {
-            return this.setCache(null);
+            this.setCache(null);
         }
 
         try {
             const entries = JSON.parse(storageData);
-            return this.setCache(entries);
+            this.setCache(entries);
         } catch (e) {
-            return this.setCache(null);
+            this.setCache(null);
         }
     }
 

@@ -19,6 +19,9 @@ import { translator } from '../../../common/translators/translator';
 import { SettingOption } from '../../../common/settings';
 import { settingsStorage, metadataStorage } from '../../storages';
 
+/**
+ * TODO: use pageStatsStorage
+ */
 export class PageStats {
     public static MAX_HOURS_HISTORY = 24;
 

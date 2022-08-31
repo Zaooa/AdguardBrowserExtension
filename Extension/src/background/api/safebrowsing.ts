@@ -2,32 +2,19 @@ import browser from 'webextension-polyfill';
 import { LRUMap } from 'lru_map';
 import SHA256 from 'crypto-js/sha256';
 
-import { log } from '../../../common/log';
-import { strings } from '../../../common/strings';
-import { settingsStorage } from '../../storages';
-import { network } from '../network';
-import { UrlUtils } from '../../utils/url';
-import { LruCache } from '../../utils/lru-cache';
-import { lazyGet } from '../../utils/lazy';
-import { listeners } from '../../notifier';
-import { SettingOption } from '../../../common/settings';
+import { log } from '../../common/log';
+import { strings } from '../../common/strings';
+import { settingsStorage, safebrowsingCache } from '../storages';
+import { network } from './network';
+import { UrlUtils } from '../utils/url';
+import { SettingOption } from '../../common/settings';
 
 /**
- * Initializing SafebrowsingFilter.
+ * Safebrowsing Filter Api.
  *
  * http://adguard.com/en/how-malware-blocked.html#extension
  */
-const safebrowsing = (function () {
-    // Lazy initialized safebrowsing cache
-    const safebrowsingCache = {
-        get cache() {
-            return lazyGet(safebrowsingCache, 'cache', () => new LruCache(
-                SettingOption.SB_LRU_CACHE,
-                settingsStorage,
-            ));
-        },
-    };
-
+export const SafebrowsingApi = (function () {
     /**
      * Backend requests cache
      */
@@ -69,7 +56,7 @@ const safebrowsing = (function () {
                 const hash = r[2];
                 const list = r[0];
 
-                safebrowsingCache.cache.saveValue(hash, list);
+                safebrowsingCache.set(hash, list);
 
                 if (!result) {
                     const host = hashesMap[hash];
@@ -151,7 +138,7 @@ const safebrowsing = (function () {
      */
     function checkHostsInSbCache(hosts) {
         for (let i = 0; i < hosts.length; i += 1) {
-            const sbList = safebrowsingCache.cache.getValue(createHash(hosts[i]));
+            const sbList = safebrowsingCache.get(createHash(hosts[i]));
             if (sbList) {
                 return sbList;
             }
@@ -247,7 +234,7 @@ const safebrowsing = (function () {
         if (shortHashes.length === 0) {
             // In case we have not found anything in safebrowsingCache and all short hashes have been checked in
             // safebrowsingRequestsCache - means that there is no need to request backend again
-            safebrowsingCache.cache.saveValue(createHash(host), SB_ALLOW_LIST);
+            safebrowsingCache.set(createHash(host), SB_ALLOW_LIST);
             return createResponse(SB_ALLOW_LIST);
         }
 
@@ -284,7 +271,7 @@ const safebrowsing = (function () {
             sbList = processSbResponse(response.responseText, hashesMap) || SB_ALLOW_LIST;
         }
 
-        safebrowsingCache.cache.saveValue(createHash(host), sbList);
+        safebrowsingCache.set(createHash(host), sbList);
         return createResponse(sbList);
     };
 
@@ -327,29 +314,19 @@ const safebrowsing = (function () {
             return;
         }
 
-        safebrowsingCache.cache.saveValue(createHash(host), SB_ALLOW_LIST);
+        safebrowsingCache.set(createHash(host), SB_ALLOW_LIST);
     };
 
     /**
      * Clears safebrowsing cache
      */
     const clearCache = () => {
-        safebrowsingCache.cache.clear();
+        safebrowsingCache.clear();
     };
 
-    /**
-     * Subscribes to safebrowsing setting change and clears cache when setting changes
-     */
     const init = () => {
-        listeners.addSpecifiedListener(listeners.SETTING_UPDATED, (_, { propertyName }) => {
-            if (propertyName === SettingOption.DISABLE_SAFEBROWSING) {
-                clearCache();
-            }
-        });
+        safebrowsingCache.init();
     };
-
-    // Init
-    init();
 
     return {
         init,
@@ -363,5 +340,3 @@ const safebrowsing = (function () {
         clearCache,
     };
 })();
-
-export default safebrowsing;

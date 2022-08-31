@@ -1,6 +1,8 @@
 import browser from 'webextension-polyfill';
 import { RequestEvents } from '@adguard/tswebextension';
-import safebrowsing from '../api/filters/safebrowsing';
+import { SafebrowsingApi } from '../api/safebrowsing';
+import { SettingsService } from './settings';
+import { SettingOption } from '../../common/settings';
 
 export class SafebrowsingService {
     constructor() {
@@ -8,6 +10,12 @@ export class SafebrowsingService {
     }
 
     init() {
+        SafebrowsingApi.init();
+
+        SettingsService.onSettingChange.addListener(
+            SettingOption.DISABLE_SAFEBROWSING,
+            SafebrowsingApi.clearCache,
+        );
         RequestEvents.onHeadersReceived.addListener(this.onHeaderReceived);
     }
 
@@ -30,7 +38,7 @@ export class SafebrowsingService {
 
     // eslint-disable-next-line class-methods-use-this
     async filterUrl(tabId: number, url: string, originUrl: string) {
-        const safebrowsingUrl = await safebrowsing.checkSafebrowsingFilter(url, originUrl);
+        const safebrowsingUrl = await SafebrowsingApi.checkSafebrowsingFilter(url, originUrl);
 
         if (!safebrowsingUrl) {
             return;

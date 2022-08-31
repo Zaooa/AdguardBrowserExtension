@@ -1,17 +1,19 @@
 import { UrlUtils } from '../../../../../Extension/src/background/utils/url';
-import safebrowsing from '../../../../../Extension/src/background/api/filters/safebrowsing';
+import { SafebrowsingApi } from '../../../../../Extension/src/background/api/safebrowsing';
 import { ExtensionXMLHttpRequest, network } from '../../../../../Extension/src/background/api/network';
 import { log } from '../../../../../Extension/src/common/log';
+
+// TODO: fix
 
 describe('safebrowsing', () => {
     it('Calculate hash', () => {
         const host = UrlUtils.getHost('http://test.yandex.ru/someurl.html');
-        const hosts = safebrowsing.extractHosts(host);
+        const hosts = SafebrowsingApi.extractHosts(host);
 
         expect(hosts[0]).toBe('test.yandex.ru');
         expect('yandex.ru').toBe(hosts[1]);
 
-        const hashes = safebrowsing.createHashesMap(hosts);
+        const hashes = SafebrowsingApi.createHashesMap(hosts);
 
         expect(hashes['7FF9C98C9AABC19DDB67F8A0030B0691451738E7B8E75393BC6C9F6137F269BB']).toBe('test.yandex.ru');
         expect(hashes['A42653DA210A54B6874F37F0D4A12DA5E89BB436F2C6A01F83246E71CDB544E5']).toBe('yandex.ru');
@@ -19,11 +21,11 @@ describe('safebrowsing', () => {
 
     it('Process response', () => {
         const host = UrlUtils.getHost('http://theballoonboss.com');
-        const hosts = safebrowsing.extractHosts(host);
-        const hashes = safebrowsing.createHashesMap(hosts);
+        const hosts = SafebrowsingApi.extractHosts(host);
+        const hashes = SafebrowsingApi.createHashesMap(hosts);
 
         // eslint-disable-next-line max-len
-        const sbList = safebrowsing.processSbResponse('adguard-phishing-shavar:37654:B8DC93970348F0A3E6856C32AC5C04D5655E5EE17D4169EC51A2102FB6D5E12A\nadguard-malware-shavar:35176:AE617C8343E1C79E27515B3F6D6D26413FCE47AE32A73488F9D033B4D2A46B3D\nadguard-phishing-shavar:35071:AE617C8343E1C79E27515B3F6D6D26413FCE47AE32A73488F9D033B4D2A46B3D', hashes);
+        const sbList = SafebrowsingApi.processSbResponse('adguard-phishing-shavar:37654:B8DC93970348F0A3E6856C32AC5C04D5655E5EE17D4169EC51A2102FB6D5E12A\nadguard-malware-shavar:35176:AE617C8343E1C79E27515B3F6D6D26413FCE47AE32A73488F9D033B4D2A46B3D\nadguard-phishing-shavar:35071:AE617C8343E1C79E27515B3F6D6D26413FCE47AE32A73488F9D033B4D2A46B3D', hashes);
 
         expect(sbList).toBe('adguard-phishing-shavar');
     });
@@ -38,11 +40,11 @@ describe('safebrowsing', () => {
         });
 
         const testUrl = 'http://google.com';
-        const response = await safebrowsing.lookupUrl(testUrl);
+        const response = await SafebrowsingApi.lookupUrl(testUrl);
         expect(response).toBeFalsy();
         expect(counter).toBe(1);
 
-        const response2 = await safebrowsing.lookupUrl(testUrl);
+        const response2 = await SafebrowsingApi.lookupUrl(testUrl);
         expect(response2).toBeFalsy();
         // Check there was only one request to backend
         expect(counter).toBe(1);
@@ -65,7 +67,7 @@ describe('safebrowsing', () => {
         const testUrlOne = 'http://google.co.jp';
         const testUrlTwo = 'http://yahoo.co.jp';
         const testUrlThree = 'http://co.jp';
-        let response = await safebrowsing.lookupUrl(testUrlOne);
+        let response = await SafebrowsingApi.lookupUrl(testUrlOne);
 
         expect(!response).toBeTruthy();
         expect(counter).toBe(1);
@@ -75,7 +77,7 @@ describe('safebrowsing', () => {
 
         hashesChecked = [];
 
-        response = await safebrowsing.lookupUrl(testUrlTwo);
+        response = await SafebrowsingApi.lookupUrl(testUrlTwo);
         expect(!response).toBeTruthy();
         // One new hash added
         expect(counter).toBe(2);
@@ -84,7 +86,7 @@ describe('safebrowsing', () => {
 
         hashesChecked = [];
 
-        response = await safebrowsing.lookupUrl(testUrlThree);
+        response = await SafebrowsingApi.lookupUrl(testUrlThree);
         expect(!response).toBeTruthy();
         // All hashes have been checked already - so there was no request to backend
         expect(counter).toBe(2);
@@ -103,7 +105,7 @@ describe('safebrowsing', () => {
             });
         });
 
-        await safebrowsing.lookupUrl('https://example.org');
+        await SafebrowsingApi.lookupUrl('https://example.org');
 
         // eslint-disable-next-line max-len
         expect(logSpy).toHaveBeenCalledWith(
@@ -119,7 +121,7 @@ describe('safebrowsing', () => {
             }) as unknown as Promise<ExtensionXMLHttpRequest>;
         });
 
-        await safebrowsing.lookupUrl('https://example.com');
+        await SafebrowsingApi.lookupUrl('https://example.com');
 
         expect(logSpy).toHaveBeenCalledWith(
             'Error response status {0} received from safebrowsing lookup server.',
@@ -132,7 +134,7 @@ describe('safebrowsing', () => {
             return Promise.resolve() as unknown as Promise<ExtensionXMLHttpRequest>;
         });
 
-        await safebrowsing.lookupUrl('https://npmjs.com');
+        await SafebrowsingApi.lookupUrl('https://npmjs.com');
 
         expect(logSpy).toHaveBeenCalledWith('Can`t read response from the server');
     });

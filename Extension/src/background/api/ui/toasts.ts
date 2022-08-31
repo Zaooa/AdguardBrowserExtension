@@ -6,6 +6,7 @@ import { translator } from '../../../common/translators/translator';
 import { TabsApi } from '../extension';
 import { UiApi } from './main';
 import { CommonFilterMetadata } from '../../storages';
+import { notifications } from '../../utils/notifications';
 
 export class Toasts {
     private static maxTries = 500; // 2500 sec
@@ -68,35 +69,31 @@ export class Toasts {
         previousVersion: string,
         triesCount = 1,
     ) {
-        /* TODO: notification
         const promoNotification = notifications.getCurrentNotification();
         if (!promoNotification
-            && browserUtils.getMajorVersionNumber(
-                currentVersion
-            ) === browserUtils.getMajorVersionNumber(previousVersion)
-            && browserUtils.getMinorVersionNumber(
-                currentVersion
-            ) === browserUtils.getMinorVersionNumber(previousVersion)
+            && BrowserUtils.getMajorVersionNumber(
+                currentVersion,
+            ) === BrowserUtils.getMajorVersionNumber(previousVersion)
+            && BrowserUtils.getMinorVersionNumber(
+                currentVersion,
+            ) === BrowserUtils.getMinorVersionNumber(previousVersion)
         ) {
             // In case of no promo available or versions equivalence
             return;
         }
-        */
 
-        const offer = translator.getMessage('options_popup_version_update_offer');
-        const offerDesc = '';
+        let offer = translator.getMessage('options_popup_version_update_offer');
+        let offerDesc = '';
         // eslint-disable-next-line max-len
-        const offerButtonHref = 'https://link.adtidy.org/forward.html?action=learn_about_adguard&from=version_popup&app=browser_extension';
-        const offerButtonText = translator.getMessage('options_popup_version_update_offer_button_text');
+        let offerButtonHref = 'https://link.adtidy.org/forward.html?action=learn_about_adguard&from=version_popup&app=browser_extension';
+        let offerButtonText = translator.getMessage('options_popup_version_update_offer_button_text');
 
-        /*
-        if (promoNotification) {
+        if (promoNotification && typeof promoNotification.text !== 'string') {
             offer = promoNotification.text.title;
             offerDesc = promoNotification.text.desc;
             offerButtonText = promoNotification.text.btn;
             offerButtonHref = `${promoNotification.url}&from=version_popup`;
         }
-        */
 
         const message = {
             type: 'show-version-updated-popup',
@@ -108,7 +105,7 @@ export class Toasts {
             // eslint-disable-next-line max-len
             changelogHref: 'https://link.adtidy.org/forward.html?action=github_version_popup&from=version_popup&app=browser_extension',
             changelogText: translator.getMessage('options_popup_version_update_changelog_text'),
-            showPromoNotification: false, // !!promoNotification, TODO
+            showPromoNotification: !!promoNotification,
             offer,
             offerDesc,
             offerButtonText,

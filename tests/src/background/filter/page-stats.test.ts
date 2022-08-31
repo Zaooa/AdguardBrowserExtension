@@ -17,6 +17,7 @@ class MockStorage implements StorageInterface {
     }
 }
 
+// TODO: fix;
 jest.mock('../../../../Extension/src/background/storages/main', () => {
     return {
         __esModule: true,
