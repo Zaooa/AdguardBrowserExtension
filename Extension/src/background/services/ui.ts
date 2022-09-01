@@ -388,9 +388,7 @@ export class UiService {
                 badge = notification.badgeText || badge;
                 badgeColor = notification.badgeBgColor || badgeColor;
 
-                const hasSpecialIcons = !!notification.icons;
-
-                if (hasSpecialIcons) {
+                if (notification.icons) {
                     if (disabled) {
                         icon = notification.icons.ICON_GRAY;
                     } else {

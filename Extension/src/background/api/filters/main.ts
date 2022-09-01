@@ -24,7 +24,7 @@ import { UserRulesApi } from './userrules';
 import { AllowlistApi } from './allowlist';
 import { CommonFilterApi } from './common';
 import { CustomFilterApi } from './custom';
-import { pageStats } from './page-stats';
+import { PageStatsApi } from './page-stats';
 
 export type FilterMetadata = CommonFilterMetadata | CustomFilterMetadata;
 
@@ -41,7 +41,7 @@ export class FiltersApi {
         await FiltersApi.initI18nMetadata();
         await FiltersApi.initMetadata();
 
-        pageStats.init();
+        PageStatsApi.init();
         CustomFilterApi.init();
         AllowlistApi.init();
         await UserRulesApi.init();

@@ -16,7 +16,7 @@ import { AntiBannerFiltersId } from '../../common/constants';
 import { UserAgent } from '../../common/user-agent';
 import { Engine } from '../engine';
 import { settingsStorage } from '../storages';
-import { pageStats, SettingsApi } from '../api';
+import { PageStatsApi, SettingsApi } from '../api';
 
 import { UiService } from './ui';
 import { notifications } from '../utils/notifications';
@@ -37,7 +37,7 @@ export class PopupService {
 
         return {
             frameInfo: PopupService.getMainFrameInfo(tabId),
-            stats: pageStats.getStatisticsData(),
+            stats: PageStatsApi.getStatisticsData(),
             settings: SettingsApi.getData(),
             options: {
                 showStatsSupported: true,
@@ -57,8 +57,8 @@ export class PopupService {
 
         const blockedCountIncrement = 1;
 
-        pageStats.updateStats(rule.getFilterListId(), blockedCountIncrement, new Date());
-        pageStats.updateTotalBlocked(blockedCountIncrement);
+        PageStatsApi.updateStats(rule.getFilterListId(), blockedCountIncrement);
+        PageStatsApi.incrementTotalBlocked(blockedCountIncrement);
         UiService.debounceUpdateTabIcon(tabId);
     }
 
@@ -95,11 +95,11 @@ export class PopupService {
         let documentAllowlisted = false;
         let userAllowlisted = false;
         let canAddRemoveRule = false;
-        let frameRule;
+        let frameRule: { filterId: number, ruleText: string } | undefined;
 
         const adguardProductName = '';
 
-        const totalBlocked = pageStats.getTotalBlocked();
+        const totalBlocked = PageStatsApi.getTotalBlocked();
 
         const totalBlockedTab = blockedRequestCount || 0;
         const applicationFilteringDisabled = settingsStorage.get(SettingOption.DISABLE_FILTERING);
