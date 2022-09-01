@@ -21,6 +21,7 @@ import {
     eventService,
     safebrowsingService,
     localeDetect,
+    NotificationService,
 } from './services';
 
 export class App {
@@ -44,7 +45,7 @@ export class App {
         browser.runtime.onInstalled.addListener(this.onInstall);
 
         await SettingsApi.init();
-
+        NotificationService.init();
         await SettingsService.init();
         await FiltersService.init();
         await CustomFilterService.init();

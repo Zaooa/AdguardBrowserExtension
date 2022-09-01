@@ -6,7 +6,7 @@ import { translator } from '../../../common/translators/translator';
 import { TabsApi } from '../extension';
 import { UiApi } from './main';
 import { CommonFilterMetadata } from '../../storages';
-import { notifications } from '../../utils/notifications';
+import { notificationApi } from './notification';
 
 export class Toasts {
     private static maxTries = 500; // 2500 sec
@@ -69,7 +69,7 @@ export class Toasts {
         previousVersion: string,
         triesCount = 1,
     ) {
-        const promoNotification = notifications.getCurrentNotification();
+        const promoNotification = notificationApi.getCurrentNotification();
         if (!promoNotification
             && BrowserUtils.getMajorVersionNumber(
                 currentVersion,

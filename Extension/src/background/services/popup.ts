@@ -16,10 +16,9 @@ import { AntiBannerFiltersId } from '../../common/constants';
 import { UserAgent } from '../../common/user-agent';
 import { Engine } from '../engine';
 import { settingsStorage } from '../storages';
-import { PageStatsApi, SettingsApi } from '../api';
+import { PageStatsApi, SettingsApi, notificationApi } from '../api';
 
 import { UiService } from './ui';
-import { notifications } from '../utils/notifications';
 
 export class PopupService {
     static init() {
@@ -45,7 +44,7 @@ export class PopupService {
                 showInfoAboutFullVersion: !settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 isMacOs: UserAgent.isMacOs,
                 isEdgeBrowser: UserAgent.isEdge || UserAgent.isEdgeChromium,
-                notification: notifications.getCurrentNotification(),
+                notification: notificationApi.getCurrentNotification(),
                 isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 hasCustomRulesToReset: false, // TODO,
             },

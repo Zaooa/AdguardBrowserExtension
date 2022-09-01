@@ -9,7 +9,6 @@ import { Engine } from '../engine';
 import { UrlUtils } from '../utils/url';
 import { settingsStorage } from '../storages';
 import { SettingOption } from '../../common/settings';
-import { notifications } from '../utils/notifications';
 import { BrowserUtils } from '../utils/browser-utils';
 import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
 import { listeners } from '../notifier';
@@ -19,6 +18,7 @@ import {
     TabsApi,
     getIconImageData,
     SettingsApi,
+    notificationApi,
 } from '../api';
 
 // TODO: decompose
@@ -383,7 +383,7 @@ export class UiService {
             }
 
             // If there's an active notification, indicate it on the badge
-            const notification = notifications.getCurrentNotification();
+            const notification = notificationApi.getCurrentNotification();
             if (notification) {
                 badge = notification.badgeText || badge;
                 badgeColor = notification.badgeBgColor || badgeColor;
