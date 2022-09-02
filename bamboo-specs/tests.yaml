@@ -35,16 +35,14 @@ Test:
 
             yarn install ${bamboo.varsYarn}
             yarn lint
-            #TODO: test refactoring
-            #yarn test
+            yarn test
             yarn dev
             rm -rf node_modules
   artifacts:
-    # TODO: tswebextension integration
-    # - name: adguard-api.zip
-    #   location: build/dev
-    #   pattern: adguard-api.zip
-    #   required: true
+    - name: adguard-api.zip
+       location: build/dev
+       pattern: adguard-api.zip
+       required: true
     - name: build.txt
       location: build/dev
       pattern: build.txt

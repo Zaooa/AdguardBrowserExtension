@@ -54,8 +54,7 @@ const devPlan = [
     bundleFirefoxStandalone,
     bundleEdge,
     bundleOpera,
-    // TODO: tswebextension integration
-    // bundleAdguardApi,
+    bundleAdguardApi,
     buildInfo,
 ];
 
@@ -66,8 +65,7 @@ const betaPlan = [
     bundleFirefoxStandalone,
     bundleFirefoxXpi,
     bundleEdge,
-    // TODO: tswebextension integration
-    // bundleAdguardApi,
+    bundleAdguardApi,
     buildInfo,
 ];
 
