@@ -5,6 +5,12 @@ import { isHttpRequest, tabsApi } from '@adguard/tswebextension';
 import { messageHandler } from '../message-handler';
 import { MessageType, OpenAbuseTabMessage, OpenSiteReportTabMessage } from '../../common/messages';
 import { UserAgent } from '../../common/user-agent';
+import {
+    Forward,
+    ForwardAction,
+    ForwardFrom,
+    ForwardParams,
+} from '../../common/forward';
 import { Engine } from '../engine';
 import { UrlUtils } from '../utils/url';
 import { settingsStorage } from '../storages';
@@ -12,6 +18,7 @@ import { SettingOption } from '../../common/settings';
 import { BrowserUtils } from '../utils/browser-utils';
 import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
 import { listeners } from '../notifier';
+
 import {
     toasts,
     FiltersApi,
@@ -31,9 +38,15 @@ export class UiService {
 
     static filtersDownloadPageUrl = UiService.getExtensionPageUrl('filter-download.html');
 
-    static thankYouPageUrl = 'https://welcome.adguard.com/v2/thankyou.html';
+    static thankYouPageUrl = Forward.get({
+        action: ForwardAction.THANK_YOU,
+        from: ForwardFrom.BACKGROUND,
+    });
 
-    static comparePageUrl = 'https://adguard.com/forward.html?action=compare&from=options_screen&app=browser_extension';
+    static comparePageUrl = Forward.get({
+        action: ForwardAction.COMPARE,
+        from: ForwardFrom.OPTIONS,
+    });
 
     static extensionStoreUrl = UiService.getExtensionStoreUrl();
 
@@ -100,7 +113,7 @@ export class UiService {
     }
 
     static async openAbuseTab({ data }: OpenAbuseTabMessage): Promise<void> {
-        const { url } = data;
+        const { url, from } = data;
 
         let { browserName } = UserAgent;
         let browserDetails: string | undefined;
@@ -112,15 +125,33 @@ export class UiService {
 
         const filterIds = Engine.api.configuration.filters;
 
+        const params: ForwardParams = {
+            action: ForwardAction.REPORT,
+            from,
+            product_type: 'Ext',
+            product_version: encodeURIComponent(browser.runtime.getManifest().version),
+            browser: encodeURIComponent(browserName),
+            url: encodeURIComponent(url),
+        };
+
+        if (browserDetails) {
+            params.browser_detail = encodeURIComponent(browserDetails);
+        }
+
+        if (filterIds.length > 0) {
+            params.filters = encodeURIComponent(filterIds.join('.'));
+        }
+
+        Object.assign(
+            params,
+            UiService.getStealthParams(filterIds),
+            UiService.getBrowserSecurityParams(),
+        );
+
+        const reportUrl = Forward.get(params);
+
         await browser.tabs.create({
-            url: `https://reports.adguard.com/new_issue.html?product_type=Ext&product_version=${
-                encodeURIComponent(browser.runtime.getManifest().version)
-            }&browser=${encodeURIComponent(browserName)
-            }${browserDetails ? `&browser_detail=${encodeURIComponent(browserDetails)}` : ''
-            }&url=${encodeURIComponent(url)
-            }${filterIds.length > 0 ? `&filters=${encodeURIComponent(filterIds.join('.'))}` : ''
-            }${UiService.getStealthString(filterIds)
-            }${UiService.getBrowserSecurityString()}`,
+            url: reportUrl,
         });
     }
 
@@ -136,8 +167,11 @@ export class UiService {
         const punycodeDomain = UrlUtils.toPunyCode(domain);
 
         await browser.tabs.create({
-            // eslint-disable-next-line max-len
-            url: `https://adguard.com/site.html?domain=${encodeURIComponent(punycodeDomain)}&utm_source=extension&aid=16593`,
+            url: Forward.get({
+                action: ForwardAction.SITE_REPORT,
+                from: ForwardFrom.CONTEXT_MENU,
+                domain: encodeURIComponent(punycodeDomain),
+            }),
         });
     }
 
@@ -233,94 +267,97 @@ export class UiService {
         return `${UiService.baseUrl}pages/${path}`;
     }
 
-    static getBrowserSecurityString(): string {
+    static getBrowserSecurityParams(): { [key: string]: string } {
         const isEnabled = !settingsStorage.get(SettingOption.DISABLE_SAFEBROWSING);
-        return `&browsing_security.enabled=${isEnabled}`;
+        return { 'browsing_security.enabled': String(isEnabled) };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static getStealthString(filterIds: number[]): string {
+    static getStealthParams(filterIds: number[]): { [key: string]: string } {
         const stealthEnabled = !settingsStorage.get(SettingOption.DISABLE_STEALTH_MODE);
 
         if (!stealthEnabled) {
-            return '&stealth.enabled=false';
+            return { 'stealth.enabled': 'false' };
         }
+
         const stealthOptions = [
             {
-                queryKey: 'ext_hide_referrer',
+                queryKey: 'stealth.ext_hide_referrer',
                 settingKey: SettingOption.HIDE_REFERRER,
             },
             {
-                queryKey: 'hide_search_queries',
+                queryKey: 'stealth.hide_search_queries',
                 settingKey: SettingOption.HIDE_SEARCH_QUERIES,
             },
             {
-                queryKey: 'DNT',
+                queryKey: 'stealth.DNT',
                 settingKey: SettingOption.SEND_DO_NOT_TRACK,
             },
             {
-                queryKey: 'x_client',
+                queryKey: 'stealth.x_client',
                 settingKey: SettingOption.BLOCK_CHROME_CLIENT_DATA,
             },
             {
-                queryKey: 'webrtc',
+                queryKey: 'stealth.webrtc',
                 settingKey: SettingOption.BLOCK_WEBRTC,
             },
             {
-                queryKey: 'third_party_cookies',
+                queryKey: 'stealth.third_party_cookies',
                 settingKey: SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES,
                 settingValueKey: SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME,
             },
             {
-                queryKey: 'first_party_cookies',
+                queryKey: 'stealth.first_party_cookies',
                 settingKey: SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES,
                 settingValueKey: SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME,
             },
         ];
 
-        const stealthOptionsString = stealthOptions.map((option) => {
-            const { queryKey, settingKey, settingValueKey } = option;
+        const stealthOptionsEntries = [['stealth.enabled', 'true']];
+
+        for (let i = 0; i < stealthOptions.length; i += 1) {
+            const { queryKey, settingKey, settingValueKey } = stealthOptions[i];
+
             const setting = settingsStorage.get(settingKey);
-            let settingString: string;
+
             if (!setting) {
-                return '';
+                continue;
             }
+
+            let option: string;
+
             if (!settingValueKey) {
-                settingString = setting.toString();
+                option = String(setting);
             } else {
-                settingString = settingsStorage.get(settingValueKey).toString();
+                option = String(settingsStorage.get(settingValueKey));
             }
-            return `stealth.${queryKey}=${encodeURIComponent(settingString)}`;
-        })
-            .filter(string => string.length > 0)
-            .join('&');
 
-        // TODO: implement when filters service will be created)
-        // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1937
-        /*
-        const isRemoveUrlParamsEnabled = filterIds.includes(AntiBannerFiltersId.URL_TRACKING_FILTER_ID);
-        if (isRemoveUrlParamsEnabled) {
-            stealthOptionsString = `${stealthOptionsString}&stealth.strip_url=true`;
+            stealthOptionsEntries.push([queryKey, option]);
         }
-        */
 
-        return `&stealth.enabled=true&${stealthOptionsString}`;
+        const isRemoveUrlParamsEnabled = filterIds.includes(AntiBannerFiltersId.URL_TRACKING_FILTER_ID);
+
+        if (isRemoveUrlParamsEnabled) {
+            stealthOptionsEntries.push(['stealth.strip_url', 'true']);
+        }
+
+        return Object.fromEntries(stealthOptionsEntries);
     }
 
     static getExtensionStoreUrl() {
-        let browserName = 'chrome';
+        let action = ForwardAction.CHROME_STORE;
 
         if (UserAgent.isOpera) {
-            browserName = 'opera';
+            action = ForwardAction.OPERA_STORE;
         } else if (UserAgent.isFirefox) {
-            browserName = 'firefox';
+            action = ForwardAction.FIREFOX_STORE;
         } else if (UserAgent.isEdge) {
-            browserName = 'edge';
+            action = ForwardAction.EDGE_STORE;
         }
 
-        const action = `${browserName}_store`;
-
-        return `https://adguard.com/forward.html?action=${action}&from=options_screen&app=browser_extension`;
+        return Forward.get({
+            action,
+            from: ForwardFrom.OPTIONS,
+        });
     }
 
     static debounceUpdateTabIcon(tabId: number) {

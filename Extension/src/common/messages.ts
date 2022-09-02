@@ -1,3 +1,4 @@
+import { ForwardFrom } from './forward';
 import { SettingOption, Settings } from './settings';
 
 /**
@@ -112,6 +113,7 @@ export type OpenAbuseTabMessage = {
   type: MessageType.OPEN_ABUSE_TAB;
   data: {
     url: string;
+    from: ForwardFrom;
   };
 };
 

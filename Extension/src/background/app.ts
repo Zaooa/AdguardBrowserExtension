@@ -23,14 +23,21 @@ import {
     localeDetect,
     NotificationService,
 } from './services';
+import {
+    Forward,
+    ForwardAction,
+    ForwardFrom,
+} from '../common/forward';
 
 export class App {
     private isFirstInstall = false;
 
     private isUpdated = false;
 
-    // eslint-disable-next-line max-len
-    static uninstallUrl = 'https://adguard.com/forward.html?action=adguard_uninstal_ext&from=background&app=browser_extension';
+    static uninstallUrl = Forward.get({
+        action: ForwardAction.UNINSTALL_EXTENSION,
+        from: ForwardFrom.BACKGROUND,
+    });
 
     constructor() {
         this.onInstall = this.onInstall.bind(this);

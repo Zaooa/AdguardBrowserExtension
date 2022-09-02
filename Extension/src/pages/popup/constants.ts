@@ -1,3 +1,20 @@
+import { Forward, ForwardAction, ForwardFrom } from '../../common/forward';
+
+export const IOS_URL = Forward.get({
+    action: ForwardAction.IOS,
+    from: ForwardFrom.POPUP,
+});
+
+export const ANDROID_URL = Forward.get({
+    action: ForwardAction.ANDROID,
+    from: ForwardFrom.POPUP,
+});
+
+export const COMPARE_URL = Forward.get({
+    action: ForwardAction.COMPARE,
+    from: ForwardFrom.POPUP,
+});
+
 export const VIEW_STATES = {
     ACTIONS: 'actions',
     STATS: 'stats',

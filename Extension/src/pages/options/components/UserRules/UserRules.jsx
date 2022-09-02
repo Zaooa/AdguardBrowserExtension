@@ -8,7 +8,7 @@ import { MessageType } from '../../../../common/constants';
 import { rootStore } from '../../stores/RootStore';
 import { messenger } from '../../../services/messenger';
 import { UserRulesSwitcher } from './UserRulesSwitcher';
-import { HOW_TO_CREATE_RULES_URL } from '../../../constants';
+import { HOW_TO_CREATE_RULES_URL } from '../../constants';
 
 import './styles.pcss';
 

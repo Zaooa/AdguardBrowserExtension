@@ -9,11 +9,17 @@ import { rootStore } from '../../stores/RootStore';
 import { messenger } from '../../../services/messenger';
 import { hoursToMs, handleFileUpload } from '../../../helpers';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
+
+import {
+    ACCEPTABLE_ADS_LEARN_MORE_URL,
+    SAFEBROWSING_LEARN_MORE_URL,
+    GITHUB_URL,
+} from '../../constants';
+
 import { exportData, ExportTypes } from '../../../common/utils/export';
 import { UserAgent } from '../../../../common/user-agent';
 import {
     APPEARANCE_THEMES,
-    GITHUB_URL,
     BROWSER_ADDON_STORE_LINKS,
 } from '../../../constants';
 
@@ -127,12 +133,6 @@ const General = observer(() => {
         DISABLE_SAFEBROWSING,
         APPEARANCE_THEME,
     } = settings.names;
-
-    // eslint-disable-next-line max-len
-    const ACCEPTABLE_ADS_LEARN_MORE_URL = 'https://link.adtidy.org/forward.html?action=self_promotion&from=options_screen&app=browser_extension';
-
-    // eslint-disable-next-line max-len
-    const SAFEBROWSING_LEARN_MORE_URL = 'https://link.adtidy.org/forward.html?action=protection_works&from=options_screen&app=browser_extension';
 
     return (
         <>

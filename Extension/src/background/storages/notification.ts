@@ -1,4 +1,5 @@
 import browser from 'webextension-polyfill';
+import { Forward, ForwardAction, ForwardApp } from '../../common/forward';
 
 export type NotificationText = {
      title: string,
@@ -115,7 +116,10 @@ export const backToSchool22Notification: Notification = {
         },
     },
     text: '',
-    url: 'https://link.adtidy.org/forward.html?action=back_to_school_22&app=browser_extension',
+    url: Forward.get({
+        action: ForwardAction.BACK_TO_SCHOOL,
+        app: ForwardApp.BROWSER_EXTENSION,
+    }),
     from: '30 August 2022 12:00:00',
     to: '4 September 2022 23:59:00',
     type: 'animated',

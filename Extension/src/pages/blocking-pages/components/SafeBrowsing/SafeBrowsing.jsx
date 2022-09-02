@@ -2,12 +2,18 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useCallback, useState } from 'react';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
+import { Forward, ForwardAction, ForwardFrom } from '../../../../common/forward';
 
 import { MessageType } from '../../../../common/constants';
 import { getParams } from '../../getParams';
 import { messenger } from '../../../services/messenger';
 
 import '../../styles/index.pcss';
+
+const ADGUARD_SITE_URL = Forward.get({
+    action: ForwardAction.ADGUARD_SITE,
+    from: ForwardFrom.SAFEBROWSING,
+});
 
 export const SafeBrowsing = () => {
     const [advanced, setAdvanced] = useState(false);
@@ -29,6 +35,12 @@ export const SafeBrowsing = () => {
         messenger.sendMessage(MessageType.OPEN_SAFEBROWSING_TRUSTED, { url });
     }, [url]);
 
+    const reportUrl = Forward.get({
+        action: ForwardAction.SITE_REPORT,
+        from: ForwardFrom.SAFEBROWSING,
+        domain: host,
+    });
+
     return (
         <div className="alert alert--red" id="app">
             <div className="alert__in">
@@ -38,7 +50,7 @@ export const SafeBrowsing = () => {
                     </div>
                 </div>
                 <div className="alert__body">
-                    <a href="https://link.adtidy.org/forward.html?action=adguard_site&from=safebrowsing&app=browser_extension" className="alert__logo" />
+                    <a href={ADGUARD_SITE_URL} className="alert__logo" />
                     <div className="hero hero--red" />
                     <div className="alert__body-title">
                         {malware === 'true' ? ( // query param is string
@@ -67,7 +79,7 @@ export const SafeBrowsing = () => {
                         {advanced ? (
                             <>
                                 <a
-                                    href={`https://link.adtidy.org/forward.html?action=site_report_page&domain=${host}&from=safebrowsing&app=browser_extension`}
+                                    href={reportUrl}
                                     className="button button--white alert__btn"
                                 >
                                     {reactTranslator.getMessage('blocking_pages_more_info_button')}

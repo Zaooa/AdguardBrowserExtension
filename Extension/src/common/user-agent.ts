@@ -98,7 +98,7 @@ export class UserAgent {
      */
     static getBrowserVersion(browserName: string): number | null {
         let brand: string;
-        let uaStringMask: RegExp;
+        let uaStringMask: RegExp | undefined;
 
         if (browserName === 'Chrome') {
             brand = 'Google Chrome';

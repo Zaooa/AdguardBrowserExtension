@@ -10,6 +10,7 @@ import { userRulesEditorStore } from '../../../common/components/UserRulesEditor
 import { log } from '../../../../common/log';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { ConfirmModal } from '../../../common/components/ConfirmModal';
+import { COLLECT_HITS_LEARN_MORE_URL } from '../../constants';
 
 const Miscellaneous = observer(() => {
     const {
@@ -27,9 +28,6 @@ const Miscellaneous = observer(() => {
     if (!settings) {
         return null;
     }
-
-    // eslint-disable-next-line max-len
-    const COLLECT_HITS_LEARN_MORE_URL = 'https://link.adtidy.org/forward.html?action=filter_rules&from=options_screen&app=browser_extension';
 
     const settingChangeHandler = async ({ id, data }) => {
         log.info(`Setting ${id} set to ${data}`);
