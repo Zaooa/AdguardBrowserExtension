@@ -1,51 +1,38 @@
-import browser from 'webextension-polyfill';
-import { RequestEvents } from '@adguard/tswebextension';
+import browser, { WebRequest } from 'webextension-polyfill';
+import { RequestType } from '@adguard/tsurlfilter';
+import { RequestData, RequestEvents } from '@adguard/tswebextension';
 import { SafebrowsingApi } from '../api/safebrowsing';
 import { SettingsService } from './settings';
 import { SettingOption } from '../../common/settings';
 
 export class SafebrowsingService {
-    constructor() {
-        this.onHeaderReceived = this.onHeaderReceived.bind(this);
-    }
-
-    init() {
-        SafebrowsingApi.init();
+    static init() {
+        SafebrowsingApi.initCache();
 
         SettingsService.onSettingChange.addListener(
             SettingOption.DISABLE_SAFEBROWSING,
             SafebrowsingApi.clearCache,
         );
-        RequestEvents.onHeadersReceived.addListener(this.onHeaderReceived);
+
+        RequestEvents.onHeadersReceived.addListener(SafebrowsingService.onHeaderReceived);
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    onHeaderReceived({ details }) {
+    private static onHeaderReceived({ context }: RequestData<WebRequest.OnHeadersReceivedDetailsType>) {
         const {
-            type,
+            requestType,
             statusCode,
-            url,
+            requestUrl,
+            referrerUrl,
             tabId,
-            originUrl,
-        } = details;
+        } = context;
 
-        if (type === 'main_frame' && statusCode !== 301 && statusCode !== 302) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            this.filterUrl(tabId, url, originUrl);
+        if (requestType === RequestType.Document && statusCode !== 301 && statusCode !== 302) {
+            SafebrowsingApi
+                .checkSafebrowsingFilter(requestUrl, referrerUrl)
+                .then((safebrowsingUrl) => {
+                    browser.tabs.update(tabId, { url: safebrowsingUrl });
+                })
+                .catch(() => {});
         }
-    }
-
-    // eslint-disable-next-line class-methods-use-this
-    async filterUrl(tabId: number, url: string, originUrl: string) {
-        const safebrowsingUrl = await SafebrowsingApi.checkSafebrowsingFilter(url, originUrl);
-
-        if (!safebrowsingUrl) {
-            return;
-        }
-
-        await browser.tabs.update(tabId, { url: safebrowsingUrl });
     }
 }
-
-export const safebrowsingService = new SafebrowsingService();

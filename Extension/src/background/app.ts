@@ -24,7 +24,7 @@ import {
     CustomFilterService,
     FilteringLogService,
     eventService,
-    safebrowsingService,
+    SafebrowsingService,
     localeDetect,
     NotificationService,
 } from './services';
@@ -68,7 +68,7 @@ export class App {
         PopupService.init();
         localeDetect.init();
         eventService.init();
-        safebrowsingService.init();
+        SafebrowsingService.init();
         await App.setUninstallUrl();
 
         if (this.isFirstInstall) {

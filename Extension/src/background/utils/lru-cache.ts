@@ -19,69 +19,60 @@ import { LRUMap } from 'lru_map';
 import { StorageInterface } from '../../common/storage';
 
 /**
- * Cache with maxCacheSize stored in local storage,
+ * LRU map stored in local storage,
  * which automatically clears less recently used entries
  */
-export class LruCache<StorageKey, Key, Value> {
+export class LruCache<StorageKey, Key, Value> extends LRUMap<Key, Value> {
     protected key: StorageKey;
 
     protected storage: StorageInterface<StorageKey, string>;
 
-    protected maxCacheSize: number;
-
-    protected cacheSize: number;
-
-    protected cache: LRUMap<Key, Value>;
-
     constructor(
         key: StorageKey,
         storage: StorageInterface<StorageKey, string>,
-        maxCacheSize = 1000,
+        limit = 1000,
     ) {
+        super(limit);
+
         this.key = key;
         this.storage = storage;
-        this.maxCacheSize = maxCacheSize;
     }
 
     public init() {
         const storageData = this.storage.get(this.key);
 
         if (!storageData) {
-            this.setCache(null);
+            return;
         }
 
         try {
             const entries = JSON.parse(storageData);
-            this.setCache(entries);
+            this.assign(entries);
         } catch (e) {
-            this.setCache(null);
+            // do nothing
         }
     }
 
-    public setCache(data: Iterable<[Key, Value]>): void {
-        this.cache = new LRUMap(this.maxCacheSize, data);
-        this.cacheSize = this.cache.size;
+    public save(): void {
+        this.storage.set(this.key, JSON.stringify(this.toJSON()));
     }
 
-    public saveCache() {
-        return this.storage.set(this.key, JSON.stringify(this.cache.toJSON()));
+    public get(key: Key): Value {
+        return super.get(key);
     }
 
-    public get(key: Key) {
-        return this.cache.get(key);
-    }
+    public set(key: Key, value: Value): LruCache<StorageKey, Key, Value> {
+        super.set(key, value);
 
-    public set(key: Key, value: Value) {
-        this.cache.set(key, value);
-        this.cacheSize += 1;
-
-        if (this.cacheSize % 20 === 0) {
-            return this.saveCache();
+        if (this.size % 20 === 0) {
+            this.save();
         }
+
+        return this;
     }
 
-    public clear() {
-        this.setCache(null);
-        return this.saveCache();
+    public clear(): void {
+        this.clear();
+        this.save();
     }
 }
