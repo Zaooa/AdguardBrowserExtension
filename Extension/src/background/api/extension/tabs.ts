@@ -1,4 +1,19 @@
-import browser, { Tabs } from 'webextension-polyfill';
+import browser, { Tabs, Windows } from 'webextension-polyfill';
+import { Prefs } from '../../prefs';
+
+export type OpenTabProps = Tabs.CreateCreatePropertiesType & {
+    /**
+     * If tab with url is found, focus it instead create new one
+     */
+    focusIfHasAlreadyOpened?: boolean,
+};
+
+export type OpenWindowProps = Windows.CreateCreateDataType & {
+    /**
+     * If window with url is found, focus it instead create new one
+     */
+    focusIfHasAlreadyOpened?: boolean,
+};
 
 /**
  * Helper class for browser.tabs API
@@ -30,5 +45,55 @@ export class TabsApi {
             currentWindow: true,
             active: true,
         });
+    }
+
+    static async openTab({ focusIfHasAlreadyOpened, url, ...props }: OpenTabProps) {
+        if (focusIfHasAlreadyOpened) {
+            const tab = await TabsApi.findOne({ url });
+
+            if (tab && !tab.active) {
+                await TabsApi.focus(tab);
+                return;
+            }
+        }
+
+        await browser.tabs.create({
+            url,
+            ...props,
+        });
+    }
+
+    static async openWindow({ focusIfHasAlreadyOpened, url, ...props }: OpenWindowProps) {
+        if (focusIfHasAlreadyOpened) {
+            const tab = await TabsApi.findOne({ url });
+
+            if (tab && !tab.active) {
+                await TabsApi.focus(tab);
+                return;
+            }
+        }
+
+        await browser.windows.create({
+            url,
+            ...props,
+        });
+    }
+
+    public static isExtensionTab(tab: Tabs.Tab): boolean {
+        const { url } = tab;
+
+        if (!url) {
+            return false;
+        }
+
+        let urlProtocol: string;
+
+        try {
+            urlProtocol = new URL(url).protocol;
+        } catch (e) {
+            return false;
+        }
+
+        return urlProtocol.indexOf(Prefs.scheme) > -1;
     }
 }

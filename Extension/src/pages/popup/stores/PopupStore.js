@@ -313,7 +313,7 @@ class PopupStore {
             this.promoNotification = null;
         });
         await messenger.sendMessage(MessageType.SET_NOTIFICATION_VIEWED, { withDelay: false });
-        await messenger.sendMessage('openTab', { url });
+        await messenger.sendMessage(MessageType.OPEN_TAB, { url });
     };
 
     @action

@@ -23,7 +23,6 @@ export const enum ForwardAction {
     EDGE_STORE = 'edge_store',
     IOS = 'ios_about',
     ANDROID = 'android_about',
-    BACK_TO_SCHOOL = 'back_to_school',
 }
 
 export const enum ForwardFrom {

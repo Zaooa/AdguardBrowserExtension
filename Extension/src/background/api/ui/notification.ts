@@ -14,9 +14,9 @@ import { TabsApi } from '../extension';
 export class NotificationApi {
     private static checkTimeoutMs = 10 * 60 * 1000; // 10 minutes
 
-    private static minPeriod = 30 * 60 * 1000; // 30 minutes
+    private static minPeriodMs = 30 * 1000; // 30 minutes
 
-    private static delay = 30 * 1000; // clear notification in 30 seconds
+    private static delayMs = 30 * 1000; // clear notification in 30 seconds
 
     private currentNotification: Notification | null;
 
@@ -55,7 +55,7 @@ export class NotificationApi {
 
             this.timeoutId = window.setTimeout(() => {
                 this.setNotificationViewed(false);
-            }, NotificationApi.delay);
+            }, NotificationApi.delayMs);
             return;
         }
 
@@ -92,7 +92,7 @@ export class NotificationApi {
         const currentTime = Date.now();
         const timeSinceLastNotification = currentTime - NotificationApi.getLastNotificationTime();
 
-        if (timeSinceLastNotification < NotificationApi.minPeriod) {
+        if (timeSinceLastNotification < NotificationApi.minPeriodMs) {
         // Just a check to not show the notification too often
             return null;
         }

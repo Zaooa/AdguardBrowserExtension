@@ -4,7 +4,6 @@ import { BrowserUtils } from '../../utils/browser-utils';
 
 import { translator } from '../../../common/translators/translator';
 import { TabsApi } from '../extension';
-import { UiApi } from './main';
 import { CommonFilterMetadata } from '../../storages';
 import { notificationApi } from './notification';
 
@@ -35,7 +34,7 @@ export class Toasts {
             if (tab?.id) {
                 await browser.tabs.sendMessage(tab.id, {
                     type: 'show-alert-popup',
-                    isAdguardTab: UiApi.isExtensionTab(tab),
+                    isAdguardTab: TabsApi.isExtensionTab(tab),
                     title,
                     text,
                     alertStyles: this.styles,

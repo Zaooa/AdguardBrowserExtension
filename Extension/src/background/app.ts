@@ -8,7 +8,12 @@ import { SettingOption } from '../common/settings';
 import { messageHandler } from './message-handler';
 import { Engine } from './engine';
 import { settingsStorage } from './storages';
-import { SettingsApi, toasts, CommonFilterApi } from './api';
+import {
+    SettingsApi,
+    toasts,
+    CommonFilterApi,
+    PagesApi,
+} from './api';
 import {
     UiService,
     PopupService,
@@ -68,7 +73,7 @@ export class App {
 
         if (this.isFirstInstall) {
             messageHandler.addListener(MessageType.CHECK_REQUEST_FILTER_READY, App.onCheckRequestFilterReady);
-            await UiService.openFiltersDownloadPage();
+            await PagesApi.openFiltersDownloadPage();
             await CommonFilterApi.initDefaultFilters();
         }
 

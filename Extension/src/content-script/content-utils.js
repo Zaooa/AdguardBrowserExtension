@@ -18,6 +18,8 @@
 
 import { contentPage } from './content-script';
 import { MessageType } from '../common/constants';
+import { messenger } from '../pages/services/messenger';
+import { SettingOption } from '../common/settings';
 
 export const contentUtils = (function () {
     const MAX_Z_INDEX = '2147483647';
@@ -250,16 +252,14 @@ export const contentUtils = (function () {
                     element.addEventListener('click', () => {
                         if (element.classList.contains('disable-notifications')) {
                             // disable update notifications
-                            contentPage.sendMessage({
-                                type: MessageType.CHANGE_USER_SETTING,
-                                key: 'show-app-updated-disabled',
+                            messenger.sendMessage(MessageType.CHANGE_USER_SETTING, {
+                                key: SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION,
                                 value: true,
                             });
                         }
                         if (showPromoNotification
                             && element.classList.contains('set-notification-viewed')) {
-                            contentPage.sendMessage({
-                                type: 'setNotificationViewed',
+                            messenger.sendMessage(MessageType.SET_NOTIFICATION_VIEWED, {
                                 withDelay: false,
                             });
                         }
