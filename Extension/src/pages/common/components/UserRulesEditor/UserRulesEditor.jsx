@@ -391,7 +391,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                             fullscreen ? (
                                 <button
                                     type="button"
-                                    className="actions__btn actions__btn--icon"
+                                    className="button actions__btn actions__btn--icon"
                                     onClick={closeEditorFullscreen}
                                     aria-label={reactTranslator.getMessage('options_editor_close_fullscreen_button_tooltip')}
                                 >
@@ -400,7 +400,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                             ) : (
                                 <button
                                     type="button"
-                                    className="actions__btn actions__btn--icon"
+                                    className="button actions__btn actions__btn--icon"
                                     onClick={openEditorFullscreen}
                                     aria-label={reactTranslator.getMessage('options_editor_open_fullscreen_button_tooltip')}
                                 >
