@@ -34,7 +34,7 @@ export class Toasts {
             if (tab?.id) {
                 await browser.tabs.sendMessage(tab.id, {
                     type: 'show-alert-popup',
-                    isAdguardTab: TabsApi.isExtensionTab(tab),
+                    isAdguardTab: TabsApi.isAdguardExtensionTab(tab),
                     title,
                     text,
                     alertStyles: this.styles,

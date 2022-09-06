@@ -37,7 +37,7 @@ export class PagesApi {
 
     static async openSettingsPage(): Promise<void> {
         await TabsApi.openTab({
-            focusIfHasAlreadyOpened: true,
+            focusIfOpen: true,
             url: PagesApi.settingsUrl,
         });
     }
@@ -60,7 +60,7 @@ export class PagesApi {
         const url = PagesApi.filteringLogUrl + (activeTab.id ? `#${activeTab.id}` : '');
 
         await TabsApi.openWindow({
-            focusIfHasAlreadyOpened: true,
+            focusIfOpen: true,
             url,
             type: 'popup',
         });
@@ -184,7 +184,7 @@ export class PagesApi {
         path = PagesApi.getExtensionPageUrl(path);
 
         await TabsApi.openTab({
-            focusIfHasAlreadyOpened: true,
+            focusIfOpen: true,
             url: path,
         });
     }

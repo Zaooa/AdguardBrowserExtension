@@ -5,14 +5,14 @@ export type OpenTabProps = Tabs.CreateCreatePropertiesType & {
     /**
      * If tab with url is found, focus it instead create new one
      */
-    focusIfHasAlreadyOpened?: boolean,
+    focusIfOpen?: boolean,
 };
 
 export type OpenWindowProps = Windows.CreateCreateDataType & {
     /**
      * If window with url is found, focus it instead create new one
      */
-    focusIfHasAlreadyOpened?: boolean,
+    focusIfOpen?: boolean,
 };
 
 /**
@@ -47,8 +47,8 @@ export class TabsApi {
         });
     }
 
-    static async openTab({ focusIfHasAlreadyOpened, url, ...props }: OpenTabProps) {
-        if (focusIfHasAlreadyOpened) {
+    static async openTab({ focusIfOpen, url, ...props }: OpenTabProps) {
+        if (focusIfOpen) {
             const tab = await TabsApi.findOne({ url });
 
             if (tab && !tab.active) {
@@ -63,8 +63,8 @@ export class TabsApi {
         });
     }
 
-    static async openWindow({ focusIfHasAlreadyOpened, url, ...props }: OpenWindowProps) {
-        if (focusIfHasAlreadyOpened) {
+    static async openWindow({ focusIfOpen, url, ...props }: OpenWindowProps) {
+        if (focusIfOpen) {
             const tab = await TabsApi.findOne({ url });
 
             if (tab && !tab.active) {
@@ -79,21 +79,21 @@ export class TabsApi {
         });
     }
 
-    public static isExtensionTab(tab: Tabs.Tab): boolean {
+    public static isAdguardExtensionTab(tab: Tabs.Tab): boolean {
         const { url } = tab;
 
         if (!url) {
             return false;
         }
 
-        let urlProtocol: string;
-
         try {
-            urlProtocol = new URL(url).protocol;
+            const parsed = new URL(url);
+
+            const { protocol, hostname } = parsed;
+
+            return protocol.indexOf(Prefs.scheme) > -1 && hostname === Prefs.id;
         } catch (e) {
             return false;
         }
-
-        return urlProtocol.indexOf(Prefs.scheme) > -1;
     }
 }
