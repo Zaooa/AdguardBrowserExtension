@@ -73,6 +73,11 @@ export class App {
         const isFirstRun = isVersionChanged && !prevVersion;
         const isUpdate = isVersionChanged && prevVersion;
 
+        // TODO: settings chain migration
+        // if(isUpdate){
+        //    settings = Migration.updateSettings(prevVersion, currentVersion, settings)
+        // }
+
         /**
          * Set settings
          *
@@ -230,7 +235,7 @@ export class App {
         try {
             await browser.runtime.setUninstallURL(App.uninstallUrl);
         } catch (e) {
-            log.error(e);
+            log.error(`Can't set app uninstall url: ${e.message}`);
         }
     }
 }
