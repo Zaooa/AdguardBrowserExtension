@@ -15,7 +15,7 @@ import { fullscreenUserRulesEditor } from '../fullscreen-user-rules-editor';
 export class SettingsService {
     static onSettingChange = new SettingsEvents();
 
-    static async init() {
+    static init() {
         messageHandler.addListener(MessageType.GET_OPTIONS_DATA, SettingsService.getOptionsData);
         messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.reset);
         messageHandler.addListener(MessageType.CHANGE_USER_SETTING, SettingsService.changeUserSettings);
