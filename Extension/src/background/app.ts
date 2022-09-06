@@ -1,18 +1,20 @@
 /* eslint-disable no-console */
-import browser, { Runtime } from 'webextension-polyfill';
+import browser from 'webextension-polyfill';
 
 import { MessageType } from '../common/messages';
 import { log } from '../common/log';
-import { SettingOption } from '../common/settings';
+import {
+    ADGUARD_SETTINGS_KEY, defaultSettings, genClientId, SettingOption, Settings,
+} from '../common/settings';
 
 import { messageHandler } from './message-handler';
 import { Engine } from './engine';
-import { settingsStorage } from './storages';
+import { settingsStorage, storage } from './storages';
 import {
-    SettingsApi,
     toasts,
     CommonFilterApi,
     PagesApi,
+    FiltersApi,
 } from './api';
 import {
     UiService,
@@ -34,48 +36,66 @@ import {
     ForwardFrom,
 } from '../common/forward';
 
+import { Prefs } from './prefs';
+
 /**
  * App entry point
  */
 export class App {
-    private isFirstInstall = false;
-
-    private isUpdated = false;
-
     static uninstallUrl = Forward.get({
         action: ForwardAction.UNINSTALL_EXTENSION,
         from: ForwardFrom.BACKGROUND,
     });
 
-    constructor() {
-        this.onInstall = this.onInstall.bind(this);
-    }
-
     /**
      * Initializes all app services
      * and handle webextension API events for first install and update scenario
      */
-    async init() {
+    static async init() {
         /**
          * Initializes message handler as soon as possible to prevent connection errors from extension pages
          */
         messageHandler.init();
 
         /**
-         * Handles app start reason (first install or update)
-         * TODO: sync check
+         * Get persisted settings from browser.storage.local
          */
-        browser.runtime.onInstalled.addListener(this.onInstall);
+        const settings = await storage.get(ADGUARD_SETTINGS_KEY) as Partial<Settings | undefined>;
 
         /**
-         * Initializes App data:
-         *
-         * - Initializes setting storage. If some fields are not exist, sets default values
-         * - Loads app metadata on first initialization and caches it in nested storage
-         * - Initializes nested storages for userrules, allowlist, custom filters metadata and page-stats
-         * - Initializes nested storages for filters state, groups state and filters versions, based on app metadata
+         * Checks if app initialized first time or updated
          */
-        await SettingsApi.init();
+        const prevVersion = settings?.[SettingOption.APP_VERSION];
+        const currentVersion = Prefs.version;
+
+        const isVersionChanged = prevVersion !== currentVersion;
+
+        const isFirstRun = isVersionChanged && !prevVersion;
+        const isUpdate = isVersionChanged && prevVersion;
+
+        /**
+         * Set settings
+         *
+         * Use Object.assign to prevent setting fields mismatch,
+         * when partial data stored
+         *
+         * Force rewrite app data
+         */
+        settingsStorage.setSettings({
+            ...defaultSettings,
+            ...settings,
+            [SettingOption.APP_VERSION]: currentVersion,
+            [SettingOption.CLIENT_ID]: settings?.[SettingOption.CLIENT_ID] || genClientId(),
+        });
+
+        /**
+         * Initializes Filters data:
+         * - Loads app i18n metadata and caches it in i18n-metadata storage
+         * - Loads app metadata, apply localization from i18n-metadata storage and caches it in metadata storage
+         * - Initializes storages for userrules, allowlist, custom filters metadata and page-stats
+         * - Initializes storages for filters state, groups state and filters versions, based on app metadata
+         */
+        await FiltersApi.init();
 
         /**
          * Initializes app notifications:
@@ -153,7 +173,7 @@ export class App {
         /**
          * First install additional scenario
          */
-        if (this.isFirstInstall) {
+        if (isFirstRun) {
             /**
              * Adds engine status listener for filters-download page
              */
@@ -173,12 +193,7 @@ export class App {
         /**
          * Update additional scenario
          */
-        if (this.isUpdated) {
-            const prevVersion = settingsStorage.get(SettingOption.APP_VERSION);
-            const currentVersion = browser.runtime.getManifest().version;
-
-            settingsStorage.set(SettingOption.APP_VERSION, currentVersion);
-
+        if (isUpdate) {
             if (!settingsStorage.get(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION)) {
                 toasts.showApplicationUpdatedPopup(currentVersion, prevVersion);
             }
@@ -188,19 +203,6 @@ export class App {
          * Runs tswebextension
          */
         await Engine.start();
-    }
-
-    /**
-     * Handles install reason from browser.runtime.onInstalled
-     */
-    private async onInstall({ reason }: Runtime.OnInstalledDetailsType) {
-        if (reason === 'install') {
-            this.isFirstInstall = true;
-        }
-
-        if (reason === 'update') {
-            this.isUpdated = true;
-        }
     }
 
     /**

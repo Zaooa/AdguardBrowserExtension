@@ -3,7 +3,6 @@ import {
     SettingOption,
     AppearanceTheme,
     defaultSettings,
-    ADGUARD_SETTINGS_KEY,
     Settings,
 } from '../../common/settings';
 
@@ -29,7 +28,6 @@ import {
     filterStateStorage,
     groupStateStorage,
     settingsStorage,
-    storage,
 } from '../storages';
 
 import { UserRulesApi } from './filters/userrules';
@@ -43,18 +41,6 @@ import {
 import { AntiBannerFiltersId } from '../../common/constants';
 
 export class SettingsApi {
-    public static async init() {
-        const settings = await storage.get(ADGUARD_SETTINGS_KEY) as Partial<Settings>;
-
-        /**
-         * Use Object.assign to prevent setting fields mismatch,
-         * when partial data stored
-         */
-        settingsStorage.setSettings({ ...defaultSettings, ...settings });
-
-        await FiltersApi.init();
-    }
-
     public static set<T extends SettingOption>(key: T, value: Settings[T]): void {
         settingsStorage.set(key, value);
     }
@@ -93,10 +79,18 @@ export class SettingsApi {
     }
 
     public static async reset() {
+        const version = settingsStorage.get(SettingOption.APP_VERSION);
+
+        const clientId = settingsStorage.get(SettingOption.CLIENT_ID);
+
         await UserRulesApi.setUserRules([]);
 
         // Set settings store to defaults
-        settingsStorage.setSettings({ ...defaultSettings });
+        settingsStorage.setSettings({
+            ...defaultSettings,
+            [SettingOption.APP_VERSION]: version,
+            [SettingOption.CLIENT_ID]: clientId,
+        });
 
         // Re-init filters
         await FiltersApi.init();

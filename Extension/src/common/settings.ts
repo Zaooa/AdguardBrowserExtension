@@ -1,7 +1,7 @@
-import browser from 'webextension-polyfill';
 import { UserAgent } from './user-agent';
 
 export enum SettingOption {
+    // App data
     CLIENT_ID = 'clientId',
     APP_VERSION = 'app-version',
 
@@ -93,8 +93,6 @@ export const DEFAULT_ALLOWLIST = [];
 export const DEFAULT_INVERTED_ALLOWLIST = [];
 
 export type Settings = {
-    [SettingOption.CLIENT_ID]: string,
-    [SettingOption.APP_VERSION]: string,
     [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: boolean,
     [SettingOption.DISABLE_SAFEBROWSING]: boolean,
     [SettingOption.DISABLE_COLLECT_HITS]: boolean,
@@ -124,6 +122,9 @@ export type Settings = {
     [SettingOption.ALLOWLIST_DOMAINS]: string,
     [SettingOption.INVERTED_ALLOWLIST_DOMAINS]: string,
 
+    [SettingOption.CLIENT_ID]?: string,
+    [SettingOption.APP_VERSION]?: string,
+
     [SettingOption.FILTERS_STATE_PROP]?: string,
     [SettingOption.FILTERS_VERSION_PROP]?: string,
     [SettingOption.GROUPS_STATE_PROP]?: string,
@@ -146,7 +147,7 @@ function isPromoInfoDisabled(): boolean {
     return (!UserAgent.isWindows && !UserAgent.isMacOs) || UserAgent.isEdge;
 }
 
-function genClientId() {
+export function genClientId() {
     const result = [];
     const suffix = (Date.now()) % 1e8;
     const symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890';
@@ -158,8 +159,6 @@ function genClientId() {
 }
 
 export const defaultSettings: Settings = {
-    [SettingOption.CLIENT_ID]: genClientId(),
-    [SettingOption.APP_VERSION]: browser.runtime.getManifest().version,
     [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: isPromoInfoDisabled(),
     [SettingOption.DISABLE_SAFEBROWSING]: true,
     [SettingOption.DISABLE_COLLECT_HITS]: true,
